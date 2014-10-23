@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html ng-app="cuwyApp" ng-controller="drugsCtrl">
+<head>
+	<meta charset="utf-8" />
+	<title>{{siteMap.title}}</title>
+	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
+</head>
+<body>
+<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
+/ <span class="h1">{{siteMap.name}}</span>
+<hr/>
+<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<span class="navbar-right"> <a href="#"
+					data-ng-click="drugListOrArchive = false; seekPatient = ''">
+						Список ліків </a> | <a href="#"
+					data-ng-click="drugListOrArchive = true; seekPatient = ''">
+						Архів </a>
+				</span>
+			</div>
+		</div>
+		<div class="row">
+		<div class="col-xs-6">
+			<div class="input-group">
+				<span class="input-group-addon">Пошук:</span>
+				<input ng-model="seekDrug" type="text" class="form-control" 
+				placeholder="Медикамент пошук / запис" auto-focus=""
+				/>
+			</div>
+		</div>
+		<div class="col-xs-3">
+			<button type="button" ng-click="saveNewDrug()" class="btn btn-default">
+				<span class="glyphicon glyphicon-floppy-disk"></span>
+				Зберегти новий медикамент
+			</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-8">
+			<table width="100%">
+				<thead><tr><th>Nr</th><th>Медикамент</th></tr></thead>
+				<tbody data-ng-repeat="drug in drug1sList | filter: {DRUG_ARCHIVE:drugListOrArchive} | filter: seekDrug | limitTo : 12">
+					<tr>
+					<td>{{drug.DRUG_ID}}</td>
+					<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
+						<a href="drug.html?id={{drug.DRUG_ID}}">
+						{{drug.DRUG_NAME}}
+						</a>
+					</td>
+					<td ng-context-menu="menuDrugList" ng-show="drug.drugUpdateOpen">
+						<div class="row">
+							<div class="col-xs-5">
+								<input ng-model="drug.DRUG_NAME" type="text" class="form-control" />
+							</div>
+							<div class="col-xs-3">
+								<button title="Зберегти" type="button" ng-click="updateDrug(drug)" class="btn btn-default">
+									<span class="glyphicon glyphicon-floppy-disk"></span>
+								</button>
+								<span title="Вийти" class="close navbar-right" data-ng-click="drug.drugUpdateOpen = false">
+									<span class="glyphicon glyphicon-share-alt"></span>
+									<!-- 
+								x
+									<span class="glyphicon glyphicon-remove-sign"></span>
+									<span class="glyphicon glyphicon-remove-circle"></span>
+									 -->
+								</span>
+							</div>
+						</div>
+					</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
+	<script src='/js-vendor/textAngular.min.js'></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/db/drug1sList.json.js"></script>
+	<script type="text/javascript">
+	cuwyApp.controller('drugsCtrl', [ '$scope', '$http', function ($scope, $http) {
+		$scope.siteMap = config.siteMap.siteMaps[1];
+
+		console.log("drugsCtrl");
+		$scope.drug1sList = drug1sList;
+		$scope.drugListOrArchive = false;
+
+		$scope.saveNewDrug = function(){
+			console.log("saveNewDrug");
+			console.log($scope.seekDrug);
+			postDrug('/saveNewDrug', {"DRUG_NAME":$scope.seekDrug});
+		}
+
+		$scope.updateDrug = function(drugToUpdate){
+			console.log("updateDrug");
+			postDrug('/updateDrug', drugToUpdate );
+			drugToUpdate.drugUpdateOpen = false;
+		}
+
+		postDrug = function (postUrl, editDrug){
+			$http({
+				method : 'POST',
+				data : editDrug,
+				url : postUrl
+			}).success(function(data, status, headers, config){
+				$scope.drug1sList = data;
+				console.log(data);
+			}).error(function(data, status, headers, config) {
+				$scope.error = data;
+			});
+		}
+
+		$scope.menuDrugList = [
+		['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+			console.debug('Edit');
+			console.log($itemScope);
+			$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
+		}],
+		null,
+		['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
+			console.debug('delete');
+			console.debug($itemScope);
+			console.debug($itemScope.drug);
+			$itemScope.drug.DRUG_ARCHIVE = !$scope.patientListOrArchive;
+			postDrug('/updateDrug', $itemScope.drug);
+		}],
+		/*
+		['<span class="glyphicon glyphicon-floppy-remove"></span> Видалити з БД', function ($itemScope) {
+			console.debug('delete');
+			console.debug($itemScope);
+			console.debug($itemScope.drug);
+			postDrug('/removeDrug', $itemScope.drug);
+		}],
+		*/
+		['<span class="glyphicon glyphicon-floppy-open"></span> Відкрити медикамент документ', function ($itemScope) {
+			console.debug('Edit');
+			console.log($itemScope);
+			$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
+		}]
+		];
+
+	} ] );
+	</script>
+</body>
+</html>

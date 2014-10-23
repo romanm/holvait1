@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html ng-app="cuwyApp" ng-controller="drugCtrl">
+<head>
+	<meta charset="utf-8" />
+	<title>{{siteMap.title}}</title>
+	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
+</head>
+<body>
+<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
+/ <span class="h1">{{siteMap.name}}</span>
+<span class="navbar-right">
+	<ul class="nav nav-pills" title="{{numberOfChange}} незбережених змін">
+		<li ng-class="{'disabled': numberOfChange == 0}">
+			<a ng-click="saveDrugDocument()" href="#">
+				<span class="glyphicon glyphicon-floppy-disk"></span>
+				{{numberOfChange}}
+				</a>
+		</li>
+	</ul>
+</span>
+<hr/>
+<div class="container">
+	<div class="row">
+		<div class="col-xs-2">
+			<span class="close navbar-right"><small>Назви</small></span>
+			<h3><u>{{drugDocument.DRUG_NAME}}</u></h3>
+		</div>
+		<div class="col-xs-6">
+			<span class="close navbar-right"><small>Дози</small></span>
+			<div>
+				<div data-ng-repeat="dose in drugDocument.doses"
+					data-ng-click="dose2newDose(dose)"
+					data-ng-context-menu="menuDoses"
+				>
+					<small data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+						{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+					</small>
+					{{dose.DOSE_NUMBER}}
+					{{dose.DOSE_UNIT}}
+					{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}
+				</div>
+			</div>
+			<table>
+				<tr>
+					<th title="Концентрація">--</th>
+					<th title="Одиниці виміру концентрації">
+						<span 
+						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
+						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
+					</th>
+					<th></th>
+					<th title="Кількість">--</th>
+					<th title="Одиниці виміру">
+						<span 
+						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг']"
+						data-ng-click="newDrugDocumentDose.DOSE_UNIT = doseUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
+					</th>
+					<th title="Шлях введення">
+						<span 
+						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п.о.']"
+						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
+						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
+					</th>
+				</tr>
+				<tr>
+					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
+					<td>-</td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_UNIT" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
+					<td> &nbsp; </td>
+					<td> <a data-ng-click="addNewDrugDocumentDose()"> <span class="glyphicon glyphicon-plus"></span> </a> </td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-xs-4">
+			<span class="close navbar-right"><small>Час</small></span>
+		</div>
+	</div>
+</div>
+
+<hr/>
+<a href="drugs.html">Ліки</a>
+
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
+	<script src='/js-vendor/textAngular.min.js'></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/db/drug1sList.json.js"></script>
+
+	<script type="text/javascript">
+	//var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap']);
+	cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
+		console.log("drugCtrl");
+		$scope.parameters = parameters;
+		$scope.numberOfChange = 0;
+
+		$scope.siteMap = config.siteMap.siteMaps[5];
+		$http({
+			method : 'GET',
+			url : '/read/drug_'+$scope.parameters.id
+		}).success(function(data, status, headers, config) {
+			console.log(data);
+			$scope.drugDocument = data;
+			if(null == $scope.drugDocument.doses)
+				$scope.drugDocument.doses = [];
+			if(null == $scope.drugDocument.localIdSequence)
+				$scope.drugDocument.localIdSequence = 1;
+		}).error(function(data, status, headers, config) {
+		});
+
+		$scope.newDrugDocumentDose = {};
+		$scope.dose2newDose = function(dose){
+			angular.copy(dose, $scope.newDrugDocumentDose);
+		}
+		$scope.addNewDrugDocumentDose = function(){
+			$scope.newDrugDocumentDose.DOSE_ID = $scope.drugDocument.localIdSequence++;
+			$scope.drugDocument.doses.push($scope.newDrugDocumentDose);
+			$scope.newDrugDocumentDose = {};
+			$scope.numberOfChange++;
+		};
+
+		$scope.saveDrugDocument = function(){
+			console.log("--------devPost-----------");
+			$http({
+				method : 'POST',
+				data : $scope.drugDocument,
+				url : "/save/drug"
+			}).success(function(data, status, headers, config){
+				$scope.numberOfChange = 0;
+			}).error(function(data, status, headers, config) {
+				$scope.error = data;
+			});
+		}
+
+		$scope.menuDoses = [
+			['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
+				$itemScope.drugDocument.doses.splice($itemScope.$index, 1);
+				$scope.numberOfChange++;
+			}]
+		];
+
+	}]);
+	</script>
+
+
+</body>
+</html>

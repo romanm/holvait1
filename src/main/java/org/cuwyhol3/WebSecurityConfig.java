@@ -30,16 +30,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/js/**", 
 						"/js-vendor/**", 
 						"/home.html",
-						"/patients.html"
-						,"/patient.html"
-						,"/protocols.html"
+						"/showimg.html"
+						//drug
+						,"/drugs.html"
+						,"/drug.html"
+						,"/saveNewDrug"
+						,"/removeDrug"
+						,"/updateDrug"
+						,"/drug1sList"
+						,"/save/drug"
+						//prescribe
 						,"/lp24h.html"
-						,"/showimg.html"
+						,"/protocols.html"
 						,"/saveNewPrescribe"
 						,"/updatePrescribe"
-						,"/updatePatient"
 						,"/prescribe1sList"
 						,"/save/prescribes"
+						//patient
+						,"/patients.html"
+						,"/patient.html"
+						,"/saveNewPatient"
+						,"/save/patient"
+						,"/removePatient"
+						,"/updatePatient"
+						,"/patient1sList"
+						,"/updatePatient"
+						//edit
 						,"/session/copy"
 						,"/session/paste"
 						).permitAll()
