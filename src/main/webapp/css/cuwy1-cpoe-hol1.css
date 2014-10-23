@@ -1,6 +1,15 @@
 .selected{
 	background-color: LightCyan ;
 }
+table.tablehover td:hover{
+	border: 1px dotted navy; 
+	/*
+	border: 1px dotted lime; 
+	border: 1px dotted blue; 
+	border: 1px dotted green; 
+	*/
+}
+.record-highlight-parent { border: 1px dotted green; }
 .hover:hover{
 	background-color: LightCyan;
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html ng-app="cuwyApp" ng-controller="patientLp24hCtrl">
 <head>
 	<meta charset="utf-8" />
@@ -62,7 +62,7 @@
 					<span class="glyphicon glyphicon-print"></span>
 				</a>
 				</span>
-				<table data-ng-show="!prescribeHistory.isCollapsed" >
+				<table data-ng-show="!prescribeHistory.isCollapsed" class="tablehover">
 					<colgroup>
 						<col style="width: 2px;"></col>
 					</colgroup>
@@ -157,7 +157,7 @@
 							<span class="glyphicon glyphicon-floppy-disk"></span>
 						</button>
 						<div>
-						<div data-ng-repeat="drug in drug1sList | filter: editedPrescribeDrug.DRUG_NAME | limitTo : 12">
+						<div data-ng-repeat="drug in drug1sList | filter: {DRUG_ARCHIVE:false} | filter: editedPrescribeDrug.DRUG_NAME | limitTo : 12">
 							<a ng-click="drugToTask2(drug, taskInDay, prescribeHistory)">
 							{{drug.DRUG_NAME}}
 							</a>

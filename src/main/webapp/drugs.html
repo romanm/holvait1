@@ -6,7 +6,8 @@
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
-<body>
+
+<body key-trap="">
 <a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
 / <span class="h1">{{siteMap.name}}</span>
 <hr/>
@@ -14,9 +15,9 @@
 		<div class="row">
 			<div class="col-xs-12">
 				<span class="navbar-right"> <a href="#"
-					data-ng-click="drugListOrArchive = false; seekPatient = ''">
+					data-ng-click="filterArchive(false)">
 						Список ліків </a> | <a href="#"
-					data-ng-click="drugListOrArchive = true; seekPatient = ''">
+					data-ng-click="filterArchive(true)">
 						Архів </a>
 				</span>
 			</div>
@@ -25,7 +26,8 @@
 		<div class="col-xs-6">
 			<div class="input-group">
 				<span class="input-group-addon">Пошук:</span>
-				<input ng-model="seekDrug" type="text" class="form-control" 
+				<input data-ng-model="seekDrug" type="text" class="form-control" 
+					data-ng-change="filterDrugs()"
 				placeholder="Медикамент пошук / запис" auto-focus=""
 				/>
 			</div>
@@ -39,36 +41,38 @@
 	</div>
 	<div class="row">
 		<div class="col-xs-8">
-			<table width="100%">
+			<table width="100%" class="tablehover">
 				<thead><tr><th>Nr</th><th>Медикамент</th></tr></thead>
-				<tbody data-ng-repeat="drug in drug1sList | filter: {DRUG_ARCHIVE:drugListOrArchive} | filter: seekDrug | limitTo : 12">
-					<tr>
-					<td>{{drug.DRUG_ID}}</td>
-					<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
-						<a href="drug.html?id={{drug.DRUG_ID}}">
-						{{drug.DRUG_NAME}}
-						</a>
-					</td>
-					<td ng-context-menu="menuDrugList" ng-show="drug.drugUpdateOpen">
-						<div class="row">
-							<div class="col-xs-5">
-								<input ng-model="drug.DRUG_NAME" type="text" class="form-control" />
+				<tbody data-ng-repeat="drug in drug1sListFilter" >
+					<tr data-ng-class="{selected:drug1sListFilter[selectDrugIndex]==drug}"
+						data-ng-click="clickItem($index)"
+					>
+						<td>{{drug.DRUG_ID}}</td>
+						<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
+							<a id="drug_{{drug.DRUG_ID}}" href="drug.html?id={{drug.DRUG_ID}}">
+							{{drug.DRUG_NAME}}
+							</a>
+						</td>
+						<td ng-context-menu="menuDrugList" ng-show="drug.drugUpdateOpen">
+							<div class="row">
+								<div class="col-xs-5">
+									<input ng-model="drug.DRUG_NAME" type="text" class="form-control" />
+								</div>
+								<div class="col-xs-3">
+									<button title="Зберегти" type="button" ng-click="updateDrug(drug)" class="btn btn-default">
+										<span class="glyphicon glyphicon-floppy-disk"></span>
+									</button>
+									<span title="Вийти" class="close navbar-right" data-ng-click="drug.drugUpdateOpen = false">
+										<span class="glyphicon glyphicon-share-alt"></span>
+										<!-- 
+									x
+										<span class="glyphicon glyphicon-remove-sign"></span>
+										<span class="glyphicon glyphicon-remove-circle"></span>
+										 -->
+									</span>
+								</div>
 							</div>
-							<div class="col-xs-3">
-								<button title="Зберегти" type="button" ng-click="updateDrug(drug)" class="btn btn-default">
-									<span class="glyphicon glyphicon-floppy-disk"></span>
-								</button>
-								<span title="Вийти" class="close navbar-right" data-ng-click="drug.drugUpdateOpen = false">
-									<span class="glyphicon glyphicon-share-alt"></span>
-									<!-- 
-								x
-									<span class="glyphicon glyphicon-remove-sign"></span>
-									<span class="glyphicon glyphicon-remove-circle"></span>
-									 -->
-								</span>
-							</div>
-						</div>
-					</td>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -87,12 +91,30 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
 	<script type="text/javascript">
-	cuwyApp.controller('drugsCtrl', [ '$scope', '$http', function ($scope, $http) {
+	cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', '$location', function ($scope, $http, $filter, $location) {
 		$scope.siteMap = config.siteMap.siteMaps[1];
 
 		console.log("drugsCtrl");
 		$scope.drug1sList = drug1sList;
 		$scope.drugListOrArchive = false;
+		$scope.selectDrugIndex = null;
+
+		$scope.filterArchive = function(archive){
+			$scope.drugListOrArchive = archive;
+			$scope.filterDrugs();
+		}
+		$scope.filterDrugs = function(){
+			var f1 = $filter('filter')($scope.drug1sList, {DRUG_ARCHIVE:$scope.drugListOrArchive});
+			var f2 = $filter('filter')(f1, $scope.seekDrug);
+			$scope.drug1sListFilter = $filter('limitTo')(f2, 12);
+		}
+		$scope.filterDrugs();
+
+		$scope.clickItem = function(drugIndex) {
+			$scope.selectDrugIndex = drugIndex;
+			console.log($scope.selectDrugIndex);
+			//console.log($scope.drug1sListFilter[$scope.selectDrugIndex]);
+		}
 
 		$scope.saveNewDrug = function(){
 			console.log("saveNewDrug");
@@ -147,6 +169,58 @@
 			$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
 		}]
 		];
+		
+	var KeyCodes = {
+		UPARROW : 38,
+		DOWNARROW : 40,
+		LEFTARROW : 37,
+		RIGHTARROW : 39,
+		RETURNKEY : 13,
+		BACKSPACE : 8,
+		TABKEY : 9,
+		ESCAPE : 27,
+		SPACEBAR : 32,
+	};
+
+	$scope.keys = [];
+	$scope.keys.push({
+		code : KeyCodes.RETURNKEY,
+		action : function() {
+			var drug=$scope.drug1sListFilter[$scope.selectDrugIndex];
+			document.getElementById("drug_"+drug.DRUG_ID).click();
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.UPARROW,
+		action : function() {
+			if(null==$scope.selectDrugIndex || 0==$scope.selectDrugIndex){
+				$scope.selectDrugIndex = $scope.drug1sListFilter.length-1;
+			}else{
+				$scope.selectDrugIndex--;
+			}
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.DOWNARROW,
+		action : function() {
+			if(null==$scope.selectDrugIndex || $scope.selectDrugIndex==($scope.drug1sListFilter.length-1)){
+				$scope.selectDrugIndex = 0;
+			}else{
+				$scope.selectDrugIndex++;
+			}
+		}
+	});
+
+	$scope.$on('keydown', function(msg, obj) {
+		var code = obj.code;
+		$scope.keys.forEach(function(o) {
+			if (o.code !== code) {
+				return;
+			}
+			o.action();
+			$scope.$apply();
+		});
+	});
 
 	} ] );
 	</script>
