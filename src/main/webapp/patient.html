@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html ng-app="cuwyApp" ng-controller="patientLp24hCtrl">
+<head>
+	<meta charset="utf-8" />
+	<title>{{siteMap.title}}</title>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
+	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
+</head>
+<body>
+<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
+/ <span class="h1">{{siteMap.name}}
+<span>{{patient.PATIENT_NAME}}</span>
+</span>
+<span class="navbar-right">
+	<ul class="nav nav-pills" title="{{numberOfChange}} незбережених змін">
+		<li> <a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
+		<li data-ng-class="{'disabled': numberOfChange == 0}">
+			<a ng-click="savePatient()" href="#">
+				<span class="glyphicon glyphicon-floppy-disk"></span>
+				{{numberOfChange}}
+			</a>
+		</li>
+	</ul>
+</span>
+<hr/>
+<div class="container">
+	<div class="row">
+		<div class="col-xs-12">
+			<div data-ng-repeat="prescribeHistory in patient.prescribesHistory"
+				data-ng-init="prescribeHistoryIndex = $index; "
+			>
+				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
+					data-ng-click="collapseDayPrescribe(prescribeHistory)"
+				>
+				{{prescribeHistory.date | date:'dd-MM-yyyy '}}
+				<small>
+					{{prescribeHistory.date | date:'HH:mm'}}
+				</small>
+<!-- 
+				<input id="patientDob{{$index}}" name="patientDob{{$index}}" 
+					ng-model="prescribeHistory.date"
+					ng-click="open($event)"
+					is-open="opened"
+					datepicker-options="dateOptions"
+					datepicker-popup="dd-MM-yyyy" 
+				/>
+					class="form-control input-sm"
+					datepicker-popup="yyyy-MM-dd" 
+					class="form-control input-sm" type="text" placeholder="д.н. (дд-мм-рррр)"
+					datepicker-popup="dd-MM-yyyy" is-open="opened"
+					datepicker-options="dateOptions" ng-required="true"
+ -->
+				</span>
+				<a href="#"
+					data-ng-click="collapseDayPrescribe(prescribeHistory)"
+				>
+					<span class="glyphicon glyphicon-folder-{{!prescribeHistory.isCollapsed?'open':'close'}}"></span>
+				</a>
+				<span class="navbar-right">
+				<a href="/print2_md_form_nr_011-o.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
+					<span class="glyphicon glyphicon-print"></span>
+				</a>
+				</span>
+				<table data-ng-show="!prescribeHistory.isCollapsed" >
+					<colgroup>
+						<col style="width: 2px;"></col>
+					</colgroup>
+					<caption>
+					</caption>
+					<thead>
+						<tr>
+				<th data-ng-context-menu="menuTasksAll" colspan="2" >Призначене лікування</th>
+				<th data-ng-repeat="dayHour in dayHours"
+					data-ng-init="lpHour = getLp24hourStr(dayHour)"
+				>
+					|
+					<u data-ng-show="lpHour == prescribeStartHour ">
+					{{lpHour}}
+					</u>
+					<span data-ng-show="lpHour != prescribeStartHour ">
+					{{lpHour}}
+					</span>
+				</th>
+							<th>|</th>
+						</tr>
+					</thead>
+					<tbody data-ng-repeat="taskInDay in prescribeHistory.tasksInDay"
+						data-ng-init="taskInDayIndex = $index"
+					>
+						<tr data-ng-class="{selected:prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple}">
+							<td class="hover" data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
+								<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u>
+								<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
+							</td>
+							<td data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory)"
+							ng-context-menu="menuTask"
+							title="{{taskInDay.isCollapsed}}"
+							>
+								{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
+								? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
+								<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
+									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
+									}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
+								</small>
+								<span>
+									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_NUMBER}}
+									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_UNIT}}
+									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_ROUTE_OF_ADMINISTRATION}}
+								</span>
+							</td>
+							<td data-ng-repeat="dayHour in dayHours"
+							 ng-init="dayHourIndex = $index"
+							 data-ng-click="useHour(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory)"
+							> . 
+								<span 
+								data-ng-show="isMinus(taskInDayIndex, dayHourIndex, prescribeHistory)"
+								class="glyphicon glyphicon-minus"></span>
+							</td>
+							<td>.</td>
+						</tr>
+			<tr data-ng-if="taskInDay.isCollapsed">
+				<td />
+				<td class="well" colspan="25">
+					<span class="close navbar-right">
+						<small>
+						<span data-ng-click="taskInDay.dialogTab='drug'">
+							<span data-ng-show="taskInDay.dialogTab != 'drug'">ліка</span>
+							<u data-ng-show="taskInDay.dialogTab == 'drug'">ліка</u>
+						</span>
+						|
+						<span data-ng-click="taskInDay.dialogTab='dose'">
+							<span data-ng-show="taskInDay.dialogTab != 'dose'">доза</span>
+							<u data-ng-show="taskInDay.dialogTab == 'dose'">доза</u>
+						</span>
+						|
+						<span data-ng-click="taskInDay.dialogTab='times'">
+							<span data-ng-show="taskInDay.dialogTab != 'times'">час</span>
+							<u data-ng-show="taskInDay.dialogTab == 'times'">час</u>
+						</span>
+						|
+						<a data-ng-click="taskInDay.isCollapsed = false">
+							<span class="glyphicon glyphicon-share-alt"></span>
+						</a>
+						</small>
+					</span>
+				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
+				<div data-ng-show="taskInDay.dialogTab=='drug'">
+					<form class="navbar-form navbar-left" role="search">
+						<div class="form-group">
+							<div class="input-group">
+								<span class="input-group-addon">Пошук:</span>
+								<input type="text" class="form-control" data-ng-model="editedPrescribeDrug.DRUG_NAME" auto-focus="" placeholder="Медикамент пошук / запис">
+							</div>
+						</div>
+						<button  data-ng-click="saveNewDrug(seekDrug, taskInDay, prescribeHistory)" class="btn btn-default">
+							<span class="glyphicon glyphicon-floppy-disk"></span>
+						</button>
+						<div>
+						<div data-ng-repeat="drug in drug1sList | filter: editedPrescribeDrug.DRUG_NAME | limitTo : 12">
+							<a ng-click="drugToTask2(drug, taskInDay, prescribeHistory)">
+							{{drug.DRUG_NAME}}
+							</a>
+						</div>
+						</div>
+					</form>
+				</div>
+		<div data-ng-show="taskInDay.dialogTab=='dose'">
+			<div >
+				<span data-ng-repeat="dose in drugDocument.doses" data-ng-click="addDoseToPrescribeDrug(dose)">
+					<small data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+						{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+					</small>
+					{{dose.DOSE_NUMBER}}
+					{{dose.DOSE_UNIT}}
+					{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}
+					|
+				</span>
+			</div>
+			<table style="width: 600px;">
+				<tr>
+					<th title="Концентрація">--</th>
+					<th title="Одиниці виміру концентрації">
+						<span 
+						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
+						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
+					</th>
+					<th></th>
+					<th title="Кількість">--</th>
+					<th title="Одиниці виміру">
+						<span 
+						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг']"
+						data-ng-click="newDrugDocumentDose.DOSE_UNIT = doseUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
+					</th>
+					<th title="Шлях введення">
+						<span 
+						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п.о.']"
+						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
+						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
+					</th>
+				</tr>
+				<tr>
+					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
+					<td>-</td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_UNIT" type="text" class="form-control" /> </td>
+					<td> <input ng-model="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
+					<td> &nbsp; </td>
+					<td> <a data-ng-click="addNewDrugDocumentDose()"> <span class="glyphicon glyphicon-plus"></span> </a> </td>
+				</tr>
+			</table>
+		</div>
+		<div data-ng-show="taskInDay.dialogTab=='times'">
+				..
+				<table>
+					<tr>
+						<td>
+						<span data-ng-click="prescribeHoursLeft(prescribeHistory.prescribes.tasks[taskInDayIndex])" 
+						class="glyphicon glyphicon-arrow-left"></span>
+						||
+						</td>
+						<td data-ng-repeat="hour2prescribe in getHoures2prescribe(prescribeHistory.prescribes.tasks[taskInDayIndex])">
+						<span data-ng-click="prescribeHourLeft(prescribeHistory.prescribes.tasks[taskInDayIndex], hour2prescribe)" class="glyphicon glyphicon-arrow-left"></span>
+							{{hour2prescribe}}
+						<span data-ng-click="prescribeHourRight(prescribeHistory.prescribes.tasks[taskInDayIndex], hour2prescribe)"  class="glyphicon glyphicon-arrow-right"></span>
+						|
+						</td>
+						<td>
+						|
+						<span data-ng-click="prescribeHoursRight(prescribeHistory.prescribes.tasks[taskInDayIndex])"
+						class="glyphicon glyphicon-arrow-right"></span>
+						</td>
+					</tr>
+				</table>
+				..
+		</div>
+				<span class="close navbar-right">
+					<small>
+					Додаток:
+					<a href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">
+						{{prescribeHistory.prescribes.tasks[$index].DRUG_NAME}}
+					</a>
+					</small>
+				</span>
+				</td>
+			</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<hr/>
+<a href="patients.html">Список пацієнтів</a>
+|
+<a href="protocols.html">Клінічні протоколи</a>
+
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
+	<script src='/js-vendor/textAngular.min.js'></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/db/patient1sList.json.js"></script>
+
+	<script src="/js/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/db/patient1sList.json.js"></script>
+	<script src="/db/drug1sList.json.js"></script>
+	<script src="/js/patientLp24hCtrl.js"></script>
+</body>
+</html>

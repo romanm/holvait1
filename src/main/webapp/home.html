@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html data-ng-app="cuwyApp" data-ng-controller="homeCtrl">
+<head>
+	<meta charset="utf-8" />
+	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
+	<title>{{siteMap.title}}</title>
+</head>
+<body>
+<a href="http://stfalcon.github.io/euromaidan/" class="em-ribbon" 
+	style="position: absolute; left:0; top:0; width: 90px; height: 90px; 
+	background: url('http://stfalcon.github.io/euromaidan/img/em-ribbon.png'); z-index: 2013; 
+	border: 0;" title="Розмісти стрічку з символікою України і ЄС на своєму сайті!" target="_blank"></a>
+	<div class="container">
+	<h1>
+		{{siteMap.name}}
+		<small>
+		{{siteMap.subname}}
+		</small>
+	</h1>
+	<hr/>
+	<div class="row">
+		<div class="col-xs-9">
+			<h2>
+				<a href="{{siteMap.siteMaps[0].url}}">{{siteMap.siteMaps[0].name}}</a>
+			</h2>
+		</div>
+	</div>
+	<hr/>
+	<div class="row">
+	<div class="col-xs-4">
+	<h3>
+		<a href="{{siteMap.siteMaps[3].url}}">{{siteMap.siteMaps[3].name}}</a>
+	</h3>
+	</div>
+	<div class="col-xs-4">
+	<h3>
+		<a href="{{siteMap.siteMaps[1].url}}">{{siteMap.siteMaps[1].name}}</a>
+	</h3>
+	</div>
+	</div>
+	</div>
+	
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
+	<script src='/js-vendor/textAngular.min.js'></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script type="text/javascript">
+	cuwyApp.controller('homeCtrl', [ '$scope', '$http', function ($scope, $http) {
+		$scope.siteMap = config.siteMap;
+	} ] );
+	</script>
+</body>
+</html>
