@@ -84,33 +84,38 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		startingDay: 1
 	};
 
-$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
-	var oldCollapsed = taskInDay.isCollapsed;
-	$($scope.tasksInDay).each(function () {
-		this.isCollapsed = false;
-	} );
-	taskInDay.isCollapsed = !oldCollapsed;
-	$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[taskInDayIndex];
-	console.log($scope.editedPrescribeDrug);
-	if(null == $scope.editedPrescribeDrug){
-		$scope.editedPrescribeDrug = {DRUG_NAME:null};
+
+	$scope.clickItem = function(drugIndex) {
+		$scope.selectDrugIndex = drugIndex;
+	}
+
+	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
+		var oldCollapsed = taskInDay.isCollapsed;
+		$($scope.tasksInDay).each(function () {
+			this.isCollapsed = false;
+		} );
+		taskInDay.isCollapsed = !oldCollapsed;
+		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[taskInDayIndex];
 		console.log($scope.editedPrescribeDrug);
+		if(null == $scope.editedPrescribeDrug){
+			$scope.editedPrescribeDrug = {DRUG_NAME:null};
+			console.log($scope.editedPrescribeDrug);
+		}
+		console.log(null == $scope.editedPrescribeDrug.DRUG_NAME);
+		console.log("" == $scope.editedPrescribeDrug.DRUG_NAME);
+		if(null == $scope.editedPrescribeDrug.DRUG_NAME 
+		|| "" == $scope.editedPrescribeDrug.DRUG_NAME
+		){
+			taskInDay.dialogTab = "drug";
+		}else{
+			taskInDay.dialogTab = "dose";
+		}
+	
+		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
+			readDrugDocument($scope.editedPrescribeDrug);
+		}
 	}
-	console.log(null == $scope.editedPrescribeDrug.DRUG_NAME);
-	console.log("" == $scope.editedPrescribeDrug.DRUG_NAME);
-	if(null == $scope.editedPrescribeDrug.DRUG_NAME 
-	|| "" == $scope.editedPrescribeDrug.DRUG_NAME
-	){
-		taskInDay.dialogTab = "drug";
-	}else{
-		taskInDay.dialogTab = "dose";
-	}
-
-	if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
-		readDrugDocument($scope.editedPrescribeDrug);
-	}
-}
-
+	
 readDrugDocument = function(drug){
 	$http({
 		method : 'GET',

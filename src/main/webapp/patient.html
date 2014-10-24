@@ -1,4 +1,4 @@
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html ng-app="cuwyApp" ng-controller="patientLp24hCtrl">
 <head>
 	<meta charset="utf-8" />
@@ -7,7 +7,8 @@
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
-<body>
+
+<body key-trap="">
 <a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
 / <span class="h1">{{siteMap.name}}
 <span>{{patient.PATIENT_NAME}}</span>
@@ -89,14 +90,19 @@
 						data-ng-init="taskInDayIndex = $index"
 					>
 						<tr data-ng-class="{selected:prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple}">
-							<td class="hover" data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
-								<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u>
-								<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
-							</td>
-							<td data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory)"
-							ng-context-menu="menuTask"
-							title="{{taskInDay.isCollapsed}}"
-							>
+								<td class="hover"
+									data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
+									<u
+									data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex
+										+ 1}}</u> <span
+									data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex
+										+ 1 }}</span>
+								</td>
+								<td 
+									data-ng-click="clicktem(taskInDayIndex); openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory)"
+									ng-context-menu="menuTask"
+									title="{{taskInDay.isCollapsed}}"
+								>
 								{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
 								? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
 								<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">

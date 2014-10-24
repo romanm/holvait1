@@ -7,7 +7,7 @@
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
-<body key-trap="">
+<body key-cuwytrap="">
 <a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
 / <span class="h1">{{siteMap.name}}</span>
 <hr/>
@@ -46,6 +46,7 @@
 				<tbody data-ng-repeat="drug in drug1sListFilter" >
 					<tr data-ng-class="{selected:drug1sListFilter[selectDrugIndex]==drug}"
 						data-ng-click="clickItem($index)"
+						data-ng-dblclick="openItem($index)"
 					>
 						<td>{{drug.DRUG_ID}}</td>
 						<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
@@ -112,8 +113,11 @@
 
 		$scope.clickItem = function(drugIndex) {
 			$scope.selectDrugIndex = drugIndex;
-			console.log($scope.selectDrugIndex);
-			//console.log($scope.drug1sListFilter[$scope.selectDrugIndex]);
+		}
+		$scope.openItem = function(drugIndex) {
+			$scope.selectDrugIndex = drugIndex;
+			var drug=$scope.drug1sListFilter[$scope.selectDrugIndex];
+			document.getElementById("drug_"+drug.DRUG_ID).click();
 		}
 
 		$scope.saveNewDrug = function(){
@@ -186,13 +190,20 @@
 	$scope.keys.push({
 		code : KeyCodes.RETURNKEY,
 		action : function() {
-			var drug=$scope.drug1sListFilter[$scope.selectDrugIndex];
-			document.getElementById("drug_"+drug.DRUG_ID).click();
+			$scope.openItem($scope.selectDrugIndex);
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.RETURNKEY,
+		ctrlKey : true,
+		action : function() {
+			console.log("CtrlRETURNKEY ");
 		}
 	});
 	$scope.keys.push({
 		code : KeyCodes.UPARROW,
 		action : function() {
+			console.log("UPARROW ");
 			if(null==$scope.selectDrugIndex || 0==$scope.selectDrugIndex){
 				$scope.selectDrugIndex = $scope.drug1sListFilter.length-1;
 			}else{
@@ -202,7 +213,15 @@
 	});
 	$scope.keys.push({
 		code : KeyCodes.DOWNARROW,
+		ctrlKey : true,
 		action : function() {
+			console.log("CtrlDOWNARROW ");
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.DOWNARROW,
+		action : function() {
+			console.log("DOWNARROW ");
 			if(null==$scope.selectDrugIndex || $scope.selectDrugIndex==($scope.drug1sListFilter.length-1)){
 				$scope.selectDrugIndex = 0;
 			}else{
@@ -212,11 +231,12 @@
 	});
 
 	$scope.$on('keydown', function(msg, obj) {
-		var code = obj.code;
+		var code = obj.event.keyCode;
+		var ctrlKey = obj.event.ctrlKey;
 		$scope.keys.forEach(function(o) {
-			if (o.code !== code) {
-				return;
-			}
+			if (o.code !== code) return;
+			if(ctrlKey && !o.ctrlKey) return;
+			if(o.ctrlKey && !ctrlKey) return;
 			o.action();
 			$scope.$apply();
 		});

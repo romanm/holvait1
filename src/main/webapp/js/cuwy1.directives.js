@@ -158,20 +158,30 @@ cuwyApp.directive('ngContextMenu', function ($parse) {
 	};
 });
 
+cuwyApp.directive('keyCuwytrap', function() {
+	return function(scope, elem) {
+		elem.bind('keydown', function(event) {
+			scope.$broadcast('keydown', {
+				event : event
+			});
+		});
+	};
+});
+
 cuwyApp.directive('keyTrap', function() {
 	return function(scope, elem) {
 		elem.bind('keydown', function(event) {
 			scope.$broadcast('keydown', {
-				code : event.keyCode
+				code : event.keyCode,
 			});
 		});
 	};
 });
 
 cuwyApp.directive('ngBlur', function() {
-	  return function( scope, elem, attrs ) {
-	    elem.bind('blur', function() {
-	      scope.$apply(attrs.ngBlur);
-	    });
-	  };
-	});
+	return function( scope, elem, attrs ) {
+		elem.bind('blur', function() {
+			scope.$apply(attrs.ngBlur);
+		});
+	};
+});
