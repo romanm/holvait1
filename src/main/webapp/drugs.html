@@ -111,6 +111,11 @@
 		}
 		$scope.filterDrugs();
 
+		adaptSelectDrugToFilterList = function(){
+			if(($scope.drug1sListFilter.length-1) < $scope.selectDrugIndex)
+				$scope.selectDrugIndex = null;
+		}
+
 		$scope.clickItem = function(drugIndex) {
 			$scope.selectDrugIndex = drugIndex;
 		}
@@ -204,6 +209,7 @@
 		code : KeyCodes.UPARROW,
 		action : function() {
 			console.log("UPARROW ");
+			adaptSelectDrugToFilterList();
 			if(null==$scope.selectDrugIndex || 0==$scope.selectDrugIndex){
 				$scope.selectDrugIndex = $scope.drug1sListFilter.length-1;
 			}else{
@@ -222,6 +228,7 @@
 		code : KeyCodes.DOWNARROW,
 		action : function() {
 			console.log("DOWNARROW ");
+			adaptSelectDrugToFilterList();
 			if(null==$scope.selectDrugIndex || $scope.selectDrugIndex==($scope.drug1sListFilter.length-1)){
 				$scope.selectDrugIndex = 0;
 			}else{

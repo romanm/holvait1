@@ -96,13 +96,9 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
 		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[taskInDayIndex];
-		console.log($scope.editedPrescribeDrug);
 		if(null == $scope.editedPrescribeDrug){
 			$scope.editedPrescribeDrug = {DRUG_NAME:null};
-			console.log($scope.editedPrescribeDrug);
 		}
-		console.log(null == $scope.editedPrescribeDrug.DRUG_NAME);
-		console.log("" == $scope.editedPrescribeDrug.DRUG_NAME);
 		if(null == $scope.editedPrescribeDrug.DRUG_NAME 
 		|| "" == $scope.editedPrescribeDrug.DRUG_NAME
 		){
