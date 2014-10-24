@@ -72,7 +72,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		});
 	}
 
-
 	$scope.open = function($event) {
 		$event.preventDefault();
 		$event.stopPropagation();
@@ -439,11 +438,13 @@ saveDrugDocument = function(){
 //---------------------drug document---------------------END-------
 
 //---------------------keydown-------------------------------
-
 var KeyCodes = {
 	ESC : 27,
 	C : 67,
 	V : 86,
+	S : 83,
+	P : 80,
+	Delete : 46,
 	UPARROW : 38,
 	DOWNARROW : 40,
 	LEFTARROW : 37,
@@ -465,11 +466,26 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
+	code : KeyCodes.Delete,
+	action : function() {
+		console.log("Delete");
+	}
+});
+$scope.keys.push({
 	code : KeyCodes.RETURNKEY,
 	action : function() {
 		console.log("RETURNKEY ");
 		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.selectDrugIndex];
 		$scope.openPrescribeDrugDialog(taskInDay, $scope.selectDrugIndex, $scope.editedPrescribeHistory);
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.RETURNKEY,
+	shiftKey : true,
+	action : function() {
+		console.log("ShiftRETURNKEY ");
+		$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.selectDrugIndex+1, 0, null);
+		$scope.numberOfChange++;
 	}
 });
 $scope.keys.push({
@@ -484,6 +500,13 @@ $scope.keys.push({
 	action : function() {
 		console.log("UPARROW ");
 		$scope.selectDrugIndex--;
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.P,
+	ctrlKey : true,
+	action : function() {
+		console.log("Ctrl_P");
 	}
 });
 $scope.keys.push({
@@ -507,12 +530,14 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
-	code : KeyCodes.RETURNKEY,
+	code : KeyCodes.S,
 	ctrlKey : true,
 	action : function() {
-		console.log("CtrlRETURNKEY ");
+		console.log("Ctrl_S");
+		$scope.savePatient();
 	}
 });
+
 $scope.keys.push({
 	code : KeyCodes.DOWNARROW,
 	ctrlKey : true,
@@ -528,14 +553,36 @@ $scope.keys.push({
 	}
 });
 
+$scope.keys.push({
+	code : KeyCodes.DOWNARROW,
+	altKey : true,
+	action : function() {
+		console.log("AltDOWNARROW");
+		movePlus($scope.editedPrescribeHistory.prescribes.tasks, $scope.selectDrugIndex + 1);
+		$scope.selectDrugIndex++;
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.UPARROW,
+	altKey : true,
+	action : function() {
+		console.log("AltUPARROW");
+		moveMinus($scope.editedPrescribeHistory.prescribes.tasks, $scope.selectDrugIndex);
+		$scope.selectDrugIndex--;
+	}
+});
+
 $scope.$on('keydown', function(msg, obj) {
-	//console.log(obj);
+	console.log(obj);
 	var code = obj.event.keyCode;
 	var ctrlKey = obj.event.ctrlKey;
+	var altKey = obj.event.altKey;
+	var shiftKey = obj.event.shiftKey;
 	$scope.keys.forEach(function(o) {
-		if (o.code !== code) return;
-		if(ctrlKey && !o.ctrlKey) return;
-		if(o.ctrlKey && !ctrlKey) return;
+		if(o.code !== code) return;
+		if((ctrlKey && !o.ctrlKey) || (o.ctrlKey && !ctrlKey)) return;
+		if((altKey && !o.altKey) || (o.altKey && !altKey)) return;
+		if((shiftKey && !o.shiftKey) || (o.shiftKey && !shiftKey)) return;
 		o.action();
 		$scope.$apply();
 	});
@@ -574,4 +621,3 @@ cuwyApp.controller('taskInDayCtrl', [ '$scope', '$http',function ($scope, $http)
 	});
 
 }]);
-
