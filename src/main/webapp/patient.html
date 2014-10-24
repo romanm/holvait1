@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="cuwyApp" ng-controller="patientLp24hCtrl">
+<html data-ng-app="cuwyApp" data-ng-controller="patientLp24hCtrl">
 <head>
 	<meta charset="utf-8" />
 	<title>{{siteMap.title}}</title>
@@ -96,7 +96,7 @@
 									<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
 								</td>
 								<td 
-									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory); clickItem(taskInDayIndex);"
+									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
 									data-ng-class="{selected:taskInDayIndex == selectDrugIndex}"
 									ng-context-menu="menuTask"
 									title="{{taskInDay.isCollapsed}}"
@@ -123,7 +123,9 @@
 							</td>
 							<td>.</td>
 						</tr>
-			<tr data-ng-if="taskInDay.isCollapsed">
+			<tr data-ng-if="taskInDay.isCollapsed"
+				data-ng-controller="taskInDayCtrl"
+			>
 				<td />
 				<td class="well" colspan="25">
 					<span class="close navbar-right">
@@ -149,7 +151,7 @@
 						</small>
 					</span>
 				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-				<div data-ng-show="taskInDay.dialogTab=='drug'">
+				<div data-ng-show="taskInDay.dialogTab == 'drug'">
 					<form class="navbar-form navbar-left" role="search">
 						<div class="form-group">
 							<div class="input-group">

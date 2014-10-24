@@ -84,14 +84,12 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		startingDay: 1
 	};
 
-	$scope.clickItem = function(drugIndex) {
-		$scope.selectDrugIndex = drugIndex;
-	}
-
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
 		$scope.editedPrescribeHistory = prescribeHistory;
-		if(taskInDayIndex != $scope.selectDrugIndex)
+		if(taskInDayIndex != $scope.selectDrugIndex){
+			$scope.selectDrugIndex = taskInDayIndex;
 			return;
+		}
 		var oldCollapsed = taskInDay.isCollapsed;
 		$($scope.tasksInDay).each(function () {
 			this.isCollapsed = false;
@@ -278,21 +276,27 @@ contextMenuCopy = function(copyObject){
 	});
 }
 
+copy = function(taskIndex, prescribeHistory){
+	var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	console.log(drug);
+	console.log(drug.selectMultiple);
+	if(drug.selectMultiple){
+		$itemScope.$parent.prescribeHistory.prescribes.selectMultiple = true;
+		contextMenuCopy($itemScope.$parent.prescribeHistory.prescribes); 
+	}else{
+		contextMenuCopy(drug); 
+	}
+}
+
 $scope.menuTask = [
 	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
-		var drug = $itemScope.$parent.prescribeHistory.prescribes.tasks[$itemScope.$index];
-		console.log(drug);
-		console.log(drug.selectMultiple);
-		if(drug.selectMultiple){
-			$itemScope.$parent.prescribeHistory.prescribes.selectMultiple = true;
-			contextMenuCopy($itemScope.$parent.prescribeHistory.prescribes); 
-		}else{
-			contextMenuCopy(drug); 
-		}
+		var taskIndex = $itemScope.$index;
+		console.log(taskIndex+"/"+$scope.selectDrugIndex);
+		copy(taskIndex, $itemScope.$parent.prescribeHistory);
 	}],
 	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) { 
 		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
-		contextMenuPaste($itemScope); 
+		contextMenuPaste($itemScope.taskInDay, $itemScope.$parent.prescribeHistory); 
 	}],
 	null,
 	['<span class="glyphicon glyphicon-plus"></span> Додати строчку', function ($itemScope) {
@@ -329,6 +333,7 @@ $scope.menuTask = [
 		});
 	}]
 ];
+
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
 		contextMenuCopy($itemScope.prescribeHistory.prescribes); 
@@ -357,35 +362,33 @@ $scope.menuTasksAll = [
 	}]
 ];
 
-contextMenuPaste = function($itemScope){
+contextMenuPaste = function(taskInDay, prescribeHistory){
 	$http({
 		method : 'GET',
 		url : '/session/paste'
 	}).success(function(data, status, headers, config) {
 		console.log(data);
 		if(data.selectMultiple && data.tasks){
-			var position = $itemScope.taskInDay.i;
+			var position = taskInDay.i;
 			$(data.tasks).each(function () {
 				if(this.selectMultiple){
-					insertDrugToTask(this, position++, $itemScope.$parent.prescribeHistory);
+					insertDrugToTask(this, position++, prescribeHistory);
 				}
 			});
 		}else{
 			var drug = data;
-			drugToTask(drug, $itemScope);
+			$scope.drugToTask2(drug, taskInDay, prescribeHistory)
 		}
 	}).error(function(data, status, headers, config) {
 	});
 }
+
 $scope.drugToTask2 = function(drug, taskInDay, prescribeHistory){
 	var position = taskInDay.i;
 	insertDrugToTask(drug, position, prescribeHistory);
 	taskInDay.dialogTab = "dose";
 	readDrugDocument(drug);
 	$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[position];
-}
-drugToTask = function(drug, $itemScope){
-	$scope.drugToTask2(drug, $itemScope.taskInDay, $itemScope.$parent.prescribeHistory)
 }
 
 
@@ -438,6 +441,9 @@ saveDrugDocument = function(){
 //---------------------keydown-------------------------------
 
 var KeyCodes = {
+	ESC : 27,
+	C : 67,
+	V : 86,
 	UPARROW : 38,
 	DOWNARROW : 40,
 	LEFTARROW : 37,
@@ -446,18 +452,23 @@ var KeyCodes = {
 	BACKSPACE : 8,
 	TABKEY : 9,
 	ESCAPE : 27,
-	SPACEBAR : 32,
+	SPACEBAR : 32
 };
 
 $scope.keys = [];
 $scope.keys.push({
+	code : KeyCodes.ESC,
+	action : function() {
+		console.log("Esc");
+		console.log($scope.selectDrugIndex);
+		console.log($scope.editedPrescribeHistory);
+	}
+});
+$scope.keys.push({
 	code : KeyCodes.RETURNKEY,
 	action : function() {
 		console.log("RETURNKEY ");
-		console.log($scope.selectDrugIndex);
-		console.log($scope.editedPrescribeHistory);
 		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.selectDrugIndex];
-		console.log(taskInDay);
 		$scope.openPrescribeDrugDialog(taskInDay, $scope.selectDrugIndex, $scope.editedPrescribeHistory);
 	}
 });
@@ -473,6 +484,26 @@ $scope.keys.push({
 	action : function() {
 		console.log("UPARROW ");
 		$scope.selectDrugIndex--;
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.V,
+	ctrlKey : true,
+	action : function() {
+		console.log("Ctrl_V");
+		console.log("/"+$scope.selectDrugIndex);
+		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.selectDrugIndex];
+		console.log(taskInDay);
+		contextMenuPaste(taskInDay, $scope.editedPrescribeHistory); 
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.C,
+	ctrlKey : true,
+	action : function() {
+		console.log("Ctrl_C");
+		console.log("/"+$scope.selectDrugIndex);
+		copy($scope.selectDrugIndex, $scope.editedPrescribeHistory);
 	}
 });
 $scope.keys.push({
@@ -498,6 +529,7 @@ $scope.keys.push({
 });
 
 $scope.$on('keydown', function(msg, obj) {
+	//console.log(obj);
 	var code = obj.event.keyCode;
 	var ctrlKey = obj.event.ctrlKey;
 	$scope.keys.forEach(function(o) {
@@ -509,7 +541,37 @@ $scope.$on('keydown', function(msg, obj) {
 	});
 });
 //---------------------keydown---------------------END-------
+}]);
 
+cuwyApp.controller('taskInDayCtrl', [ '$scope', '$http',function ($scope, $http) {
+	console.log("---------taskInDayCtrl------------");
+
+	var KeyCodes = {
+		ESCAPE : 27
+	};
+
+	$scope.keys = [];
+	$scope.keys.push({
+		code : KeyCodes.ESCAPE,
+		action : function() {
+			console.log("Esc -- taskInDayCtrl");
+			console.log($scope.taskInDay.isCollapsed);
+			$scope.taskInDay.isCollapsed = false;
+		}
+	});
+
+	$scope.$on('keydown', function(msg, obj) {
+		//console.log(obj);
+		var code = obj.event.keyCode;
+		var ctrlKey = obj.event.ctrlKey;
+		$scope.keys.forEach(function(o) {
+			if (o.code !== code) return;
+			if(ctrlKey && !o.ctrlKey) return;
+			if(o.ctrlKey && !ctrlKey) return;
+			o.action();
+			$scope.$apply();
+		});
+	});
 
 }]);
 
