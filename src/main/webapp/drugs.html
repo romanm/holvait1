@@ -92,7 +92,7 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
 	<script type="text/javascript">
-	cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', '$location', function ($scope, $http, $filter, $location) {
+	cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
 		$scope.siteMap = config.siteMap.siteMaps[1];
 
 		console.log("drugsCtrl");

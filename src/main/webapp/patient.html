@@ -8,7 +8,7 @@
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
-<body key-trap="">
+<body key-cuwytrap="">
 <a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
 / <span class="h1">{{siteMap.name}}
 <span>{{patient.PATIENT_NAME}}</span>
@@ -29,7 +29,7 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div data-ng-repeat="prescribeHistory in patient.prescribesHistory"
-				data-ng-init="prescribeHistoryIndex = $index; "
+				data-ng-init="prescribeHistoryIndex = $index;"
 			>
 				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
 					data-ng-click="collapseDayPrescribe(prescribeHistory)"
@@ -92,14 +92,12 @@
 						<tr data-ng-class="{selected:prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple}">
 								<td class="hover"
 									data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
-									<u
-									data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex
-										+ 1}}</u> <span
-									data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex
-										+ 1 }}</span>
+									<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
+									<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
 								</td>
 								<td 
-									data-ng-click="clicktem(taskInDayIndex); openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory)"
+									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory); clickItem(taskInDayIndex);"
+									data-ng-class="{selected:taskInDayIndex == selectDrugIndex}"
 									ng-context-menu="menuTask"
 									title="{{taskInDay.isCollapsed}}"
 								>
@@ -196,7 +194,7 @@
 					<th title="Кількість">--</th>
 					<th title="Одиниці виміру">
 						<span 
-						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг']"
+						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг', 'г']"
 						data-ng-click="newDrugDocumentDose.DOSE_UNIT = doseUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
 					</th>

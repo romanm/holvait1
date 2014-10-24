@@ -84,18 +84,20 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		startingDay: 1
 	};
 
-
 	$scope.clickItem = function(drugIndex) {
 		$scope.selectDrugIndex = drugIndex;
 	}
 
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
+		$scope.editedPrescribeHistory = prescribeHistory;
+		if(taskInDayIndex != $scope.selectDrugIndex)
+			return;
 		var oldCollapsed = taskInDay.isCollapsed;
 		$($scope.tasksInDay).each(function () {
 			this.isCollapsed = false;
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
-		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[taskInDayIndex];
+		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[$scope.selectDrugIndex];
 		if(null == $scope.editedPrescribeDrug){
 			$scope.editedPrescribeDrug = {DRUG_NAME:null};
 		}
@@ -432,6 +434,82 @@ saveDrugDocument = function(){
 	});
 }
 //---------------------drug document---------------------END-------
+
+//---------------------keydown-------------------------------
+
+var KeyCodes = {
+	UPARROW : 38,
+	DOWNARROW : 40,
+	LEFTARROW : 37,
+	RIGHTARROW : 39,
+	RETURNKEY : 13,
+	BACKSPACE : 8,
+	TABKEY : 9,
+	ESCAPE : 27,
+	SPACEBAR : 32,
+};
+
+$scope.keys = [];
+$scope.keys.push({
+	code : KeyCodes.RETURNKEY,
+	action : function() {
+		console.log("RETURNKEY ");
+		console.log($scope.selectDrugIndex);
+		console.log($scope.editedPrescribeHistory);
+		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.selectDrugIndex];
+		console.log(taskInDay);
+		$scope.openPrescribeDrugDialog(taskInDay, $scope.selectDrugIndex, $scope.editedPrescribeHistory);
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.DOWNARROW,
+	action : function() {
+		console.log("DOWNARROW ");
+		$scope.selectDrugIndex++;
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.UPARROW,
+	action : function() {
+		console.log("UPARROW ");
+		$scope.selectDrugIndex--;
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.RETURNKEY,
+	ctrlKey : true,
+	action : function() {
+		console.log("CtrlRETURNKEY ");
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.DOWNARROW,
+	ctrlKey : true,
+	action : function() {
+		console.log("CtrlDOWNARROW ");
+	}
+});
+$scope.keys.push({
+	code : KeyCodes.UPARROW,
+	ctrlKey : true,
+	action : function() {
+		console.log("CtrlUPARROW");
+	}
+});
+
+$scope.$on('keydown', function(msg, obj) {
+	var code = obj.event.keyCode;
+	var ctrlKey = obj.event.ctrlKey;
+	$scope.keys.forEach(function(o) {
+		if (o.code !== code) return;
+		if(ctrlKey && !o.ctrlKey) return;
+		if(o.ctrlKey && !ctrlKey) return;
+		o.action();
+		$scope.$apply();
+	});
+});
+//---------------------keydown---------------------END-------
+
 
 }]);
 
