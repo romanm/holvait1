@@ -1,6 +1,10 @@
 .selected{
 	background-color: LightCyan ;
 }
+.selectpath{
+	border: 1px dashed navy; 
+}
+.mouseover:hover,
 table.tablehover td:hover{
 	border: 1px dotted navy; 
 	/*

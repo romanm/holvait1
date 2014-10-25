@@ -28,9 +28,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/db/**", 
 						"/db/prescribe/**", 
 						"/js/**", 
-						"/js-vendor/**", 
-						"/home.html",
-						"/showimg.html"
+						"/js-vendor/**" 
+						,"/home.html"
+						,"/help.html"
+						,"/showimg.html"
 						//drug
 						,"/drugs.html"
 						,"/drug.html"

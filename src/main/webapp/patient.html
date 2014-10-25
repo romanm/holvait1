@@ -7,17 +7,20 @@
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
-
-<body key-cuwytrap="">
+<!-- 
+<body key-cuwytrap="" data-ng-cloak="">
+ -->
+<body data-key-cuwytrap="" >
 <a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
-/ <span class="h1">{{siteMap.name}}
-<span>{{patient.PATIENT_NAME}}</span>
-</span>
-<span class="navbar-right">
-	<ul class="nav nav-pills" title="{{numberOfChange}} незбережених змін">
+/ <a href="patient.html?id={{parameters.id}}"> <span class="h1">{{siteMap.name}} <span>{{patient.PATIENT_NAME}}</span>
+	</span>
+	</a>
+	<span class="navbar-right">
+	<ul class="nav nav-pills">
+		<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
 		<li> <a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
 		<li data-ng-class="{'disabled': numberOfChange == 0}">
-			<a ng-click="savePatient()" href="#">
+			<a ng-click="savePatient()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
 				<span class="glyphicon glyphicon-floppy-disk"></span>
 				{{numberOfChange}}
 			</a>
@@ -32,7 +35,10 @@
 				data-ng-init="prescribeHistoryIndex = $index;"
 			>
 				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
-					data-ng-click="collapseDayPrescribe(prescribeHistory)"
+					data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)"
+					class="mouseover"
+					data-ng-class="{selectpath:dayInSelectPath(prescribeHistoryIndex),
+									selected:daySelected(prescribeHistoryIndex) }"
 				>
 				{{prescribeHistory.date | date:'dd-MM-yyyy '}}
 				<small>
@@ -53,13 +59,11 @@
 					datepicker-options="dateOptions" ng-required="true"
  -->
 				</span>
-				<a href="#"
-					data-ng-click="collapseDayPrescribe(prescribeHistory)"
-				>
+				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" >
 					<span class="glyphicon glyphicon-folder-{{!prescribeHistory.isCollapsed?'open':'close'}}"></span>
 				</a>
 				<span class="navbar-right">
-				<a href="/print2_md_form_nr_011-o.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
+				<a id="print2_{{prescribeHistoryIndex}}" href="/print2_md_form_nr_011-o.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
 					<span class="glyphicon glyphicon-print"></span>
 				</a>
 				</span>
@@ -97,7 +101,8 @@
 								</td>
 								<td 
 									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
-									data-ng-class="{selected:taskInDayIndex == selectDrugIndex}"
+									data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
+														selected:taskSelected(taskInDayIndex, prescribeHistory) }"
 									ng-context-menu="menuTask"
 									title="{{taskInDay.isCollapsed}}"
 								>
