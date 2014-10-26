@@ -1,4 +1,4 @@
-cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $http) {
+cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	$scope.numberOfChange = 0;
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
@@ -56,6 +56,11 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 			}else{
 				$scope.patient.pageDeepPositionIndex = 2;
 			}
+		}
+		var patientFromList = $filter('filter')(patient1sList, {PATIENT_ID:3})[0];
+		if($scope.patient.PATIENT_NAME != patientFromList.PATIENT_NAME){
+			$scope.patient.PATIENT_NAME = patientFromList.PATIENT_NAME;
+			$scope.numberOfChange++;
 		}
 	}
 
