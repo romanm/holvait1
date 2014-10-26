@@ -18,7 +18,7 @@
 		<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
 		<li> <a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
 		<li data-ng-class="{'disabled': numberOfChange == 0}">
-			<a ng-click="savePatient()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
+			<a data-ng-click="savePatient()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
 				<span class="glyphicon glyphicon-floppy-disk"></span>
 				{{numberOfChange}}
 			</a>

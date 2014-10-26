@@ -119,16 +119,21 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 	//---------data-ng-class--------------------END------------
 
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
-		$scope.patient.selectPrescribesHistoryIndex = prescribeHistoryIndex;
-		var prescribeHistory = $scope.patient.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
+		var prescribeHistory = $scope.patient.prescribesHistory[prescribeHistoryIndex];
 		prescribeHistory.isCollapsed = !prescribeHistory.isCollapsed
+		if(prescribeHistory.isCollapsed)
+			return;
+		$scope.patient.selectPrescribesHistoryIndex = prescribeHistoryIndex;
+		$scope.editedPrescribeHistory = prescribeHistory;
 		$scope.numberOfChange++;
 	}
 
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
 		$scope.editedPrescribeHistory = prescribeHistory;
-		if(taskInDayIndex != $scope.editedPrescribeHistory.selectDrugIndex){
+		$scope.patient.pageDeepPositionIndex = 2;
+		if($scope.editedPrescribeHistory.selectDrugIndex != taskInDayIndex){
 			$scope.editedPrescribeHistory.selectDrugIndex = taskInDayIndex;
+			$scope.patient.selectPrescribesHistoryIndex = $scope.patient.prescribesHistory.indexOf(prescribeHistory);
 			return;
 		}
 		var oldCollapsed = taskInDay.isCollapsed;

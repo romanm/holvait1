@@ -2,11 +2,11 @@
 	background-color: LightCyan ;
 }
 .selectpath{
-	border: 1px dashed navy; 
+	border: 1px dotted navy; 
 }
 .mouseover:hover,
 table.tablehover td:hover{
-	border: 1px dotted navy; 
+	border: 1px dashed navy; 
 	/*
 	border: 1px dashed navy; 
 	border: 1px dotted lime; 
