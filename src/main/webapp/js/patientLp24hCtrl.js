@@ -144,7 +144,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			return;
 		}
 		var oldCollapsed = taskInDay.isCollapsed;
-		$($scope.tasksInDay).each(function () {
+		$(prescribeHistory.tasksInDay).each(function () {
 			this.isCollapsed = false;
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
