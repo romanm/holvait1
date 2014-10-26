@@ -459,7 +459,7 @@ saveDrugDocument = function(){
 
 //---------------------keydown-------------------------------
 var KeyCodes = {
-	ESCAPE : 27,
+	Escape : 27,
 	F1 : 112,
 	F9 : 120,
 	C : 67,
@@ -479,8 +479,15 @@ var KeyCodes = {
 
 $scope.keys = [];
 $scope.keys.push({
-	code : KeyCodes.ESCAPE,
+	code : KeyCodes.Escape,
 	action : function() {
+		console.log("Escape");
+		if($scope.patient.pageDeepPositionIndex == 1){
+			console.log($scope.editedPrescribeHistory);
+			if(!$scope.editedPrescribeHistory.isCollapsed){
+				$scope.editedPrescribeHistory.isCollapsed = true;
+			}
+		}
 	}
 });
 $scope.keys.push({
@@ -635,14 +642,14 @@ $scope.$on('keydown', function(msg, obj) {
 cuwyApp.controller('taskInDayCtrl', [ '$scope', '$http',function ($scope, $http) {
 	console.log("---------taskInDayCtrl------------");
 	var KeyCodes = {
-		ESCAPE : 27
+		Escape : 27
 	};
 
 	$scope.keys = [];
 	$scope.keys.push({
-		code : KeyCodes.ESCAPE,
+		code : KeyCodes.Escape,
 		action : function() {
-			console.log("Esc -- taskInDayCtrl");
+			console.log("Escape -- taskInDayCtrl");
 			$scope.taskInDay.isCollapsed = false;
 		}
 	});
