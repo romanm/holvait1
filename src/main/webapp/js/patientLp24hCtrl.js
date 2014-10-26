@@ -505,16 +505,13 @@ $scope.keys.push({
 			if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
 				$scope.editedPrescribeHistory.isCollapsed = true;
 			}else{
-				console.log("Escape - "+$scope.patient.pageDeepPositionIndex+"--");
 				$scope.patient.pageDeepPositionIndex--;
-				console.log("Escape - "+$scope.patient.pageDeepPositionIndex);
 				$("#focus_0").focus();
 			}
 		}else 
 		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
 			$scope.patient.pageDeepPositionIndex--;
 			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
-			console.log("Escape - "+$scope.patient.pageDeepPositionIndex);
 		}
 	}
 });
@@ -537,7 +534,6 @@ $scope.keys.push({
 	action : function() {
 		console.log("RETURNKEY");
 		if($scope.patient.pageDeepPositionIndex == 1){
-			console.log("RETURNKEY day");
 			$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
 		}else
 		if($scope.patient.pageDeepPositionIndex == 2){
@@ -558,11 +554,21 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowRight,
 	action : function() {
+		if($scope.patient.pageDeepPositionIndex <= 2){
+			$scope.patient.pageDeepPositionIndex++;
+		}
+		if($scope.patient.pageDeepPositionIndex < 0){
+			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
+		}else
+		if($scope.patient.pageDeepPositionIndex == 0){
+			$("#focus_0").focus();
+		}else
 		if($scope.patient.pageDeepPositionIndex == 1){
+		}else
+		if($scope.patient.pageDeepPositionIndex == 2){
 			if($scope.editedPrescribeHistory.isCollapsed){
 				$scope.editedPrescribeHistory.isCollapsed = false;
 			}
-			$scope.patient.pageDeepPositionIndex++;
 		}
 	}
 });
@@ -571,12 +577,14 @@ $scope.keys.push({
 	action : function() {
 		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
 			$scope.patient.pageDeepPositionIndex--;
-			if($scope.patient.pageDeepPositionIndex == 0){
-				$("#focus_0").focus();
-			}else
-			if($scope.patient.pageDeepPositionIndex < 0){
-				$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
-			}
+		}
+		if($scope.patient.pageDeepPositionIndex == 0){
+			$("#focus_0").focus();
+			$scope.patient.selectPrescribesHistoryIndex = 0;
+			$scope.editedPrescribeHistory = $scope.patient.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
+		}else
+		if($scope.patient.pageDeepPositionIndex < 0){
+			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
 		}
 	}
 });
