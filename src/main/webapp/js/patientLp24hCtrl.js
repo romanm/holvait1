@@ -516,7 +516,12 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowRight,
 	action : function() {
-		$scope.patient.pageDeepPositionIndex++;
+		if($scope.patient.pageDeepPositionIndex == 1){
+			if($scope.editedPrescribeHistory.isCollapsed){
+				$scope.editedPrescribeHistory.isCollapsed = false;
+			}
+			$scope.patient.pageDeepPositionIndex++;
+		}
 	}
 });
 $scope.keys.push({
