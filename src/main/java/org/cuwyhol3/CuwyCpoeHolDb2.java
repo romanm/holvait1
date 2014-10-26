@@ -26,12 +26,12 @@ public class CuwyCpoeHolDb2 {
 		dataSource.setUsername("sa");
 //		dataSource.setPassword("");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		System.out.println("------CuwyCpoeHolDb2-------"+jdbcTemplate);
+		logger.debug("------CuwyCpoeHolDb2-------"+jdbcTemplate);
 	}
 
 	public Map<String, Object> readPatient(Integer id) {
 		String sql = "SELECT * FROM patient1 WHERE patient_id = ?";
-		System.out.println("\n"+sql.replaceFirst("\\?", ""+id));
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
 		List<Map<String, Object>> patient1sList = jdbcTemplate.queryForList(sql, id);
 		Map<String, Object> map = patient1sList.get(0);
 		return map;
@@ -39,7 +39,7 @@ public class CuwyCpoeHolDb2 {
 
 	public Map<String, Object> readPrescribe(Integer id) {
 		String sql = "SELECT * FROM prescribe1 WHERE prescribe_id = ?";
-		System.out.println("\n"+sql.replaceFirst("\\?", ""+id));
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
 		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, id);
 		Map<String, Object> map = prescribe1sList.get(0);
 		return map;
@@ -47,7 +47,7 @@ public class CuwyCpoeHolDb2 {
 
 	public Map<String, Object> readDrug(Integer id) {
 		String sql = "SELECT * FROM drug1 WHERE drug_id = ?";
-		System.out.println("\n"+sql.replaceFirst("\\?", ""+id));
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
 		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, id);
 		Map<String, Object> map = prescribe1sList.get(0);
 		return map;
@@ -65,7 +65,7 @@ public class CuwyCpoeHolDb2 {
 
 	public List<Map<String, Object>> prescribe1sList() {
 		String sql = "SELECT * FROM prescribe1 ";
-		System.out.println("\n"+sql);
+		logger.debug("\n"+sql);
 		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql);
 		return prescribe1sList;
 	}
@@ -97,7 +97,7 @@ public class CuwyCpoeHolDb2 {
 
 	public List<Map<String, Object>> patient1sList() {
 		String sql = "SELECT * FROM patient1";
-		System.out.println("\n"+sql);
+		logger.debug("\n"+sql);
 		List<Map<String, Object>> patient1sList = jdbcTemplate.queryForList(sql);
 		return patient1sList;
 	}
@@ -128,6 +128,7 @@ public class CuwyCpoeHolDb2 {
 
 	public Map<String, Object> newDrug(Map<String, Object> newDrug) {
 		Object drugName = newDrug.get("DRUG_NAME");
+		logger.debug(""+drugName+"/"+newDrug);
 		jdbcTemplate.update("INSERT INTO drug1 (drug_name) VALUES (?)",drugName);
 		String sqlSelectDrug1 = "SELECT drug_id FROM drug1 WHERE drug_name = ? limit 1";
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sqlSelectDrug1, drugName);
@@ -144,7 +145,7 @@ public class CuwyCpoeHolDb2 {
 
 	public List<Map<String, Object>> drug1sList() {
 		String sql = "SELECT * FROM drug1";
-		System.out.println("\n"+sql);
+		logger.debug("\n"+sql);
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
 	}

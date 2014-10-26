@@ -34,8 +34,8 @@ public class CuwyHol3Controller {
 	public @ResponseBody List<Map<String, Object>> updatePrescribe(
 			@RequestBody Map<String, Object> prescribeToUpdate) {
 		logger.debug("------------------");
-		System.out.println("/updatePrescribe");
-		System.out.println(prescribeToUpdate);
+		logger.debug("/updatePrescribe");
+		logger.debug(" o - "+prescribeToUpdate);
 		int updateProtocol = cuwyCpoeHolDb2.updatePrescribeOrder(prescribeToUpdate);
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
 		Map<String, Object> readPrescribes = readPrescribes(prescribeId);
@@ -48,26 +48,26 @@ public class CuwyHol3Controller {
 	//------------------patient----------------------
 	@RequestMapping(value = "/saveNewPatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewPatient(@RequestBody Map<String, Object> newPatient) {
-		System.out.println("/saveNewPatient");
-		System.out.println(newPatient);
+		logger.debug("/saveNewPatient");
+		logger.debug(" o - "+newPatient);
 		newPatient = cuwyCpoeHolDb2.newPatient(newPatient);
-		System.out.println(newPatient);
+		logger.debug(" o - "+newPatient);
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
 	}
 	@RequestMapping(value = "/removePatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> removePatient(@RequestBody Map<String, Object> patientToRemove) {
-		System.out.println("/removePatient");
-		System.out.println(patientToRemove);
+		logger.debug("/removePatient");
+		logger.debug(" o - "+patientToRemove);
 		int removePatientId = cuwyCpoeHolDb2.removePatient(patientToRemove);
-		System.out.println(removePatientId);
+		logger.debug(" o - "+removePatientId);
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
 	}
 	@RequestMapping(value = "/updatePatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updatePatient(@RequestBody Map<String, Object> patientToUpdate) {
-		System.out.println("/removePatient");
-		System.out.println(patientToUpdate);
+		logger.debug("/removePatient");
+		logger.debug(" o - "+patientToUpdate);
 		int updatePatient = cuwyCpoeHolDb2.updatePatient(patientToUpdate);
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
@@ -82,7 +82,7 @@ public class CuwyHol3Controller {
 	}
 	@RequestMapping(value = "/patient1sList", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> patient1sList() {
-		System.out.println("/patient1sList");
+		logger.debug("/patient1sList");
 		List<Map<String, Object>> patient1sList = cuwyCpoeHolDb2.patient1sList();
 		writeToJsDbFile("var patient1sList = ", patient1sList, patient1sListJsFileName);
 		return patient1sList;
@@ -92,26 +92,26 @@ public class CuwyHol3Controller {
 	//------------------drug----------------------
 	@RequestMapping(value = "/saveNewDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewDrug(@RequestBody Map<String, Object> newDrug) {
-		System.out.println("/saveNewDrug");
-		System.out.println(newDrug);
+		logger.debug("/saveNewDrug");
+		logger.debug(" o - "+newDrug);
 		newDrug = cuwyCpoeHolDb2.newDrug(newDrug);
-		System.out.println(newDrug);
+		logger.debug(" o - "+newDrug);
 		List<Map<String, Object>> drug1sList = drug1sList();
 		return drug1sList;
 	}
 	@RequestMapping(value = "/removeDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> removeDrug(@RequestBody Map<String, Object> drugToRemove) {
-		System.out.println("/removeDrug");
-		System.out.println(drugToRemove);
+		logger.debug("/removeDrug");
+		logger.debug(" o - "+drugToRemove);
 		int removeDrugId = cuwyCpoeHolDb2.removeDrug(drugToRemove);
-		System.out.println(removeDrugId);
+		logger.debug(" o - "+removeDrugId);
 		List<Map<String, Object>> drug1sList = drug1sList();
 		return drug1sList;
 	}
 	@RequestMapping(value = "/updateDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updateDrug(@RequestBody Map<String, Object> drugToUpdate) {
-		System.out.println("/removeDrug");
-		System.out.println(drugToUpdate);
+		logger.debug("/removeDrug");
+		logger.debug(" o - "+drugToUpdate);
 		int updateDrug = cuwyCpoeHolDb2.updateDrug(drugToUpdate);
 		List<Map<String, Object>> drug1sList = drug1sList();
 		return drug1sList;
@@ -144,10 +144,10 @@ public class CuwyHol3Controller {
 	@RequestMapping(value = "/removePrescribeOrder", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> removePrescribe(
 			@RequestBody Map<String, Object> prescribeToRemove) {
-		System.out.println("/removePrescribeOrder");
-		System.out.println(prescribeToRemove);
+		logger.debug("/removePrescribeOrder");
+		logger.debug(" o - "+prescribeToRemove);
 		int removePrescribeId = cuwyCpoeHolDb2.removePrescribeOrder(prescribeToRemove);
-		System.out.println(removePrescribeId);
+		logger.debug(" o - "+removePrescribeId);
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
@@ -164,7 +164,7 @@ public class CuwyHol3Controller {
 	}
 	@RequestMapping(value="/read/patient_{patientId}", method=RequestMethod.GET)
 	public @ResponseBody Map<String, Object> readPatient(@PathVariable Integer patientId) {
-		System.out.println("/read/patient_"+patientId);
+		logger.debug("/read/patient_"+patientId);
 		String fileNameWithPathAdd = getPatientDbJsonName(patientId);
 		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
 		if(null == readJsonDbFile2map){
@@ -184,9 +184,9 @@ public class CuwyHol3Controller {
 
 	private Map<String, Object> readJsonDbFile2map(String fileName) {
 		String pathToFile = applicationFolderPfad + innerDbFolderPfad + fileName;
-		System.out.println(pathToFile);
+		logger.debug(pathToFile);
 		File file = new File(pathToFile);
-		System.out.println(file);
+		logger.debug(" o - "+file);
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> readJsonDbFile2map = null;// = new HashMap<String, Object>();
 		try {
@@ -212,16 +212,16 @@ public class CuwyHol3Controller {
 	//---------prescribes-----------
 		@RequestMapping(value = "/session/paste", method = RequestMethod.GET)
 		public @ResponseBody Map<String, Object> sessionPaste(HttpSession session){
-			System.out.println(session);
+			logger.debug(" o - "+session);
 			Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
-			System.out.println(copyObj);
+			logger.debug(" o - "+copyObj);
 			return copyObj;
 		}
 		@RequestMapping(value = "/session/copy", method = RequestMethod.POST)
 		public @ResponseBody Map<String, Object> sessionCopy(
 				@RequestBody Map<String, Object> copyObj, HttpSession session){
-			System.out.println(copyObj);
-			System.out.println(session);
+			logger.debug(" o - "+copyObj);
+			logger.debug(" o - "+session);
 			session.setAttribute("copyObj", copyObj);
 			return copyObj;
 		}
@@ -238,16 +238,16 @@ public class CuwyHol3Controller {
 	@RequestMapping(value = "/saveNewPrescribe", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewPrescribe(
 			@RequestBody Map<String, Object> newPrescribe) {
-		System.out.println("/saveNewPrescribe");
-		System.out.println(newPrescribe);
+		logger.debug("/saveNewPrescribe");
+		logger.debug(" o - "+newPrescribe);
 		newPrescribe = cuwyCpoeHolDb2.newPrescribe(newPrescribe);
-		System.out.println(newPrescribe);
+		logger.debug(" o - "+newPrescribe);
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
 	@RequestMapping(value = "/prescribe1sList", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> prescribe1sList() {
-		System.out.println("/prescribe1sList");
+		logger.debug("/prescribe1sList");
 		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sList();
 		writeToJsDbFile("var prescribeOrder1sList = ", prescribe1sList, prescribeOrder1sListJsFileName);
 		return prescribe1sList;
