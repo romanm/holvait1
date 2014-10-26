@@ -40,16 +40,16 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		$($scope.patient.prescribesHistory).each(function () {
 			this.tasksInDay = getTasksInDay();
 		} );
-		if(!$scope.patient.selectPrescribesHistoryIndex){
+		if(typeof $scope.patient.selectPrescribesHistoryIndex === 'undefined'){
 			$scope.patient.selectPrescribesHistoryIndex = 0;
 			$scope.numberOfChange++;
 		}
 		$scope.editedPrescribeHistory = $scope.patient.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
-		if(!$scope.editedPrescribeHistory.selectDrugIndex){
+		if(typeof $scope.editedPrescribeHistory.selectDrugIndex === 'undefined'){
 			$scope.editedPrescribeHistory.selectDrugIndex = 0;
 			$scope.numberOfChange++;
 		}
-		if(!$scope.patient.pageDeepPositionIndex){
+		if(typeof $scope.patient.pageDeepPositionIndex === 'undefined'){
 			$scope.numberOfChange++;
 			if($scope.editedPrescribeHistory.isCollapsed){
 				$scope.patient.pageDeepPositionIndex = 1;
@@ -72,6 +72,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', function ($scope, $h
 		}
 		$scope.patient.prescribesHistory.splice(0, 0, prescribeHistory);
 	}
+
 	$scope.savePatient = function(){
 			$($scope.patient.prescribesHistory).each(function () {
 				this.tasksInDay = null;
