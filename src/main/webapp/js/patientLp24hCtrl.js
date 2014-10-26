@@ -591,10 +591,17 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowDown,
 	action : function() {
-		if($scope.patient.pageDeepPositionIndex == 2)
+		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.editedPrescribeHistory.selectDrugIndex++;
-		else if($scope.patient.pageDeepPositionIndex == 1){
+			if($scope.editedPrescribeHistory.selectDrugIndex >= 19){
+				$scope.editedPrescribeHistory.selectDrugIndex = 0;
+			}
+		}else
+		if($scope.patient.pageDeepPositionIndex == 1){
 			$scope.patient.selectPrescribesHistoryIndex++;
+			if($scope.patient.selectPrescribesHistoryIndex >= $scope.patient.prescribesHistory.length){
+				$scope.patient.selectPrescribesHistoryIndex = 0;
+			}
 			$scope.editedPrescribeHistory = $scope.patient.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
 		}
 	}
@@ -602,13 +609,22 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowUp,
 	action : function() {
-		if($scope.patient.pageDeepPositionIndex == 2)
+		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
+			console.log($scope.editedPrescribeHistory.selectDrugIndex);
+			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
+				$scope.editedPrescribeHistory.selectDrugIndex = 18;
+			}
+			console.log($scope.editedPrescribeHistory.selectDrugIndex);
+		}
 		else if($scope.patient.pageDeepPositionIndex == 1){
 			$scope.patient.selectPrescribesHistoryIndex--;
+			if($scope.patient.selectPrescribesHistoryIndex < 0){
+				$scope.patient.selectPrescribesHistoryIndex = 
+					$scope.patient.prescribesHistory.length - 1;
+			}
 			$scope.editedPrescribeHistory = $scope.patient.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
 		}
-
 	}
 });
 $scope.keys.push({
