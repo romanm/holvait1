@@ -530,6 +530,19 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
+	code : KeyCodes.SPACEBAR,
+	action : function() {
+		console.log("SPACEBAR");
+		if($scope.patient.pageDeepPositionIndex == 1){
+			$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
+		}else
+		if($scope.patient.pageDeepPositionIndex == 2){
+			var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
+			$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}
+	}
+});
+$scope.keys.push({
 	code : KeyCodes.RETURNKEY,
 	action : function() {
 		console.log("RETURNKEY");
