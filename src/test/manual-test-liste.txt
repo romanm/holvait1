@@ -5,6 +5,8 @@ lp24 editor
 1. Arrow Right from edited Prescribe History if it is closed opened it and go focus on it task.
 2. Escape close edited Prescribe History if it is open
 3. One unsaved changes when loading a patient document that remains after save. #3 
+4. Escape logic - up, up, up. #6 
+
 
 999. Close day without focus loss if day is open.
 

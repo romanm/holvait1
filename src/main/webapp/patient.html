@@ -9,9 +9,16 @@
 </head>
 
 <body data-key-cuwytrap="" >
-<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
-/ <a href="patient.html?id={{parameters.id}}"> <span class="h1">{{siteMap.name}} <span>{{patient.PATIENT_NAME}}</span>
-	</span>
+	<a id="focus_minus_2"
+		data-ng-class="{'selected': patient.pageDeepPositionIndex == -2}"
+		href="/home.html"><span class="glyphicon glyphicon-home"></span></a> 
+/	<a id="focus_minus_1"
+		data-ng-class="{'selected': patient.pageDeepPositionIndex == -1}"
+		href="patients.html">Список пацієнтів</a> 
+/	<a id="focus_0"
+		data-ng-class="{'selected': patient.pageDeepPositionIndex == 0}"
+		href="patient.html?id={{parameters.id}}"> <span class="h1">{{siteMap.name}}
+			<span>{{patient.PATIENT_NAME}}</span></span>
 	</a>
 	<span class="navbar-right">
 	<ul class="nav nav-pills">

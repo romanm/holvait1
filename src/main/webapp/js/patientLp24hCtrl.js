@@ -1,4 +1,5 @@
 cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
+	var minPageDeepPositionIndex = -2;
 	$scope.numberOfChange = 0;
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
@@ -163,6 +164,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug);
 		}
+		$scope.taslInDayDialogIsOpen = true;
 	}
 	
 readDrugDocument = function(drug){
@@ -489,11 +491,30 @@ $scope.keys.push({
 	code : KeyCodes.Escape,
 	action : function() {
 		console.log("Escape");
+		if($scope.taslInDayDialogIsOpen){
+			$scope.taslInDayDialogIsOpen = false;
+		}else
+		if($scope.patient.pageDeepPositionIndex == 2){
+			$scope.patient.pageDeepPositionIndex--;
+		}else
 		if($scope.patient.pageDeepPositionIndex == 1){
-			console.log($scope.editedPrescribeHistory);
-			if(!$scope.editedPrescribeHistory.isCollapsed){
+			var calcNotCollapsed = 0;
+			$($scope.patient.prescribesHistory).each(function () {
+				if(!this.isCollapsed) calcNotCollapsed++;
+			} );
+			if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
 				$scope.editedPrescribeHistory.isCollapsed = true;
+			}else{
+				console.log("Escape - "+$scope.patient.pageDeepPositionIndex+"--");
+				$scope.patient.pageDeepPositionIndex--;
+				console.log("Escape - "+$scope.patient.pageDeepPositionIndex);
+				$("#focus_0").focus();
 			}
+		}else 
+		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
+			$scope.patient.pageDeepPositionIndex--;
+			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
+			console.log("Escape - "+$scope.patient.pageDeepPositionIndex);
 		}
 	}
 });
@@ -514,8 +535,15 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.RETURNKEY,
 	action : function() {
-		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
-		$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		console.log("RETURNKEY");
+		if($scope.patient.pageDeepPositionIndex == 1){
+			console.log("RETURNKEY day");
+			$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
+		}else
+		if($scope.patient.pageDeepPositionIndex == 2){
+			var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
+			$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}
 	}
 });
 $scope.keys.push({
