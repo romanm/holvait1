@@ -569,7 +569,15 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowLeft,
 	action : function() {
-		$scope.patient.pageDeepPositionIndex--;
+		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
+			$scope.patient.pageDeepPositionIndex--;
+			if($scope.patient.pageDeepPositionIndex == 0){
+				$("#focus_0").focus();
+			}else
+			if($scope.patient.pageDeepPositionIndex < 0){
+				$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
+			}
+		}
 	}
 });
 $scope.keys.push({
