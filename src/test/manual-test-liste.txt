@@ -1,0 +1,8 @@
+manual test liste
+-----------------
+lp24 editor
+-----------
+1. Arrow Right from edited Prescribe History if it is closed opened it and go focus on it task.
+2. Escape close edited Prescribe History if it is open
+999. Close day without focus loss if day is open.
+
