@@ -7,7 +7,8 @@ lp24 editor
 3. One unsaved changes when loading a patient document that remains after save. #3 
 4. Escape logic - up, up, up. #6 
 5. Test Arrow Up, Down, Left, Right. #7 
-
+6. Dialogue drug in the prescriptions document #8 
+7. Tips page (F1) #9 
 
 999. Close day without focus loss if day is open.
 

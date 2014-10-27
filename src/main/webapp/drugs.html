@@ -8,8 +8,13 @@
 </head>
 
 <body key-cuwytrap="">
-<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
-/ <span class="h1">{{siteMap.name}}</span>
+	<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
+/	<span class="h1">{{siteMap.name}}</span>
+	<span class="navbar-right">
+		<ul class="nav nav-pills">
+			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
+		</ul>
+	</span>
 <hr/>
 <div class="container">
 		<div class="row">
@@ -180,6 +185,7 @@
 		];
 		
 	var KeyCodes = {
+		F1 : 112,
 		UPARROW : 38,
 		DOWNARROW : 40,
 		LEFTARROW : 37,
@@ -236,6 +242,12 @@
 			}
 		}
 	});
+	$scope.keys.push({
+		code : KeyCodes.F1,
+		action : function() {
+			$scope.openF1();
+		}
+	});
 
 	$scope.$on('keydown', function(msg, obj) {
 		var code = obj.event.keyCode;
@@ -248,6 +260,10 @@
 			$scope.$apply();
 		});
 	});
+
+	$scope.openF1 = function(){
+		window.open("help.html#drugs", "", "width=1000, height=500");
+	}
 
 	} ] );
 	</script>

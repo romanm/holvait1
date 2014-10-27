@@ -522,7 +522,7 @@ $scope.keys.push({
 	}
 });
 $scope.openF1 = function(){
-	window.open("help.html", "", "width=1000, height=500");
+	window.open("help.html#patient", "", "width=1000, height=500");
 }
 $scope.keys.push({
 	code : KeyCodes.Delete,
