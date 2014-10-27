@@ -133,9 +133,7 @@
 							</td>
 							<td>.</td>
 						</tr>
-			<tr data-ng-if="taskInDay.isCollapsed"
-				data-ng-controller="taskInDayCtrl"
-			>
+			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
 					<span class="close navbar-right">
@@ -166,17 +164,28 @@
 						<div class="form-group">
 							<div class="input-group">
 								<span class="input-group-addon">Пошук:</span>
-								<input type="text" class="form-control" data-ng-model="editedPrescribeDrug.DRUG_NAME" auto-focus="" placeholder="Медикамент пошук / запис">
+								<input type="text" class="form-control" 
+									data-ng-model="editedPrescribeDrug.DRUG_NAME" 
+									data-ng-change="filterDrugs()"
+									auto-focus="" placeholder="Медикамент пошук / запис">
 							</div>
 						</div>
 						<button  data-ng-click="saveNewDrug(seekDrug, taskInDay, prescribeHistory)" class="btn btn-default">
 							<span class="glyphicon glyphicon-floppy-disk"></span>
 						</button>
 						<div>
+						<!-- 
 						<div data-ng-repeat="drug in drug1sList | filter: {DRUG_ARCHIVE:false} | filter: editedPrescribeDrug.DRUG_NAME | limitTo : 12">
-							<a ng-click="drugToTask2(drug, taskInDay, prescribeHistory)">
+						-->
+						<div data-ng-repeat="drug in drug1sListFilter ">
+						<div data-ng-class="{
+						selectpath:drug1sListFilter[selectDrugIndex]==drug,
+						selected:drug1sListFilter[selectDrugIndex]==drug
+						}" >
+							<a data-ng-click="drugToTask2(drug, taskInDay, prescribeHistory)">
 							{{drug.DRUG_NAME}}
 							</a>
+						</div>
 						</div>
 						</div>
 					</form>
@@ -290,6 +299,9 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/patient1sList.json.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
+	<!-- 
+	<script src="/js/patientLp24hCtrl.min.js"></script>
+	 -->
 	<script src="/js/patientLp24hCtrl.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	$scope.config = config;
 	$scope.siteMap = config.siteMap.siteMaps[4];
 	$scope.parameters = parameters;
-	var pageDeepPosition = ["page","day","task"];
+	var pageDeepPosition = ["page","day","task","edittask"];
 	getDayHours = function(){
 		var dayHours = [];
 		for(var i=0;i<24;i++) dayHours.push(i);
@@ -144,6 +144,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			$scope.patient.selectPrescribesHistoryIndex = $scope.patient.prescribesHistory.indexOf(prescribeHistory);
 			return;
 		}
+		$scope.patient.pageDeepPositionIndex = 3;
 		var oldCollapsed = taskInDay.isCollapsed;
 		$(prescribeHistory.tasksInDay).each(function () {
 			this.isCollapsed = false;
@@ -164,7 +165,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug);
 		}
-		$scope.taslInDayDialogIsOpen = true;
 	}
 	
 readDrugDocument = function(drug){
@@ -480,7 +480,7 @@ var KeyCodes = {
 	ArrowDown : 40,
 	ArrowLeft : 37,
 	ArrowRight : 39,
-	RETURNKEY : 13,
+	Enter : 13,
 	BACKSPACE : 8,
 	TABKEY : 9,
 	SPACEBAR : 32
@@ -491,9 +491,6 @@ $scope.keys.push({
 	code : KeyCodes.Escape,
 	action : function() {
 		console.log("Escape");
-		if($scope.taslInDayDialogIsOpen){
-			$scope.taslInDayDialogIsOpen = false;
-		}else
 		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.patient.pageDeepPositionIndex--;
 		}else
@@ -543,9 +540,9 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
-	code : KeyCodes.RETURNKEY,
+	code : KeyCodes.Enter,
 	action : function() {
-		console.log("RETURNKEY");
+		console.log("Enter");
 		if($scope.patient.pageDeepPositionIndex == 1){
 			$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
 		}else
@@ -556,7 +553,7 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
-	code : KeyCodes.RETURNKEY,
+	code : KeyCodes.Enter,
 	shiftKey : true,
 	action : function() {
 		$scope.editedPrescribeHistory.selectDrugIndex++;
@@ -622,6 +619,7 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowUp,
 	action : function() {
+		console.log("ArrowUp");
 		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
 			console.log($scope.editedPrescribeHistory.selectDrugIndex);
@@ -708,6 +706,9 @@ $scope.$on('keydown', function(msg, obj) {
 	var altKey = obj.event.altKey;
 	var shiftKey = obj.event.shiftKey;
 	$scope.keys.forEach(function(o) {
+		if($scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed){
+			return;
+		}
 		if(o.code !== code) return;
 		if((ctrlKey && !o.ctrlKey) || (o.ctrlKey && !ctrlKey)) return;
 		if((altKey && !o.altKey) || (o.altKey && !altKey)) return;
@@ -719,10 +720,29 @@ $scope.$on('keydown', function(msg, obj) {
 //---------------------keydown---------------------END-------
 }]);
 
-cuwyApp.controller('taskInDayCtrl', [ '$scope', '$http',function ($scope, $http) {
+cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	console.log("---------taskInDayCtrl------------");
+	$scope.selectDrugIndex = null;
+	adaptSelectDrugToFilterList = function(){
+		if(($scope.drug1sListFilter.length-1) < $scope.selectDrugIndex)
+			$scope.selectDrugIndex = null;
+	}
+
+	$scope.filterDrugs = function(){
+		var f1 = $filter('filter')($scope.drug1sList, {DRUG_ARCHIVE:false});
+		var f2 = $filter('filter')(f1, $scope.editedPrescribeDrug.DRUG_NAME);
+		$scope.drug1sListFilter = $filter('limitTo')(f2, 12);
+		adaptSelectDrugToFilterList();
+		if($scope.selectDrugIndex == null)
+			$scope.selectDrugIndex = 0;
+	}
+	$scope.filterDrugs();
+	console.log($scope.drug1sListFilter);
+
 	var KeyCodes = {
-		Escape : 27
+		Escape : 27,
+		ArrowUp : 38,
+		ArrowDown : 40
 	};
 
 	$scope.keys = [];
@@ -731,6 +751,38 @@ cuwyApp.controller('taskInDayCtrl', [ '$scope', '$http',function ($scope, $http)
 		action : function() {
 			console.log("Escape -- taskInDayCtrl");
 			$scope.taskInDay.isCollapsed = false;
+			$scope.patient.pageDeepPositionIndex = 2;
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.ArrowUp,
+		action : function() {
+			console.log("ArrowUp ");
+			adaptSelectDrugToFilterList();
+			if(null==$scope.selectDrugIndex || 0==$scope.selectDrugIndex){
+				$scope.selectDrugIndex = $scope.drug1sListFilter.length-1;
+			}else{
+				$scope.selectDrugIndex--;
+			}
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.ArrowDown,
+		action : function() {
+			console.log("ArrowDown ");
+			adaptSelectDrugToFilterList();
+			if(null==$scope.selectDrugIndex || $scope.selectDrugIndex==($scope.drug1sListFilter.length-1)){
+				$scope.selectDrugIndex = 0;
+			}else{
+				$scope.selectDrugIndex++;
+			}
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.ArrowDown,
+		ctrlKey : true,
+		action : function() {
+			console.log("CtrlArrowDown ");
 		}
 	});
 
