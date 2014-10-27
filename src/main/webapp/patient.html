@@ -136,74 +136,19 @@
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
-					<span class="close navbar-right">
-						<small>
-						<span data-ng-click="taskInDay.dialogTab='drug'">
-							<span data-ng-show="taskInDay.dialogTab != 'drug'">ліка</span>
-							<u data-ng-show="taskInDay.dialogTab == 'drug'">ліка</u>
-						</span>
-						|
-						<span data-ng-click="taskInDay.dialogTab='dose'">
-							<span data-ng-show="taskInDay.dialogTab != 'dose'">доза</span>
-							<u data-ng-show="taskInDay.dialogTab == 'dose'">доза</u>
-						</span>
-						|
-						<span data-ng-click="taskInDay.dialogTab='times'">
-							<span data-ng-show="taskInDay.dialogTab != 'times'">час</span>
-							<u data-ng-show="taskInDay.dialogTab == 'times'">час</u>
-						</span>
-						|
-						<a data-ng-click="taskInDay.isCollapsed = false">
-							<span class="glyphicon glyphicon-share-alt"></span>
-						</a>
-						</small>
-					</span>
 				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-				<div data-ng-show="taskInDay.dialogTab == 'drug'">
+				<div >
+						<!-- 
+				<div data-ng-show="taskInDay.dialogTab == 'drug' || taskInDay.dialogTab=='dose' || taskInDay.dialogTab=='times'">
 					<form class="navbar-form navbar-left" role="search">
-						<div class="form-group">
-							<div class="input-group">
-								<span class="input-group-addon">Пошук:</span>
-								<input type="text" class="form-control" 
-									data-ng-model="editedPrescribeDrug.DRUG_NAME" 
-									data-ng-change="filterDrugs()"
-									auto-focus="" placeholder="Медикамент пошук / запис">
-							</div>
-						</div>
 						<button  data-ng-click="saveNewDrug(seekDrug, taskInDay, prescribeHistory)" class="btn btn-default">
 							<span class="glyphicon glyphicon-floppy-disk"></span>
 						</button>
-						<div>
-						<!-- 
-						<div data-ng-repeat="drug in drug1sList | filter: {DRUG_ARCHIVE:false} | filter: editedPrescribeDrug.DRUG_NAME | limitTo : 12">
-						-->
-						<div data-ng-repeat="drug in drug1sListFilter ">
-						<div data-ng-class="{
-						selectpath:drug1sListFilter[selectDrugIndex]==drug,
-						selected:drug1sListFilter[selectDrugIndex]==drug
-						}" >
-							<a data-ng-click="drugToTask2(drug, taskInDay, prescribeHistory)">
-							{{drug.DRUG_NAME}}
-							</a>
-						</div>
-						</div>
-						</div>
 					</form>
-				</div>
-		<div data-ng-show="taskInDay.dialogTab=='dose'">
-			<div >
-				<span data-ng-repeat="dose in drugDocument.doses" data-ng-click="addDoseToPrescribeDrug(dose)">
-					<small data-ng-show="dose.DOSECONCENTRATON_NUMBER">
-						{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
-					</small>
-					{{dose.DOSE_NUMBER}}
-					{{dose.DOSE_UNIT}}
-					{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}
-					|
-				</span>
-			</div>
-			<table style="width: 600px;">
+						 -->
+			<table class="dose">
 				<tr>
+					<th>Медикамент:_______</th>
 					<th title="Концентрація">--</th>
 					<th title="Одиниці виміру концентрації">
 						<span 
@@ -227,19 +172,24 @@
 					</th>
 				</tr>
 				<tr>
-					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td><input type="text" class="form-control"
+						data-ng-model="editedPrescribeDrug.DRUG_NAME"
+						data-ng-focus="changeDialogTab('drug')"
+						data-ng-blur="changeDialogTab('dose')"
+						data-ng-change="filterDrugs()" auto-focus=""
+						placeholder=" пошук / запис"></td>
+					<td> <input id="dose1" 
+						data-ng-model="newDrugDocumentDose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
 					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
 					<td>-</td>
 					<td> <input ng-model="newDrugDocumentDose.DOSE_NUMBER" type="text" class="form-control" /> </td>
 					<td> <input ng-model="newDrugDocumentDose.DOSE_UNIT" type="text" class="form-control" /> </td>
 					<td> <input ng-model="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
 					<td> &nbsp; </td>
-					<td> <a data-ng-click="addNewDrugDocumentDose()"> <span class="glyphicon glyphicon-plus"></span> </a> </td>
 				</tr>
-			</table>
-		</div>
-		<div data-ng-show="taskInDay.dialogTab=='times'">
-				..
+				<tr>
+					<td></td>
+					<td colspan="7">
 				<table>
 					<tr>
 						<td>
@@ -260,17 +210,35 @@
 						</td>
 					</tr>
 				</table>
-				..
-		</div>
-				<span class="close navbar-right">
-					<small>
-					Додаток:
-					<a href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">
-						{{prescribeHistory.prescribes.tasks[$index].DRUG_NAME}}
-					</a>
+					</td>
+				</tr>
+			</table>
+				<div data-ng-show="taskInDay.dialogTab == 'drug'">
+					<div data-ng-repeat="drug in drug1sListFilter ">
+						<div class="mouseover" data-ng-class="{
+			selectpath:drug1sListFilter[selectDrugIndex] == drug,
+			selected:drug1sListFilter[selectDrugIndex] == drug }"
+			data-ng-click="drugToTask3(drug)">
+								{{drug.DRUG_NAME}} 
+						</div>
+					</div>
+				</div>
+				<div>
+					<span data-ng-repeat="dose in drugDocument.doses"
+						data-ng-click="addDoseToPrescribeDrug(dose)"> <small
+						data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+							{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+					</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
+						{{dose.DOSE_ROUTE_OF_ADMINISTRATION}} |
+					</span>
+				</div>
+			</div>
+				<span class="close navbar-right"> <small> Додаток: <a
+							href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">
+								{{prescribeHistory.prescribes.tasks[$index].DRUG_NAME}} </a>
 					</small>
 				</span>
-				</td>
+			</td>
 			</tr>
 					</tbody>
 				</table>

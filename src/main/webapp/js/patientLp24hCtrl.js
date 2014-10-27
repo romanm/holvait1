@@ -144,6 +144,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			$scope.patient.selectPrescribesHistoryIndex = $scope.patient.prescribesHistory.indexOf(prescribeHistory);
 			return;
 		}
+
 		$scope.patient.pageDeepPositionIndex = 3;
 		var oldCollapsed = taskInDay.isCollapsed;
 		$(prescribeHistory.tasksInDay).each(function () {
@@ -151,17 +152,20 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
 		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+		console.log($scope.editedPrescribeDrug);
 		if(null == $scope.editedPrescribeDrug){
-			$scope.editedPrescribeDrug = {DRUG_NAME:null};
+			$scope.editedPrescribeDrug = 
+			{DRUG_NAME:"",
+				dose:{DOSECONCENTRATON_UNIT:""
+					,DOSECONCENTRATON_NUMBER:""
+					,DOSE_UNIT:""
+					,DOSE_NUMBER:""
+					,DOSE_ID:""
+					,DOSE_ROUTE_OF_ADMINISTRATION:""}
+			};
+			insertDrugToTask($scope.editedPrescribeDrug, $scope.editedPrescribeHistory.selectDrugIndex, prescribeHistory);
 		}
-		if(null == $scope.editedPrescribeDrug.DRUG_NAME 
-		|| "" == $scope.editedPrescribeDrug.DRUG_NAME
-		){
-			taskInDay.dialogTab = "drug";
-		}else{
-			taskInDay.dialogTab = "dose";
-		}
-	
+		console.log($scope.editedPrescribeDrug);
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug);
 		}
@@ -722,6 +726,8 @@ $scope.$on('keydown', function(msg, obj) {
 
 cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	console.log("---------taskInDayCtrl------------");
+	$scope.taskInDay.dialogTab = "start";
+	var isJustOpened = true;
 	$scope.selectDrugIndex = null;
 	adaptSelectDrugToFilterList = function(){
 		if(($scope.drug1sListFilter.length-1) < $scope.selectDrugIndex)
@@ -737,10 +743,33 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 			$scope.selectDrugIndex = 0;
 	}
 	$scope.filterDrugs();
-	console.log($scope.drug1sListFilter);
 
+	$scope.changeDialogTab = function(fieldName){
+		$scope.taskInDay.dialogTab = fieldName;
+	}
+
+	$scope.drugToTask3 = function(drug){
+		$scope.copyDrugToTask(drug, $scope.editedPrescribeDrug);
+	}
+
+	$scope.copyDrugToTask = function(dS, dT){
+		dT.DRUG_ARCHIVE = dS.DRUG_ARCHIVE;
+		dT.DRUG_ID = dS.DRUG_ID;
+		dT.DRUG_NAME = dS.DRUG_NAME;
+		console.log(1);
+		readDrugDocument(dT);
+		console.log(2);
+		$('#dose1').focus();
+		console.log(3);
+		$scope.numberOfChange++;
+		console.log($scope.taskInDay.dialogTab);
+		$scope.taskInDay.dialogTab = "dose";
+	}
+
+	//-----------------------keydown------------------------
 	var KeyCodes = {
 		Escape : 27,
+		Enter : 13,
 		ArrowUp : 38,
 		ArrowDown : 40
 	};
@@ -752,6 +781,18 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 			console.log("Escape -- taskInDayCtrl");
 			$scope.taskInDay.isCollapsed = false;
 			$scope.patient.pageDeepPositionIndex = 2;
+		}
+	});
+	$scope.keys.push({
+		code : KeyCodes.Enter,
+		shiftKey : true,
+		action : function() {
+			console.log("Enter");
+			if(isJustOpened){
+				isJustOpened = false;
+				return;
+			}
+			$scope.copyDrugToTask($scope.drug1sListFilter[$scope.selectDrugIndex], $scope.editedPrescribeDrug);
 		}
 	});
 	$scope.keys.push({

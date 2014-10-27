@@ -4,8 +4,14 @@
 .selectpath{
 	border: 1px dotted navy; 
 }
+table.dose{
+	width: 600px;
+	/*
+	width: 100%;
+	*/
+}
 .mouseover:hover,
-table.tablehover td:hover{
+table.tablehover > tbody > tr > td:hover{
 	border: 1px dashed navy; 
 	/*
 	border: 1px dashed navy; 
