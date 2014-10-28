@@ -5,6 +5,7 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	$scope.drug1sList = drug1sList;
 	$scope.drugListOrArchive = false;
 	$scope.selectDrugIndex = null;
+	$scope.pageDeepPositionIndex = 1;
 
 	$scope.filterArchive = function(archive){
 		$scope.drugListOrArchive = archive;
@@ -94,11 +95,25 @@ var KeyCodes = {
 	Enter : 13,
 	BACKSPACE : 8,
 	TABKEY : 9,
-	ESCAPE : 27,
+	Escape : 27,
 	SPACEBAR : 32,
 };
 
 $scope.keys = [];
+$scope.keys.push({
+	code : KeyCodes.Escape,
+	action : function() {
+		console.log("Escape");
+		console.log($scope.pageDeepPositionIndex);
+		if($scope.pageDeepPositionIndex == 1){
+			$scope.pageDeepPositionIndex--;
+			$("#focus_0").focus();
+		}else
+		if($scope.pageDeepPositionIndex == 0){
+			document.getElementById('focus_minus_1').click();
+		}
+	}
+});
 $scope.keys.push({
 	code : KeyCodes.Enter,
 	action : function() {

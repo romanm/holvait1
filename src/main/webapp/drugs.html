@@ -8,14 +8,20 @@
 </head>
 
 <body key-cuwytrap="">
-	<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
-/	<span class="h1">{{siteMap.name}}</span>
+	<a id="focus_minus_1"
+		data-ng-class="{'selected': pageDeepPositionIndex == -1}"
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
+/	<a id="focus_0"
+		data-ng-class="{'selected': pageDeepPositionIndex == 0}"
+		href="drugs.html"> <span class="h1">{{siteMap.name}}</span>
+	</a>
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
-			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
+			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small>
+			</a></li>
 		</ul>
 	</span>
-<hr/>
+	<hr/>
 <div class="container">
 		<div class="row">
 			<div class="col-xs-12">
