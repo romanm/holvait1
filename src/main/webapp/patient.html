@@ -138,14 +138,6 @@
 				<td class="well" colspan="25">
 				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
 				<div >
-						<!-- 
-				<div data-ng-show="taskInDay.dialogTab == 'drug' || taskInDay.dialogTab=='dose' || taskInDay.dialogTab=='times'">
-					<form class="navbar-form navbar-left" role="search">
-						<button  data-ng-click="saveNewDrug(seekDrug, taskInDay, prescribeHistory)" class="btn btn-default">
-							<span class="glyphicon glyphicon-floppy-disk"></span>
-						</button>
-					</form>
-						 -->
 			<table class="dose">
 				<tr>
 					<th>Медикамент:_______</th>
@@ -174,17 +166,28 @@
 				<tr>
 					<td><input type="text" class="form-control"
 						data-ng-model="editedPrescribeDrug.DRUG_NAME"
-						data-ng-focus="changeDialogTab('drug')"
-						data-ng-blur="changeDialogTab('dose')"
 						data-ng-change="filterDrugs()" auto-focus=""
+						data-ng-focus="changeDialogTab('drug')"
 						placeholder=" пошук / запис"></td>
+					<!-- 
+						data-ng-blur="changeDialogTab('dose')"
+					 -->
 					<td> <input id="dose1" 
-						data-ng-model="newDrugDocumentDose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
-					<td> <input ng-model="newDrugDocumentDose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
+						data-ng-focus="changeDialogTab('dose')"
+						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input
+						data-ng-focus="changeDialogTab('dose')"
+					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
 					<td>-</td>
-					<td> <input ng-model="newDrugDocumentDose.DOSE_NUMBER" type="text" class="form-control" /> </td>
-					<td> <input ng-model="newDrugDocumentDose.DOSE_UNIT" type="text" class="form-control" /> </td>
-					<td> <input ng-model="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
+					<td> <input
+							data-ng-focus="changeDialogTab('dose')"
+					 ng-model="editedPrescribeDrug.dose.DOSE_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input 
+					data-ng-focus="changeDialogTab('dose')"
+					ng-model="editedPrescribeDrug.dose.DOSE_UNIT" type="text" class="form-control" /> </td>
+					<td> <input 
+					data-ng-focus="changeDialogTab('dose')"
+					ng-model="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
 					<td> &nbsp; </td>
 				</tr>
 				<tr>
@@ -223,19 +226,25 @@
 						</div>
 					</div>
 				</div>
-				<div>
-					<span data-ng-repeat="dose in drugDocument.doses"
-						data-ng-click="addDoseToPrescribeDrug(dose)"> <small
-						data-ng-show="dose.DOSECONCENTRATON_NUMBER">
-							{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
-					</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
-						{{dose.DOSE_ROUTE_OF_ADMINISTRATION}} |
+				<div data-ng-show="taskInDay.dialogTab == 'dose'">
+					<span data-ng-repeat="dose in drugDocument.doses">
+						<span data-ng-click="addDoseToPrescribeDrug(dose)"
+						class="mouseover" data-ng-class="{
+				selectpath:drugDocument.doses[selectDoseIndex] == dose,
+				selected:drugDocument.doses[selectDoseIndex] == dose }"
+						>
+						<small
+							data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+								{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+						</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
+							{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}</span>
+							|
 					</span>
 				</div>
 			</div>
-				<span class="close navbar-right"> <small> Додаток: <a
-							href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">
-								{{prescribeHistory.prescribes.tasks[$index].DRUG_NAME}} </a>
+				<span class="close navbar-right"> <small> Додаток: 
+				<a href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">
+					{{prescribeHistory.prescribes.tasks[$index].DRUG_NAME}} </a>
 					</small>
 				</span>
 			</td>
@@ -271,5 +280,6 @@
 	<script src="/js/patientLp24hCtrl.min.js"></script>
 	 -->
 	<script src="/js/patientLp24hCtrl.js"></script>
+	<script src="/js/taskInDayCtrl.js"></script>
 </body>
 </html>
