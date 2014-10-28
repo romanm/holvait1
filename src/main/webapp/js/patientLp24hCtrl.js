@@ -531,6 +531,9 @@ $scope.keys.push({
 				$scope.patient.pageDeepPositionIndex--;
 				$("#focus_0").focus();
 			}
+		}else
+		if($scope.patient.pageDeepPositionIndex == 0){
+			document.getElementById('focus_minus_1').click();
 		}else 
 		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
 			$scope.patient.pageDeepPositionIndex--;
