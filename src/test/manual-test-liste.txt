@@ -9,6 +9,8 @@ lp24 editor
 5. Test Arrow Up, Down, Left, Right. #7 
 6. Dialogue drug in the prescriptions document #8 
 7. Tips page (F1) #9 
+8. Checking the status of disabled / enabled for button to save the document. #10 
+
 
 999. Close day without focus loss if day is open.
 
