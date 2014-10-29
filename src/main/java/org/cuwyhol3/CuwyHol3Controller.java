@@ -33,23 +33,21 @@ public class CuwyHol3Controller {
 	@RequestMapping(value = "/updatePrescribe", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updatePrescribe(
 			@RequestBody Map<String, Object> prescribeToUpdate) {
-		logger.debug("------------------");
-		logger.debug("/updatePrescribe");
-		logger.debug(" o - "+prescribeToUpdate);
+		logger.debug("/updatePrescribe prarameters = "+prescribeToUpdate);
 		int updateProtocol = cuwyCpoeHolDb2.updatePrescribeOrder(prescribeToUpdate);
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
 		Map<String, Object> readPrescribes = readPrescribes(prescribeId);
 		String prescribeName = (String) prescribeToUpdate.get("PRESCRIBE_NAME");
 		readPrescribes.put("PRESCRIBE_NAME", prescribeName);
 		writeToJsonDbFile(readPrescribes, getPrescribeDbJsonName(prescribeId));
+		prescribe1sListOpen();
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
 	//------------------patient----------------------
 	@RequestMapping(value = "/saveNewPatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewPatient(@RequestBody Map<String, Object> newPatient) {
-		logger.debug("/saveNewPatient");
-		logger.debug(" o - "+newPatient);
+		logger.debug("/saveNewPatient parameters - "+newPatient);
 		newPatient = cuwyCpoeHolDb2.newPatient(newPatient);
 		logger.debug(" o - "+newPatient);
 		List<Map<String, Object>> patient1sList = patient1sList();
@@ -57,8 +55,7 @@ public class CuwyHol3Controller {
 	}
 	@RequestMapping(value = "/removePatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> removePatient(@RequestBody Map<String, Object> patientToRemove) {
-		logger.debug("/removePatient");
-		logger.debug(" o - "+patientToRemove);
+		logger.debug("/removePatient parameters - "+patientToRemove);
 		int removePatientId = cuwyCpoeHolDb2.removePatient(patientToRemove);
 		logger.debug(" o - "+removePatientId);
 		List<Map<String, Object>> patient1sList = patient1sList();
@@ -66,8 +63,7 @@ public class CuwyHol3Controller {
 	}
 	@RequestMapping(value = "/updatePatient", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updatePatient(@RequestBody Map<String, Object> patientToUpdate) {
-		logger.debug("/removePatient");
-		logger.debug(" o - "+patientToUpdate);
+		logger.debug("/removePatient parameters - "+patientToUpdate);
 		int updatePatient = cuwyCpoeHolDb2.updatePatient(patientToUpdate);
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
@@ -175,10 +171,13 @@ public class CuwyHol3Controller {
 	}
 
 	private String prescribeOrder1sListJsFileName = "prescribeOrder1sList.json.js";
+	private String prescribeOrder1sListOpenJsFileName = "prescribeOrder1sListOpen.json.js";
 //	String applicationFolderPfad = "/home/roman/Documents/01_curepathway/work3/cuwy-cpoe-hol2/";
 //	String applicationFolderPfad = "/home/roman/01_hol/cuwy-cpoe-hol3/";
 	String applicationFolderPfad = "/home/roman/01_hol/holvait1/";
+//	String applicationFolderPfad = "/home/roman/01_hol/hol-sec-2";
 	String innerDbFolderPfad = "src/main/webapp/db/";
+	String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 	private String patient1sListJsFileName = "patient1sList.json.js";
 	private String drug1sListJsFileName = "drug1sList.json.js";
 
@@ -255,8 +254,21 @@ public class CuwyHol3Controller {
 		writeToJsDbFile("var prescribeOrder1sList = ", prescribe1sList, prescribeOrder1sListJsFileName);
 		return prescribe1sList;
 	}
+	@RequestMapping(value = "/prescribe1sListOpen", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> prescribe1sListOpen() {
+		logger.debug("/prescribe1sListOpen");
+		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sListOpen();
+		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerDbFolderPfad + prescribeOrder1sListOpenJsFileName);
+		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerOpenDbFolderPfad + prescribeOrder1sListOpenJsFileName);
+		return prescribe1sList;
+	}
 	private void writeToJsDbFile(String variable, Object objectForJson, String fileName) {
-		File file = new File(applicationFolderPfad + innerDbFolderPfad + fileName);
+		String dbPathFile = innerDbFolderPfad + fileName;
+		writeToJsDbPathFile(variable, objectForJson, dbPathFile);
+	}
+	private void writeToJsDbPathFile(String variable, Object objectForJson,
+			String dbPathFile) {
+		File file = new File(applicationFolderPfad + dbPathFile);
 		logger.debug("write to file = " + file);
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writerWithDefaultPrettyPrinter = mapper.writerWithDefaultPrettyPrinter();
@@ -269,6 +281,7 @@ public class CuwyHol3Controller {
 			e.printStackTrace();
 		}
 	}
+
 	private void writeToJsonDbFile(Object java2jsonObject, String fileName) {
 		File file = new File(applicationFolderPfad + innerDbFolderPfad + fileName);
 		logger.warn(""+file);

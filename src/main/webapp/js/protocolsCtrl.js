@@ -6,6 +6,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 	$scope.protocolOrder1sList = protocolOrder1sList;
 	console.log($scope.protocolOrder1sList);
 	$scope.prescribeOrder1sList = prescribeOrder1sList;
+	console.log($scope.prescribeOrder1sList);
 	$scope.prescribeOrder1sListOpen = prescribeOrder1sListOpen;
 	console.log($scope.prescribeOrder1sListOpen);
 	$scope.prescribeListOrArchive = false;
@@ -33,7 +34,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 	$scope.reloadFromDb = function(){
 		$http({
 			method : 'GET',
-			url : '/prescribe1sList'
+			url : config.urlPrefix + '/prescribe1sList'
 		}).success(function(data, status, headers, config) {
 			console.log(data);
 		}).error(function(data, status, headers, config) {
@@ -48,7 +49,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		$http({
 			method : 'POST',
 			data : editPrescribeOrder,
-			url : postUrl
+			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
 			console.log("postPrescribe after");
 			$scope.prescribeOrder1sList = data;
@@ -61,7 +62,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		$http({
 			method : 'POST',
 			data : editProtocolOrder,
-			url : postUrl
+			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
 			$scope.protocolOrder1sList = data;
 			console.log(data);

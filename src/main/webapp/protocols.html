@@ -46,13 +46,15 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-xs-8">
+		<div class="col-xs-5">
 			<table width="100%">
 				<thead><tr><th>Nr</th><th>Призначеня</th></tr></thead>
 				<tbody data-ng-repeat="prescribe in prescribeOrder1sList | filter: {PRESCRIBE_ARCHIVE:prescribeListOrArchive} | filter: seekPrescribe | limitTo : 12">
 				<tr>
 					<td>{{prescribe.PRESCRIBE_ID}}</td>
-					<td ng-context-menu="menuPrescribeList" ng-show="!prescribe.updateDialogOpen">
+					<td ng-context-menu="menuPrescribeList" ng-show="!prescribe.updateDialogOpen"
+						data-ng-class="{bold:prescribe.PRESCRIBE_RECOMMEND}"
+					>
 					<a href="prescribes24h.html?id={{prescribe.PRESCRIBE_ID}}">
 						{{prescribe.PRESCRIBE_NAME}}
 					</a>
@@ -60,7 +62,8 @@
 					<td ng-context-menu="menuPrescribeList" ng-show="prescribe.updateDialogOpen">
 						<div class="row">
 							<div class="col-xs-5">
-								<input ng-model="prescribe.PRESCRIBE_NAME" type="text" class="form-control" />
+								<input ng-model="prescribe.PRESCRIBE_NAME" type="text" class="form-control" /> 
+								<label> <input type="checkbox" ng-model="prescribe.PRESCRIBE_RECOMMEND"></input> Рекомендовано</label>
 							</div>
 							<div class="col-xs-3">
 								<button title="Зберегти" type="button" ng-click="updatePrescribe(prescribe)" class="btn btn-default">
@@ -76,7 +79,7 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="col-xs-4">
+		<div class="col-xs-5">
 			<table width="100%">
 				<thead><tr><th>Nr</th><th>Призначеня <small>з сайту:<a href="http://cuwy.in.ua/protocols.html
 				">cuwy.in.ua

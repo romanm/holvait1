@@ -26,7 +26,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 
 	$http({
 		method : 'GET',
-		url : '/read/prescribe_'+$scope.parameters.id
+		url : config.urlPrefix + '/read/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
 		console.log(data);
@@ -84,7 +84,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$http({
 			method : 'POST',
 			data : $scope.p24hDoc,
-			url : "/save/prescribes"
+			url : config.urlPrefix + "/save/prescribes"
 		}).success(function(data, status, headers, config){
 			$scope.p24hDoc = data;
 			$($scope.p24hDoc.prescribesHistory).each(function () {
@@ -178,7 +178,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 readDrugDocument = function(drug){
 	$http({
 		method : 'GET',
-		url : '/read/drug_'+drug.DRUG_ID
+		url : config.urlPrefix + '/read/drug_'+drug.DRUG_ID
 	}).success(function(data, status, headers, config) {
 		$scope.drugDocument = data;
 	}).error(function(data, status, headers, config) {
@@ -190,7 +190,7 @@ $scope.saveNewDrug = function(seekDrug, taskInDay, prescribeHistory){
 	$http({
 		method : 'POST',
 		data : $scope.editedPrescribeDrug,
-		url : '/saveNewDrug'
+		url : config.urlPrefix + '/saveNewDrug'
 	}).success(function(data, status, headers, config){
 		$scope.drug1sList = data;
 		var newDrug = $scope.drug1sList[$scope.drug1sList.length-1];
@@ -341,7 +341,7 @@ contextMenuCopy = function(copyObject){
 	$http({
 		method : 'POST',
 		data : copyObject,
-		url : "/session/copy"
+		url : config.urlPrefix + "/session/copy"
 	}).success(function(data, status, headers, config){
 	}).error(function(data, status, headers, config) {
 		$scope.error = data;
@@ -418,7 +418,7 @@ $scope.menuTasksAll = [
 	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) { 
 		$http({
 			method : 'GET',
-			url : '/session/paste'
+			url : config.urlPrefix + '/session/paste'
 		}).success(function(data, status, headers, config) {
 			if($itemScope.prescribeHistory.prescribes.tasks.length == 0){
 				$itemScope.prescribeHistory.prescribes.tasks = data.tasks;
@@ -437,7 +437,7 @@ $scope.menuTasksAll = [
 contextMenuPaste = function(taskInDay, prescribeHistory){
 	$http({
 		method : 'GET',
-		url : '/session/paste'
+		url : config.urlPrefix + '/session/paste'
 	}).success(function(data, status, headers, config) {
 		if(data.selectMultiple && data.tasks){
 			var position = taskInDay.i;
@@ -487,7 +487,7 @@ saveDrugDocument = function(){
 	$http({
 		method : 'POST',
 		data : $scope.drugDocument,
-		url : "/save/drug"
+		url : config.urlPrefix + "/save/drug"
 	}).success(function(data, status, headers, config){
 		$scope.drugDocument = data;
 	}).error(function(data, status, headers, config) {

@@ -10,6 +10,9 @@ table.dose{
 	width: 100%;
 	*/
 }
+.bold {
+	font-weight: bold;
+}
 .mouseover:hover,
 table.tablehover > tbody > tr > td:hover{
 	border: 1px dashed navy; 

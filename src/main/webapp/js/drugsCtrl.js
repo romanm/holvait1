@@ -48,7 +48,7 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 		$http({
 			method : 'POST',
 			data : editDrug,
-			url : postUrl
+			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
 			$scope.drug1sList = data;
 			console.log(data);

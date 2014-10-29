@@ -63,6 +63,12 @@ public class CuwyCpoeHolDb2 {
 		return newPrescribeOrder;
 	}
 
+	public List<Map<String, Object>> prescribe1sListOpen() {
+		String sql = "SELECT * FROM prescribe1 WHERE PRESCRIBE_RECOMMEND IS TRUE ";
+		logger.debug("\n"+sql);
+		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql);
+		return prescribe1sList;
+	}
 	public List<Map<String, Object>> prescribe1sList() {
 		String sql = "SELECT * FROM prescribe1 ";
 		logger.debug("\n"+sql);
@@ -87,10 +93,14 @@ public class CuwyCpoeHolDb2 {
 	public int updatePrescribeOrder(Map<String, Object> prescribeToUpdate) {
 		String prescribeName = (String) prescribeToUpdate.get("PRESCRIBE_NAME");
 		Boolean prescribeArchive = (Boolean) prescribeToUpdate.get("PRESCRIBE_ARCHIVE");
+		Boolean prescribeRecommend = (Boolean) prescribeToUpdate.get("PRESCRIBE_RECOMMEND");
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
-		String sql = "UPDATE prescribe1 SET prescribe_name = ?, prescribe_archive = ?  WHERE prescribe_id = ? ";
+		String sql = "UPDATE prescribe1 SET prescribe_name = ?"
+				+ ", prescribe_archive = ? "
+				+ ", PRESCRIBE_RECOMMEND = ? "
+				+ " WHERE prescribe_id = ? ";
 		int update = this.jdbcTemplate.update(sql,
-			prescribeName, prescribeArchive, prescribeId);
+			prescribeName, prescribeArchive, prescribeRecommend, prescribeId);
 		return update;
 	}
 	

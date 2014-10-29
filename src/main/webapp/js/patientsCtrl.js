@@ -30,7 +30,7 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 		$http({
 			method : 'POST',
 			data : editPatient,
-			url : postUrl
+			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
 			$scope.patient1sList = data;
 			console.log(data);
