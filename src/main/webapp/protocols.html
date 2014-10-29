@@ -7,7 +7,7 @@
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 <body>
-<a href="/home.html"><span class="glyphicon glyphicon-home"></span></a>
+<a href="home.html"><span class="glyphicon glyphicon-home"></span></a>
 / <span class="h1">{{siteMap.name}}</span>
 <hr/>
 <div class="container">
@@ -21,6 +21,10 @@
 				|
 				<a href="#" data-ng-click="prescribeListOrArchive = true; seekPatient = ''">
 					Архів
+				</a>
+				|
+				<a href="#" data-ng-click="reloadFromDb()" title="Поновити список">
+					<span class="glyphicon glyphicon-upload"></span>
 				</a>
 			</span>
 		</div>
@@ -49,7 +53,7 @@
 				<tr>
 					<td>{{prescribe.PRESCRIBE_ID}}</td>
 					<td ng-context-menu="menuPrescribeList" ng-show="!prescribe.updateDialogOpen">
-					<a href="lp24h.html?id={{prescribe.PRESCRIBE_ID}}">
+					<a href="prescribes24h.html?id={{prescribe.PRESCRIBE_ID}}">
 						{{prescribe.PRESCRIBE_NAME}}
 					</a>
 					</td>
@@ -80,7 +84,7 @@
 				</small></th></tr></thead>
 				<tbody data-ng-repeat="prescribeOpen in prescribeOrder1sListOpen | filter: {PRESCRIBE_ARCHIVE:prescribeListOrArchive} | filter: seekPrescribe | limitTo : 12">
 					<tr>
-						<td></td>
+						<td>{{prescribeOpen.PRESCRIBE_ID}}</td>
 						<td>{{prescribeOpen.PRESCRIBE_NAME}}</td>
 					</tr>
 				</tbody>

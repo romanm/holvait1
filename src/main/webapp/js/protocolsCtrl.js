@@ -30,6 +30,17 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		drugToUpdate.updateDialogOpen = false;
 	}
 
+	$scope.reloadFromDb = function(){
+		$http({
+			method : 'GET',
+			url : '/prescribe1sList'
+		}).success(function(data, status, headers, config) {
+			console.log(data);
+		}).error(function(data, status, headers, config) {
+			console.log(data);
+		});
+	}
+
 	postPrescribe = function (postUrl, editPrescribeOrder){
 		console.log("postPrescribe");
 		console.log(postUrl);

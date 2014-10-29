@@ -15,11 +15,10 @@
 /	<a id="focus_minus_1"
 		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -1}"
 		href="protocols.html">Список КП:призначень</a> 
-/	<a id="focus_0"
+/	<span class="h1"> <a id="focus_0"
 		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == 0}"
-		href="prescribes24h.html?id={{parameters.id}}"> <span class="h1">
-			<u>{{p24hDoc.PRESCRIBE_NAME}}</u> {{siteMap.name}}</span>
-	</a>
+		href="prescribes24h.html?id={{parameters.id}}"> <u>{{p24hDoc.PRESCRIBE_NAME}}</u>
+	</a> {{siteMap.name}}</span>
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
 			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
@@ -42,13 +41,13 @@
 				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
 					data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)"
 					class="mouseover"
+					data-ng-context-menu="menuDayBlock"
 					data-ng-class="{selectpath:dayInSelectPath(prescribeHistoryIndex),
 									selected:daySelected(prescribeHistoryIndex) }"
 				>
-				{{prescribeHistory.date | date:'dd-MM-yyyy '}}
-				<small>
-					{{prescribeHistory.date | date:'HH:mm'}}
-				</small>
+				<span title="{{prescribeHistory.date | date:'dd-MM-yyyy '}}-{{prescribeHistory.date | date:'HH:mm'}}">
+					Дні/години захворювання {{prescribeHistory.prescribeHistoryDays}}
+				</span>
 <!-- 
 				<input id="patientDob{{$index}}" name="patientDob{{$index}}" 
 					ng-model="prescribeHistory.date"
@@ -72,12 +71,34 @@
 					<span class="glyphicon glyphicon-print"></span>
 				</a>
 				</span>
+				<div data-ng-show="prescribeHistory.updateDialogOpen">
+					<div class="row">
+						<div class="col-xs-4">
+						День/Дні:
+							<input ng-model="prescribeHistory.prescribeHistoryDays"
+								type="text" class="form-control" />
+						</div>
+						<div class="col-xs-1">
+							<span title="Вийти" class="close navbar-right"
+								data-ng-click="prescribeHistory.updateDialogOpen = false">
+								<span class="glyphicon glyphicon-share-alt"></span>
+							</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-5">
+						Коментарі:
+							<input ng-model="prescribeHistory.prescribeHistoryDaysNote"
+								type="text" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div data-ng-show="prescribeHistory.prescribeHistoryDaysNote">
+					{{prescribeHistory.prescribeHistoryDaysNote}}
+				</div>
 				<table data-ng-show="!prescribeHistory.isCollapsed" class="tablehover">
-					<colgroup>
-						<col style="width: 2px;"></col>
-					</colgroup>
-					<caption>
-					</caption>
+					<colgroup> <col style="width: 2px;"></col> </colgroup>
+					<caption> </caption>
 					<thead>
 						<tr>
 				<th class="mouseover" data-ng-context-menu="menuTasksAll" colspan="2" >Призначене лікування</th>
@@ -113,7 +134,7 @@
 								>
 								{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
 								? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-								<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
+								<small data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER">
 									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
 									}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
 								</small>

@@ -65,7 +65,8 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	$scope.newPrescribes = function(){
 		var today = new Date();
 		var prescribeHistory = {
-				date:today, 
+				date:today,
+				prescribeHistoryDays: "1",
 				selectDrugIndex:0,
 				prescribes:{tasks:[]}
 		}
@@ -402,6 +403,14 @@ $scope.menuTask = [
 	}]
 ];
 
+$scope.menuDayBlock = [
+	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+		console.debug('Edit');
+		console.log($itemScope);
+		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
+	}]
+];
+
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
 		contextMenuCopy($itemScope.prescribeHistory.prescribes); 
@@ -681,8 +690,8 @@ $scope.keys.push({
 	}
 });
 
-$scope.keys.push({ ctrlKey : true, code : KeyCodes.S, action : function() { $scope.savePatient(); }});
-$scope.keys.push({code : KeyCodes.F9, action : function() { $scope.savePatient(); }});
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.S, action : function() { $scope.savePrescribes(); }});
+$scope.keys.push({code : KeyCodes.F9, action : function() { $scope.savePrescribes(); }});
 
 $scope.keys.push({
 	ctrlKey : true, code : KeyCodes.ArrowDown,

@@ -151,7 +151,7 @@ public class CuwyHol3Controller {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
-	
+
 	@RequestMapping(value="/read/prescribe_{prescribeId}", method=RequestMethod.GET)
 	public @ResponseBody Map<String, Object> readPrescribes(@PathVariable Integer prescribeId) {
 		String fileNameWithPathAdd = getPrescribeDbJsonName(prescribeId);
@@ -247,6 +247,7 @@ public class CuwyHol3Controller {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
+	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
 	@RequestMapping(value = "/prescribe1sList", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> prescribe1sList() {
 		logger.debug("/prescribe1sList");
