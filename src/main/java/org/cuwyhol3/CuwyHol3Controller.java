@@ -191,6 +191,7 @@ public class CuwyHol3Controller {
 		Map<String, Object> readJsonDbFile2map = null;// = new HashMap<String, Object>();
 		try {
 			readJsonDbFile2map = mapper.readValue(file, Map.class);
+			logger.debug(" o - "+readJsonDbFile2map);
 		} catch (JsonParseException e1) {
 			e1.printStackTrace();
 		} catch (JsonMappingException e1) {
@@ -198,6 +199,7 @@ public class CuwyHol3Controller {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		logger.debug(" o - "+readJsonDbFile2map);
 		return readJsonDbFile2map;
 	}
 	private String getPatientDbJsonName(Integer patientId) {

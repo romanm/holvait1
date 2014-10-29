@@ -42,14 +42,14 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-xs-9">
+		<div class="col-xs-8">
 			<table width="100%">
 				<thead><tr><th>Nr</th><th>Призначеня</th></tr></thead>
 				<tbody data-ng-repeat="prescribe in prescribeOrder1sList | filter: {PRESCRIBE_ARCHIVE:prescribeListOrArchive} | filter: seekPrescribe | limitTo : 12">
 				<tr>
 					<td>{{prescribe.PRESCRIBE_ID}}</td>
 					<td ng-context-menu="menuPrescribeList" ng-show="!prescribe.updateDialogOpen">
-					<a href="/lp24h.html?id={{prescribe.PRESCRIBE_ID}}">
+					<a href="lp24h.html?id={{prescribe.PRESCRIBE_ID}}">
 						{{prescribe.PRESCRIBE_NAME}}
 					</a>
 					</td>
@@ -68,6 +68,20 @@
 							</div>
 						</div>
 					</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-xs-4">
+			<table width="100%">
+				<thead><tr><th>Nr</th><th>Призначеня <small>з сайту:<a href="http://cuwy.in.ua/protocols.html
+				">cuwy.in.ua
+				</a>
+				</small></th></tr></thead>
+				<tbody data-ng-repeat="prescribeOpen in prescribeOrder1sListOpen | filter: {PRESCRIBE_ARCHIVE:prescribeListOrArchive} | filter: seekPrescribe | limitTo : 12">
+					<tr>
+						<td></td>
+						<td>{{prescribeOpen.PRESCRIBE_NAME}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -132,121 +146,9 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/protocolOrder1sList.json.js"></script>
 	<script src="/db/prescribeOrder1sList.json.js"></script>
-	<script type="text/javascript">
-	//var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap']);
-	cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http) {
-		$scope.siteMap = config.siteMap.siteMaps[3];
+	<script src="http://cuwy.in.ua/db/prescribeOrder1sListOpen.json.js"></script>
+	<script src="http://cuwy.in.ua/db/protocolOrder1sListOpen.json.js"></script>
+	<script src="/js/protocolsCtrl.js"></script>
 
-		console.log("protocolsCtrl");
-		$scope.protocolOrder1sList = protocolOrder1sList;
-		console.log($scope.protocolOrder1sList);
-		$scope.prescribeOrder1sList = prescribeOrder1sList;
-		$scope.prescribeListOrArchive = false;
-
-		$scope.saveNewPrescribe = function(){
-			console.log("saveNewPrescribe");
-			postPrescribe('/saveNewPrescribe', {"PRESCRIBE_NAME":$scope.seekPrescribe});
-		}
-		$scope.saveNewProtocol = function(){
-			console.log("saveNewProtocol");
-			postProtocol('/saveNewProtocol', {"ORDER_NAME":$scope.seekProtocol});
-		}
-
-		$scope.updatePrescribe = function(drugToUpdate){
-			console.log("updatePrescribe");
-			postPrescribe('/updatePrescribe', drugToUpdate );
-			drugToUpdate.updateDialogOpen = false;
-		}
-		$scope.updateProtocol = function(drugToUpdate){
-			console.log("updateProtocol");
-			postProtocol('/updateProtocol', drugToUpdate );
-			drugToUpdate.updateDialogOpen = false;
-		}
-
-		postPrescribe = function (postUrl, editPrescribeOrder){
-			console.log("postPrescribe");
-			console.log(postUrl);
-			console.log(editPrescribeOrder);
-			$http({
-				method : 'POST',
-				data : editPrescribeOrder,
-				url : postUrl
-			}).success(function(data, status, headers, config){
-				console.log("postPrescribe after");
-				$scope.prescribeOrder1sList = data;
-				console.log(data);
-			}).error(function(data, status, headers, config) {
-				$scope.error = data;
-			});
-		}
-		postProtocol = function (postUrl, editProtocolOrder){
-			$http({
-				method : 'POST',
-				data : editProtocolOrder,
-				url : postUrl
-			}).success(function(data, status, headers, config){
-				$scope.protocolOrder1sList = data;
-				console.log(data);
-			}).error(function(data, status, headers, config) {
-				$scope.error = data;
-			});
-		}
-
-		$scope.menuPrescribeList = [
-		['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
-			console.debug('Edit');
-			console.log($itemScope);
-			$itemScope.prescribe.updateDialogOpen = !$itemScope.prescribe.updateDialogOpen;
-		}],
-		null,
-		['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
-			console.debug('delete');
-			console.debug($itemScope);
-			console.debug($itemScope.prescribe);
-			$itemScope.prescribe.PRESCRIBE_ARCHIVE = !$scope.prescribeListOrArchive;
-			console.debug($itemScope.prescribe);
-			postProtocol('/updatePrescribe', $itemScope.prescribe);
-		}]
-		/*
-		['<span class="glyphicon glyphicon-floppy-remove"></span> Видалити з БД', function ($itemScope) {
-			console.debug('delete');
-			console.debug($itemScope);
-			console.debug($itemScope.prescribe);
-			postPrescribe('/removePrescribe', $itemScope.prescribe);
-		}]
-		*/
-		];
-
-		$scope.menuProtocolList = [
-		['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
-			console.debug('Edit');
-			console.log($itemScope);
-			$itemScope.protocolOrder.updateDialogOpen = !$itemScope.protocolOrder.updateDialogOpen;
-		}],
-		null,
-		['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
-			console.debug('delete');
-			console.debug($itemScope);
-			console.debug($itemScope.protocolOrder);
-			$itemScope.prescribe.PRESCRIBE_ARCHIVE = !$scope.prescribeListOrArchive;
-			postProtocol('/updatePrescribe', $itemScope.protocolOrder);
-		}],
-/*
-		['<span class="glyphicon glyphicon-floppy-remove"></span> Видалити з БД', function ($itemScope) {
-			console.debug('delete');
-			console.debug($itemScope);
-			console.debug($itemScope.protocolOrder);
-			postProtocol('/removeProtocolOrder', $itemScope.protocolOrder);
-		}],
- **/
-		['<span class="glyphicon glyphicon-floppy-open"></span> Перейти в розділ документ', function ($itemScope) {
-			console.debug('Edit');
-			console.log($itemScope);
-			$itemScope.drug.updateDialogOpen = !$itemScope.drug.updateDialogOpen;
-		}]
-		];
-
-	} ] );
-	</script>
 </body>
 </html>

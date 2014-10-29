@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html data-ng-app="cuwyApp" data-ng-controller="patientLp24hCtrl">
+<html data-ng-app="cuwyApp" data-ng-controller="p24hDocCtrl">
 <head>
 	<meta charset="utf-8" />
-	<title>{{patient.PATIENT_NAME}}{{siteMap.title}}</title>
+	<title>{{p24hDoc.PRESCRIBE_NAME}}{{siteMap.title}}</title>
 	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
@@ -10,22 +10,22 @@
 
 <body data-key-cuwytrap="" >
 	<a id="focus_minus_2"
-		data-ng-class="{'selected': patient.pageDeepPositionIndex == -2}"
+		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -2}"
 		href="home.html"><span class="glyphicon glyphicon-home"></span></a> 
 /	<a id="focus_minus_1"
-		data-ng-class="{'selected': patient.pageDeepPositionIndex == -1}"
-		href="patients.html">Список пацієнтів</a> 
+		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -1}"
+		href="protocols.html">Список КП:призначень</a> 
 /	<a id="focus_0"
-		data-ng-class="{'selected': patient.pageDeepPositionIndex == 0}"
-		href="patient.html?id={{parameters.id}}"> <span class="h1">
-			<u>{{patient.PATIENT_NAME}}</u> {{siteMap.name}}</span>
+		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == 0}"
+		href="prescribes24h.html?id={{parameters.id}}"> <span class="h1">
+			<u>{{p24hDoc.PRESCRIBE_NAME}}</u> {{siteMap.name}}</span>
 	</a>
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
 			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
-			<li> <a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
+			<li><a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
 			<li data-ng-class="{'disabled': numberOfChange == 0}">
-				<a data-ng-click="savePatient()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
+				<a data-ng-click="savePrescribes()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
 					<span class="glyphicon glyphicon-floppy-disk"></span>
 					{{numberOfChange}}
 				</a>
@@ -36,7 +36,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12">
-			<div data-ng-repeat="prescribeHistory in patient.prescribesHistory"
+			<div data-ng-repeat="prescribeHistory in p24hDoc.prescribesHistory"
 				data-ng-init="prescribeHistoryIndex = $index;"
 			>
 				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
@@ -270,16 +270,11 @@
 	<script src='/js-vendor/textAngular.min.js'></script>
 	<script src="/js/cuwy1.config.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
-	<script src="/db/patient1sList.json.js"></script>
 
 	<script src="/js/cuwy1.config.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
-	<script src="/db/patient1sList.json.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
-	<!-- 
-	<script src="/js/patientLp24hCtrl.min.js"></script>
-	 -->
-	<script src="/js/patientLp24hCtrl.js"></script>
+	<script src="/js/prescribes24hCtrl.js"></script>
 	<script src="/js/taskInDayCtrl.js"></script>
 
 </body>

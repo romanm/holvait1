@@ -115,12 +115,6 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
-	code : KeyCodes.Enter,
-	action : function() {
-		$scope.openItem($scope.selectDrugIndex);
-	}
-});
-$scope.keys.push({
 	ctrlKey : true, code : KeyCodes.Enter,
 	action : function() {
 		console.log("CtrlEnter ");
@@ -139,8 +133,7 @@ $scope.keys.push({
 	}
 });
 $scope.keys.push({
-	code : KeyCodes.ArrowDown,
-	ctrlKey : true,
+	ctrlKey : true, code : KeyCodes.ArrowDown,
 	action : function() {
 		console.log("CtrlArrowDown ");
 	}
@@ -157,12 +150,10 @@ $scope.keys.push({
 		}
 	}
 });
-$scope.keys.push({
-	code : KeyCodes.F1,
-	action : function() {
-		$scope.openF1();
-	}
-});
+
+$scope.keys.push({code : KeyCodes.Enter, action : function() { $scope.openItem($scope.selectDrugIndex); } });
+$scope.keys.push({code : KeyCodes.ArrowRight, action : function() { $scope.openItem($scope.selectDrugIndex); } })
+$scope.keys.push({code : KeyCodes.F1, action : function() { $scope.openF1(); } });
 
 $scope.$on('keydown', function(msg, obj) {
 	var code = obj.event.keyCode;

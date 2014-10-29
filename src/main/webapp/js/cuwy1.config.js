@@ -7,12 +7,13 @@ var config = {
 		,siteMaps:[
 			{title:"Пацієнти",name:"Пацієнти",url:"patients.html"},
 			{title:"КП::Ліки",name:"Ліки",url:"drugs.html"},
-			{title:"Редактор: Лист призначень реанімація"
-				,name:"Редактор: Лист призначень 24 години на добу - реанімація ", url:"lp24h.html"},
+			{title:":КП:Призначеня 24 г/добу"
+				,name:"- КП:Призначеня 24 г/добу", url:"lp24h.html"},
 			{title:"КП::Призначеня",name:"Призначеня::Клінічні протоколи",url:"protocols.html"},
-			{title:"IX::Пацієнт",name:"IX::Пацієнт",url:"patient.html"},
+			{title:":IX:Призначеня",name:"- IX::Призначеня",url:"patient.html"},
 			{title:"Ліка додаток",name:"Ліка додаток",url:"drug.html"}
 		]
 	},
+	urlPrefix: "",
 	startHour24lp: 8
 };

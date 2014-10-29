@@ -41,6 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/drug1sList"
 						,"/save/drug"
 						//prescribe
+						,"/prescribes24h.html"
 						,"/lp24h.html"
 						,"/protocols.html"
 						,"/saveNewPrescribe"
