@@ -24,9 +24,9 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	}
 
 	$scope.parameters = parameters;
-	var url = '/read/';
+	var url = '/read';
 	if($scope.parameters.s){
-		url += $scope.parameters.s;
+		url += "/"+$scope.parameters.s;
 	}
 	url += '/prescribe_'+$scope.parameters.id;
 	$http({
@@ -35,7 +35,6 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
 		$scope.patient = $scope.p24hDoc;
-		console.log(data);
 		initPatientDocument();
 	}).error(function(data, status, headers, config) {
 	});
@@ -162,7 +161,6 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
 		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
-		console.log($scope.editedPrescribeDrug);
 		if(null == $scope.editedPrescribeDrug){
 			$scope.editedPrescribeDrug = 
 			{DRUG_NAME:"",
@@ -175,7 +173,6 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 			};
 			insertDrugToTask($scope.editedPrescribeDrug, $scope.editedPrescribeHistory.selectDrugIndex, prescribeHistory);
 		}
-		console.log($scope.editedPrescribeDrug);
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug);
 		}
@@ -406,7 +403,6 @@ $scope.menuTask = [
 
 $scope.menuDayBlock = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
-		console.debug('Edit');
 		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
 	}]
 ];
@@ -654,11 +650,9 @@ $scope.keys.push({
 		console.log("ArrowUp");
 		if($scope.p24hDoc.pageDeepPositionIndex == 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
-			console.log($scope.editedPrescribeHistory.selectDrugIndex);
 			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
 				$scope.editedPrescribeHistory.selectDrugIndex = 18;
 			}
-			console.log($scope.editedPrescribeHistory.selectDrugIndex);
 		}
 		else if($scope.p24hDoc.pageDeepPositionIndex == 1){
 			$scope.p24hDoc.selectPrescribesHistoryIndex--;

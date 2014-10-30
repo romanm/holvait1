@@ -12,7 +12,6 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 			method : 'GET',
 			url : config.urlPrefix + '/drug1sList'
 		}).success(function(data, status, headers, config) {
-			console.log(data);
 			$scope.drug1sList = data;
 		}).error(function(data, status, headers, config) {
 			console.log(data);
@@ -63,7 +62,6 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
 			$scope.drug1sList = data;
-			console.log(data);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});
