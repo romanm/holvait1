@@ -7,6 +7,18 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	$scope.selectDrugIndex = null;
 	$scope.pageDeepPositionIndex = 1;
 
+	$scope.reloadFromDb = function(){
+		$http({
+			method : 'GET',
+			url : config.urlPrefix + '/drug1sList'
+		}).success(function(data, status, headers, config) {
+			console.log(data);
+			$scope.drug1sList = data;
+		}).error(function(data, status, headers, config) {
+			console.log(data);
+		});
+	}
+
 	$scope.filterArchive = function(archive){
 		$scope.drugListOrArchive = archive;
 		$scope.filterDrugs();
@@ -60,14 +72,11 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	$scope.menuDrugList = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		console.debug('Edit');
-		console.log($itemScope);
 		$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
 	}],
 	null,
 	['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
 		console.debug('delete');
-		console.debug($itemScope);
-		console.debug($itemScope.drug);
 		$itemScope.drug.DRUG_ARCHIVE = !$scope.patientListOrArchive;
 		postDrug('/updateDrug', $itemScope.drug);
 	}],
@@ -81,7 +90,6 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	*/
 	['<span class="glyphicon glyphicon-floppy-open"></span> Відкрити медикамент документ', function ($itemScope) {
 		console.debug('Edit');
-		console.log($itemScope);
 		$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
 	}]
 	];
@@ -104,7 +112,6 @@ $scope.keys.push({
 	code : KeyCodes.Escape,
 	action : function() {
 		console.log("Escape");
-		console.log($scope.pageDeepPositionIndex);
 		if($scope.pageDeepPositionIndex == 1){
 			$scope.pageDeepPositionIndex--;
 			$("#focus_0").focus();

@@ -14,6 +14,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelParserConfiguration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -123,8 +126,7 @@ public class CuwyHol3Controller {
 		return drug1sList;
 	}
 	@RequestMapping(value = "/save/drug", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> saveDrug(
-			@RequestBody Map<String, Object> drug){
+	public @ResponseBody Map<String, Object> saveDrug(@RequestBody Map<String, Object> drug){
 		Integer prescribeId = (Integer) drug.get("DRUG_ID");
 		writeToJsonDbFile(drug, getDrugDbJsonName(prescribeId));
 		return drug;
@@ -236,36 +238,51 @@ public class CuwyHol3Controller {
 	//---------prescribes-----------
 		@RequestMapping(value = "/session/paste", method = RequestMethod.GET)
 		public @ResponseBody Map<String, Object> sessionPaste(HttpSession session){
-			logger.debug(" o - "+session);
 			Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
-			logger.debug(" o - "+copyObj);
 			return copyObj;
 		}
 		@RequestMapping(value = "/session/copy", method = RequestMethod.POST)
 		public @ResponseBody Map<String, Object> sessionCopy(
 				@RequestBody Map<String, Object> copyObj, HttpSession session){
-			logger.debug(" o - "+copyObj);
-			logger.debug(" o - "+session);
 			session.setAttribute("copyObj", copyObj);
 			return copyObj;
 		}
+
+	ExpressionParser parser = new SpelExpressionParser(new SpelParserConfiguration(true,true));
 	//------------------prescribe----------------------
 	@RequestMapping(value = "/save/prescribes", method = RequestMethod.POST)
 	public @ResponseBody Map<String, Object> savePrescribes(
 			@RequestBody Map<String, Object> prescribes){
 		Integer prescribeId = (Integer) prescribes.get("PRESCRIBE_ID");
+		for (Object prescribeHistory : getArray(prescribes,"prescribesHistory")) {
+			for (Map drug : getMapsArray(getMap((Map)prescribeHistory, "prescribes"), "tasks")) {
+				if(null != drug){
+					if(null == drug.get("DRUG_ID")){
+						Map<String, Object> newDrug = cuwyCpoeHolDb2.newDrug(drug);
+						drug.put("DRUG_ID", newDrug.get("DRUG_ID"));
+					}
+				}
+			}
+		}
 		writeToJsonDbFile(prescribes, getPrescribeDbJsonName(prescribeId));
 		cuwyCpoeHolDb2.updatePrescribeOrder(prescribes);
 		prescribe1sList();
 		return prescribes;
 	}
+	private List<Map> getMapsArray(Map map, String key) {
+		return (List<Map>)map.get(key);
+	}
+	private List getArray(Map map, String key) {
+		return (List)map.get(key);
+	}
+	private Map getMap(Map<String, Object> prescribes, String key) {
+		return (Map)prescribes.get(key);
+	}
 	@RequestMapping(value = "/saveNewPrescribe", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewPrescribe(
 			@RequestBody Map<String, Object> newPrescribe) {
 		logger.debug("/saveNewPrescribe");
-		logger.debug(" o - "+newPrescribe);
 		newPrescribe = cuwyCpoeHolDb2.newPrescribe(newPrescribe);
-		logger.debug(" o - "+newPrescribe);
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
@@ -310,7 +327,7 @@ public class CuwyHol3Controller {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writerWithDefaultPrettyPrinter = mapper.writerWithDefaultPrettyPrinter();
 		try {
-			logger.warn(writerWithDefaultPrettyPrinter.writeValueAsString(java2jsonObject));
+//			logger.warn(writerWithDefaultPrettyPrinter.writeValueAsString(java2jsonObject));
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			writerWithDefaultPrettyPrinter.writeValue(fileOutputStream, java2jsonObject);
 		} catch (IOException e) {
