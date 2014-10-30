@@ -17,9 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelParserConfiguration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,57 +92,7 @@ public class CuwyHol3Controller {
 	}
 	//------------------patient---------------END-------
 
-	//------------------drug----------------------
-	@RequestMapping(value = "/saveNewDrug", method = RequestMethod.POST)
-	public @ResponseBody List<Map<String, Object>> saveNewDrug(@RequestBody Map<String, Object> newDrug) {
-		logger.debug("/saveNewDrug");
-		logger.debug(" o - "+newDrug);
-		newDrug = cuwyCpoeHolDb2.newDrug(newDrug);
-		logger.debug(" o - "+newDrug);
-		List<Map<String, Object>> drug1sList = drug1sList();
-		return drug1sList;
-	}
-	@RequestMapping(value = "/removeDrug", method = RequestMethod.POST)
-	public @ResponseBody List<Map<String, Object>> removeDrug(@RequestBody Map<String, Object> drugToRemove) {
-		logger.debug("/removeDrug");
-		logger.debug(" o - "+drugToRemove);
-		int removeDrugId = cuwyCpoeHolDb2.removeDrug(drugToRemove);
-		logger.debug(" o - "+removeDrugId);
-		List<Map<String, Object>> drug1sList = drug1sList();
-		return drug1sList;
-	}
-	@RequestMapping(value = "/updateDrug", method = RequestMethod.POST)
-	public @ResponseBody List<Map<String, Object>> updateDrug(@RequestBody Map<String, Object> drugToUpdate) {
-		logger.debug("/removeDrug");
-		logger.debug(" o - "+drugToUpdate);
-		int updateDrug = cuwyCpoeHolDb2.updateDrug(drugToUpdate);
-		List<Map<String, Object>> drug1sList = drug1sList();
-		return drug1sList;
-	}
-	@RequestMapping(value = "/drug1sList", method = RequestMethod.GET)
-	public @ResponseBody List<Map<String, Object>> drug1sList() {
-		List<Map<String, Object>> drug1sList = cuwyCpoeHolDb2.drug1sList();
-		logger.debug("drug1sList = " + drug1sList);
-		writeToJsDbFile("var drug1sList = ", drug1sList, drug1sListJsFileName);
-		return drug1sList;
-	}
-	@RequestMapping(value = "/save/drug", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> saveDrug(@RequestBody Map<String, Object> drug){
-		Integer prescribeId = (Integer) drug.get("DRUG_ID");
-		writeToJsonDbFile(drug, getDrugDbJsonName(prescribeId));
-		return drug;
-	}
-	@RequestMapping(value="/read/drug_{drugId}", method=RequestMethod.GET)
-	public @ResponseBody Map<String, Object> readDrug(@PathVariable Integer drugId) {
-		String fileNameWithPathAdd = getDrugDbJsonName(drugId);
-		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
-		if(null == readJsonDbFile2map){
-			readJsonDbFile2map = cuwyCpoeHolDb2.readDrug(drugId);
-			writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
-		}
-		return readJsonDbFile2map;
-	}
-	//------------------drug----------------END------
+
 	@RequestMapping(value = "/removePrescribeOrder", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> removePrescribe(
 			@RequestBody Map<String, Object> prescribeToRemove) {
@@ -252,8 +199,31 @@ public class CuwyHol3Controller {
 			return copyObj;
 		}
 
-	ExpressionParser parser = new SpelExpressionParser(new SpelParserConfiguration(true,true));
 	//------------------prescribe----------------------
+	@RequestMapping(value = "/saveNewPrescribe", method = RequestMethod.POST)
+	public @ResponseBody List<Map<String, Object>> saveNewPrescribe(
+			@RequestBody Map<String, Object> newPrescribe) {
+		logger.debug("/saveNewPrescribe");
+		newPrescribe = cuwyCpoeHolDb2.newPrescribe(newPrescribe);
+		List<Map<String, Object>> prescribe1sList = prescribe1sList();
+		return prescribe1sList;
+	}
+	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
+	@RequestMapping(value = "/prescribe1sList", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> prescribe1sList() {
+		logger.debug("/prescribe1sList");
+		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sList();
+		writeToJsDbFile("var prescribeOrder1sList = ", prescribe1sList, prescribeOrder1sListJsFileName);
+		return prescribe1sList;
+	}
+	@RequestMapping(value = "/prescribe1sListOpen", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> prescribe1sListOpen() {
+		logger.debug("/prescribe1sListOpen");
+		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sListOpen();
+		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerDbFolderPfad + prescribeOrder1sListOpenJsFileName);
+		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerOpenDbFolderPfad + prescribeOrder1sListOpenJsFileName);
+		return prescribe1sList;
+	}
 	@RequestMapping(value = "/save/prescribes", method = RequestMethod.POST)
 	public @ResponseBody Map<String, Object> savePrescribes(
 			@RequestBody Map<String, Object> prescribes){
@@ -283,6 +253,15 @@ public class CuwyHol3Controller {
 			}
 		}
 	}
+	private List getArray(Map map, String key) {
+		return (List)map.get(key);
+	}
+	private List<Map> getMapsArray(Map map, String key) {
+		return (List<Map>)map.get(key);
+	}
+	private Map getMap(Map<String, Object> prescribes, String key) {
+		return (Map)prescribes.get(key);
+	}
 	private List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
 		Set<Map> hashSet = new HashSet<Map>();
 		List<Map> ddDoses = getMapsArray(drugDocument, "doses");
@@ -294,39 +273,59 @@ public class CuwyHol3Controller {
 			hashSet.add(dose);
 		return new ArrayList<Map>(hashSet);
 	}
-	private List<Map> getMapsArray(Map map, String key) {
-		return (List<Map>)map.get(key);
+	//------------------drug----------------------
+	@RequestMapping(value = "/saveNewDrug", method = RequestMethod.POST)
+	public @ResponseBody List<Map<String, Object>> saveNewDrug(@RequestBody Map<String, Object> newDrug) {
+		logger.debug("/saveNewDrug");
+		logger.debug(" o - "+newDrug);
+		newDrug = cuwyCpoeHolDb2.newDrug(newDrug);
+		logger.debug(" o - "+newDrug);
+		List<Map<String, Object>> drug1sList = drug1sList();
+		return drug1sList;
 	}
-	private List getArray(Map map, String key) {
-		return (List)map.get(key);
+	@RequestMapping(value = "/removeDrug", method = RequestMethod.POST)
+	public @ResponseBody List<Map<String, Object>> removeDrug(@RequestBody Map<String, Object> drugToRemove) {
+		logger.debug("/removeDrug");
+		logger.debug(" o - "+drugToRemove);
+		int removeDrugId = cuwyCpoeHolDb2.removeDrug(drugToRemove);
+		logger.debug(" o - "+removeDrugId);
+		List<Map<String, Object>> drug1sList = drug1sList();
+		return drug1sList;
 	}
-	private Map getMap(Map<String, Object> prescribes, String key) {
-		return (Map)prescribes.get(key);
+	@RequestMapping(value = "/updateDrug", method = RequestMethod.POST)
+	public @ResponseBody List<Map<String, Object>> updateDrug(@RequestBody Map<String, Object> drugToUpdate) {
+		logger.debug("/removeDrug");
+		logger.debug(" o - "+drugToUpdate);
+		int updateDrug = cuwyCpoeHolDb2.updateDrug(drugToUpdate);
+		List<Map<String, Object>> drug1sList = drug1sList();
+		return drug1sList;
 	}
-	@RequestMapping(value = "/saveNewPrescribe", method = RequestMethod.POST)
-	public @ResponseBody List<Map<String, Object>> saveNewPrescribe(
-			@RequestBody Map<String, Object> newPrescribe) {
-		logger.debug("/saveNewPrescribe");
-		newPrescribe = cuwyCpoeHolDb2.newPrescribe(newPrescribe);
-		List<Map<String, Object>> prescribe1sList = prescribe1sList();
-		return prescribe1sList;
+	@RequestMapping(value = "/drug1sList", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> drug1sList() {
+		List<Map<String, Object>> drug1sList = cuwyCpoeHolDb2.drug1sList();
+		logger.debug("drug1sList = " + drug1sList);
+		writeToJsDbFile("var drug1sList = ", drug1sList, drug1sListJsFileName);
+		return drug1sList;
 	}
-	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
-	@RequestMapping(value = "/prescribe1sList", method = RequestMethod.GET)
-	public @ResponseBody List<Map<String, Object>> prescribe1sList() {
-		logger.debug("/prescribe1sList");
-		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sList();
-		writeToJsDbFile("var prescribeOrder1sList = ", prescribe1sList, prescribeOrder1sListJsFileName);
-		return prescribe1sList;
+	@RequestMapping(value = "/save/drug", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> saveDrug(@RequestBody Map<String, Object> drug){
+		Integer prescribeId = (Integer) drug.get("DRUG_ID");
+		writeToJsonDbFile(drug, getDrugDbJsonName(prescribeId));
+		return drug;
 	}
-	@RequestMapping(value = "/prescribe1sListOpen", method = RequestMethod.GET)
-	public @ResponseBody List<Map<String, Object>> prescribe1sListOpen() {
-		logger.debug("/prescribe1sListOpen");
-		List<Map<String, Object>> prescribe1sList = cuwyCpoeHolDb2.prescribe1sListOpen();
-		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerDbFolderPfad + prescribeOrder1sListOpenJsFileName);
-		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList, innerOpenDbFolderPfad + prescribeOrder1sListOpenJsFileName);
-		return prescribe1sList;
+	@RequestMapping(value="/read/drug_{drugId}", method=RequestMethod.GET)
+	public @ResponseBody Map<String, Object> readDrug(@PathVariable Integer drugId) {
+		String fileNameWithPathAdd = getDrugDbJsonName(drugId);
+		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
+		if(null == readJsonDbFile2map){
+			readJsonDbFile2map = cuwyCpoeHolDb2.readDrug(drugId);
+			writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
+		}
+		return readJsonDbFile2map;
 	}
+	//------------------drug----------------END------
+	
+	
 	private void writeToJsDbFile(String variable, Object objectForJson, String fileName) {
 		String dbPathFile = innerDbFolderPfad + fileName;
 		writeToJsDbPathFile(variable, objectForJson, dbPathFile);
