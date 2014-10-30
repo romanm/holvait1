@@ -82,6 +82,7 @@ public class CuwyHol3Controller {
 			@RequestBody Map<String, Object> patient){
 		Integer patientId = (Integer) patient.get("PATIENT_ID");
 		String fileNameWithPathAdd = getPatientDbJsonName(patientId);
+		updateDrugs(patient);
 		writeToJsonDbFile(patient, fileNameWithPathAdd);
 		return patient;
 	}
@@ -257,6 +258,13 @@ public class CuwyHol3Controller {
 	public @ResponseBody Map<String, Object> savePrescribes(
 			@RequestBody Map<String, Object> prescribes){
 		Integer prescribeId = (Integer) prescribes.get("PRESCRIBE_ID");
+		updateDrugs(prescribes);
+		writeToJsonDbFile(prescribes, getPrescribeDbJsonName(prescribeId));
+		cuwyCpoeHolDb2.updatePrescribeOrder(prescribes);
+		prescribe1sList();
+		return prescribes;
+	}
+	private void updateDrugs(Map<String, Object> prescribes) {
 		for (Object prescribeHistory : getArray(prescribes,"prescribesHistory")) {
 			for (Map drug : getMapsArray(getMap((Map)prescribeHistory, "prescribes"), "tasks")) {
 				if(null != drug){
@@ -274,10 +282,6 @@ public class CuwyHol3Controller {
 				}
 			}
 		}
-		writeToJsonDbFile(prescribes, getPrescribeDbJsonName(prescribeId));
-		cuwyCpoeHolDb2.updatePrescribeOrder(prescribes);
-		prescribe1sList();
-		return prescribes;
 	}
 	private List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
 		Set<Map> hashSet = new HashSet<Map>();
