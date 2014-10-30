@@ -4,7 +4,6 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
 	$scope.siteMap = config.siteMap.siteMaps[2];
-	$scope.parameters = parameters;
 	var pageDeepPosition = ["page","day","task","edittask"];
 	getDayHours = function(){
 		var dayHours = [];
@@ -24,9 +23,17 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$scope.tasksInDay.push({i:ii,isCollapsed:false});
 	}
 
+	$scope.parameters = parameters;
+	var url = '/read/';
+	console.log(url);
+	if($scope.parameters.s){
+		url += $scope.parameters.s;
+	}
+	url += '/prescribe_'+$scope.parameters.id;
+	console.log(url);
 	$http({
 		method : 'GET',
-		url : config.urlPrefix + '/read/prescribe_'+$scope.parameters.id
+		url : config.urlPrefix + url
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
 		$scope.patient = $scope.p24hDoc;

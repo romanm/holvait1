@@ -7,8 +7,7 @@ var config = {
 		,siteMaps:[
 			{title:"Пацієнти",name:"Пацієнти",url:"patients.html"},
 			{title:"КП::Ліки",name:"Ліки",url:"drugs.html"},
-			{title:":КП:Призначеня 24 г/добу"
-				,name:"- КП:Призначеня 24 г/добу", url:"lp24h.html"},
+			{title:":КП:Призначеня 24 г/добу" ,name:"- КП:Призначеня 24 г/добу", url:"prescribes24h.html"},
 			{title:"КП::Призначеня",name:"Призначеня::Клінічні протоколи",url:"protocols.html"},
 			{title:":IX:Призначеня",name:"- IX::Призначеня",url:"patient.html"},
 			{title:"Ліка додаток",name:"Ліка додаток",url:"drug.html"}

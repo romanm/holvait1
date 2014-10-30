@@ -81,15 +81,17 @@
 		</div>
 		<div class="col-xs-5">
 			<table width="100%">
-				<thead><tr><th>Nr</th><th>Призначеня <small>з сайту:<a href="http://cuwy.in.ua/protocols.html
-				">cuwy.in.ua
-				</a>
+				<thead><tr><th>Nr</th><th>Призначеня <small>з сайту: <a href="http://sah.curepathway.com/protocols.html
+				">sah.curepathway.com</a>
 				</small></th></tr></thead>
 				<tbody data-ng-repeat="prescribeOpen in prescribeOrder1sListOpen | filter: {PRESCRIBE_ARCHIVE:prescribeListOrArchive} | filter: seekPrescribe | limitTo : 12">
 					<tr>
 						<td>{{prescribeOpen.PRESCRIBE_ID}}</td>
-						<td>{{prescribeOpen.PRESCRIBE_NAME}}</td>
-					</tr>
+						<td><a
+							href="prescribes24h.html?s=sah&id={{prescribeOpen.PRESCRIBE_ID}}"
+							>{{prescribeOpen.PRESCRIBE_NAME}}
+						</a></td>
+						</tr>
 				</tbody>
 			</table>
 		</div>
@@ -153,8 +155,8 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/protocolOrder1sList.json.js"></script>
 	<script src="/db/prescribeOrder1sList.json.js"></script>
-	<script src="http://cuwy.in.ua/db/prescribeOrder1sListOpen.json.js"></script>
-	<script src="http://cuwy.in.ua/db/protocolOrder1sListOpen.json.js"></script>
+	<script src="http://sah.curepathway.com/db/prescribeOrder1sListOpen.json.js"></script>
+	<script src="http://sah.curepathway.com/db/protocolOrder1sListOpen.json.js"></script>
 	<script src="/js/protocolsCtrl.js"></script>
 
 </body>

@@ -3,6 +3,9 @@ package org.cuwyhol3;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -148,6 +151,26 @@ public class CuwyHol3Controller {
 		return prescribe1sList;
 	}
 
+	@RequestMapping(value="/read/{shortServerName}/prescribe_{prescribeId}", method=RequestMethod.GET)
+	public @ResponseBody Map<String, Object> readPrescribesInServer(@PathVariable String shortServerName, @PathVariable Integer prescribeId) {
+		String url = "http://"+ shortServerName+ ".curepathway.com/read/prescribe_"+prescribeId;
+		return readPrescribe(url);
+	}
+	private Map<String, Object> readPrescribe(String url) {
+		logger.debug(" FROM: "+url );
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> responseBody = null;
+		try {
+			URL serverUrl = new URL(url);
+			InputStreamReader inputStreamReader = new InputStreamReader(serverUrl.openStream());
+			responseBody = mapper.readValue(inputStreamReader, Map.class);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return responseBody;
+	}
 	@RequestMapping(value="/read/prescribe_{prescribeId}", method=RequestMethod.GET)
 	public @ResponseBody Map<String, Object> readPrescribes(@PathVariable Integer prescribeId) {
 		String fileNameWithPathAdd = getPrescribeDbJsonName(prescribeId);
@@ -266,8 +289,7 @@ public class CuwyHol3Controller {
 		String dbPathFile = innerDbFolderPfad + fileName;
 		writeToJsDbPathFile(variable, objectForJson, dbPathFile);
 	}
-	private void writeToJsDbPathFile(String variable, Object objectForJson,
-			String dbPathFile) {
+	private void writeToJsDbPathFile(String variable, Object objectForJson, String dbPathFile) {
 		File file = new File(applicationFolderPfad + dbPathFile);
 		logger.debug("write to file = " + file);
 		ObjectMapper mapper = new ObjectMapper();
