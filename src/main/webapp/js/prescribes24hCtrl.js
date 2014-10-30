@@ -25,12 +25,10 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 
 	$scope.parameters = parameters;
 	var url = '/read/';
-	console.log(url);
 	if($scope.parameters.s){
 		url += $scope.parameters.s;
 	}
 	url += '/prescribe_'+$scope.parameters.id;
-	console.log(url);
 	$http({
 		method : 'GET',
 		url : config.urlPrefix + url
@@ -224,12 +222,7 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 }
 
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
-	console.log(1);
 	if(!taskInDay.isCollapsed){
-		console.log(taskInDayIndex+"/"+dayHourIndex);
-		console.log($scope.editedPrescribeDrug);
-		console.log($scope.editedPrescribeHistory.selectDrugIndex);
-		console.log(taskInDay);
 		if(!checkDrugEditedSelection(taskInDayIndex, prescribeHistory)) 
 			return;
 		if(!$scope.editedPrescribeDrug.times){
@@ -414,7 +407,6 @@ $scope.menuTask = [
 $scope.menuDayBlock = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		console.debug('Edit');
-		console.log($itemScope);
 		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
 	}]
 ];
