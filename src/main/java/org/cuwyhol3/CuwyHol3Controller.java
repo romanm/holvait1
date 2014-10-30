@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -90,7 +93,7 @@ public class CuwyHol3Controller {
 		return patient1sList;
 	}
 	//------------------patient---------------END-------
-	
+
 	//------------------drug----------------------
 	@RequestMapping(value = "/saveNewDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewDrug(@RequestBody Map<String, Object> newDrug) {
@@ -257,10 +260,17 @@ public class CuwyHol3Controller {
 		for (Object prescribeHistory : getArray(prescribes,"prescribesHistory")) {
 			for (Map drug : getMapsArray(getMap((Map)prescribeHistory, "prescribes"), "tasks")) {
 				if(null != drug){
-					if(null == drug.get("DRUG_ID")){
-						Map<String, Object> newDrug = cuwyCpoeHolDb2.newDrug(drug);
-						drug.put("DRUG_ID", newDrug.get("DRUG_ID"));
+					Map<String, Object> drugDocument;
+					Integer drugId = (Integer) drug.get("DRUG_ID");
+					if(null == drugId){
+						drugDocument = cuwyCpoeHolDb2.newDrug(drug);
+						drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
+					}else{
+						drugDocument = readDrug(drugId);
 					}
+					List<Map> doses = addDose2DrugDocument(drug, drugDocument);
+					drugDocument.put("doses", doses);
+					saveDrug(drugDocument);
 				}
 			}
 		}
@@ -269,6 +279,25 @@ public class CuwyHol3Controller {
 		prescribe1sList();
 		return prescribes;
 	}
+	private List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
+		Set<Map> hashSet = new HashSet<Map>();
+		List<Map> ddDoses = getMapsArray(drugDocument, "doses");
+		if(null != ddDoses)
+			hashSet.addAll(ddDoses);
+		List<Map> dDoses = getMapsArray(drug, "doses");
+		Map dose = getMap(drug, "dose");
+		if(null != dose)
+			hashSet.add(dose);
+		return new ArrayList<Map>(hashSet);
+	}
+	/*
+	private List<Map> getMapsArrayNotNull(Map map, String key) {
+		List<Map> mapsArray = getMapsArray(map, key);
+		if(null == mapsArray)
+			mapsArray = new ArrayList<Map>();
+		return mapsArray;
+	}
+	 * */
 	private List<Map> getMapsArray(Map map, String key) {
 		return (List<Map>)map.get(key);
 	}
