@@ -29,6 +29,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		url : config.urlPrefix + '/read/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
+		$scope.patient = $scope.p24hDoc;
 		console.log(data);
 		initPatientDocument();
 	}).error(function(data, status, headers, config) {
