@@ -290,14 +290,6 @@ public class CuwyHol3Controller {
 			hashSet.add(dose);
 		return new ArrayList<Map>(hashSet);
 	}
-	/*
-	private List<Map> getMapsArrayNotNull(Map map, String key) {
-		List<Map> mapsArray = getMapsArray(map, key);
-		if(null == mapsArray)
-			mapsArray = new ArrayList<Map>();
-		return mapsArray;
-	}
-	 * */
 	private List<Map> getMapsArray(Map map, String key) {
 		return (List<Map>)map.get(key);
 	}
