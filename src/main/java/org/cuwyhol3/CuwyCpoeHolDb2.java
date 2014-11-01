@@ -17,12 +17,14 @@ public class CuwyCpoeHolDb2 {
 	private JdbcTemplate jdbcTemplate;
 	
 	public CuwyCpoeHolDb2() {
-		String url = "jdbc:h2:file:~/01_curepathway/h2-db-server/cuwy-cpoe-hol1";
+		String url = "jdbc:h2:file:~/01_hol/h2-db/holvait1/lp24protocol";
+//		String url = "jdbc:h2:file:~/01_hol/db-h2/hol-sec-2/lp24protocol";
+//		String url = "jdbc:h2:file:~/01_hol/db-h2/holweb/lp24protocol";
+//		String url = "jdbc:h2:file:C:\\opt\\hol-vait\\db-h2\\cuwy-cpoe-hol1";
 		logger.debug(":: url = "+url);
 		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 		dataSource.setDriverClass(Driver.class);
 		dataSource.setUrl(url);
-//		dataSource.setUrl("jdbc:h2:file:C:\\opt\\hol-vait\\db-h2\\cuwy-cpoe-hol1");
 		dataSource.setUsername("sa");
 //		dataSource.setPassword("");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);

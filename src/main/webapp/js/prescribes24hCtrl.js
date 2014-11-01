@@ -725,6 +725,8 @@ $scope.$on('keydown', function(msg, obj) {
 		){
 			return;
 		}
+		if($scope.editedPrescribeHistory.updateDialogOpen)
+			return;
 		if(o.code !== code) return;
 		if((ctrlKey && !o.ctrlKey) || (o.ctrlKey && !ctrlKey)) return;
 		if((altKey && !o.altKey) || (o.altKey && !altKey)) return;

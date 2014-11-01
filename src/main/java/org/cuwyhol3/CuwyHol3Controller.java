@@ -117,6 +117,7 @@ public class CuwyHol3Controller {
 			URL serverUrl = new URL(url);
 			InputStreamReader inputStreamReader = new InputStreamReader(serverUrl.openStream());
 			responseBody = mapper.readValue(inputStreamReader, Map.class);
+			logger.debug("\n"+responseBody);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -148,11 +149,12 @@ public class CuwyHol3Controller {
 
 	private String prescribeOrder1sListJsFileName = "prescribeOrder1sList.json.js";
 	private String prescribeOrder1sListOpenJsFileName = "prescribeOrder1sListOpen.json.js";
-//	String applicationFolderPfad = "/home/roman/Documents/01_curepathway/work3/cuwy-cpoe-hol2/";
+//	String applicationFolderPfad = "C:\\opt\\hol-vait\\";
 //	String applicationFolderPfad = "/home/roman/01_hol/cuwy-cpoe-hol3/";
 	String applicationFolderPfad = "/home/roman/01_hol/holvait1/";
 //	String applicationFolderPfad = "/home/roman/01_hol/hol-sec-2";
 	String innerDbFolderPfad = "src/main/webapp/db/";
+//	String innerDbFolderPfad = "src\\main\\webapp\\db\\";
 	String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 	private String patient1sListJsFileName = "patient1sList.json.js";
 	private String drug1sListJsFileName = "drug1sList.json.js";
@@ -358,4 +360,5 @@ public class CuwyHol3Controller {
 			e.printStackTrace();
 		}
 	}
+
 }
