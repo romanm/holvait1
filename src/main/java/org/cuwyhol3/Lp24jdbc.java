@@ -10,29 +10,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.stereotype.Component;
 
-@Component("cuwyCpoeHolDb2")
-public class CuwyCpoeHolDb2 {
-	private static final Logger logger = LoggerFactory.getLogger(CuwyCpoeHolDb2.class);
+@Component("lp24jdbc")
+public class Lp24jdbc {
+	private static final Logger logger = LoggerFactory.getLogger(Lp24jdbc.class);
+	private Lp24Config lp24Config;
 
 	private JdbcTemplate jdbcTemplate;
 	
-	public CuwyCpoeHolDb2() {
-		//install windows/clinic
-//		String url = "jdbc:h2:file:C:\\opt\\vait.curepathway\\db-h2\\holvait1-prodaction\\lp24protocol";
-		//develop tasclin/clinic
-		String url = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
-		//develop tasclin/hol-sec
-//		String url = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
-		//test install freehost.ua/holweb
-//		String url = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
-
-		//install windows/clinic old
-//		String url = "jdbc:h2:file:C:\\opt\\hol-vait\\db-h2\\cuwy-cpoe-hol1";
-		logger.debug(":: url = "+url);
+	public Lp24jdbc() {
+		logger.debug(":: url = "+lp24Config.urlDb);
 
 		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 		dataSource.setDriverClass(Driver.class);
-		dataSource.setUrl(url);
+		dataSource.setUrl(lp24Config.urlDb);
 		dataSource.setUsername("sa");
 //		dataSource.setPassword("");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);

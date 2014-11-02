@@ -31,10 +31,12 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 	}
 
 	postPatient = function (postUrl, editPatient){
+		var urlPost = config.urlPrefix + postUrl;
+		console.log(urlPost);
 		$http({
 			method : 'POST',
 			data : editPatient,
-			url : config.urlPrefix + postUrl
+			url : urlPost
 		}).success(function(data, status, headers, config){
 			$scope.patient1sList = data;
 			console.log(data);
@@ -51,12 +53,10 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 	}],
 	null,
 	['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
-		console.debug('delete');
-		console.debug($itemScope);
-		console.debug($itemScope.patient);
+		console.debug('remove to archiv');
 		$itemScope.patient.PATIENT_ARCHIVE = !$scope.patientListOrArchive;
 		postPatient('/updatePatient', $itemScope.patient);
-//			postPatient('/archivePatient', $itemScope.patient);
+		$scope.filterPatients();
 	}],
 	['<span class="glyphicon glyphicon-floppy-open"></span> Відкрити пацієнт документ', function ($itemScope) {
 		console.debug('Edit');
