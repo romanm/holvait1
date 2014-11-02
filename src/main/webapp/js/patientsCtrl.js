@@ -22,6 +22,7 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 	$scope.saveNewPatient = function(){
 		console.log("saveNewPatient");
 		postPatient('/saveNewPatient', {"PATIENT_NAME":$scope.seekPatient});
+		$scope.filterPatients();
 	}
 
 	$scope.updatePatient = function(patientToUpdate){

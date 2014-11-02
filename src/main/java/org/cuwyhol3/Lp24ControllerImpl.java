@@ -174,7 +174,7 @@ public class Lp24ControllerImpl {
 		Map<String, Object> responseBody = null;
 		try {
 			URL serverUrl = new URL(url);
-			InputStreamReader inputStreamReader = new InputStreamReader(serverUrl.openStream());
+			InputStreamReader inputStreamReader = new InputStreamReader(serverUrl.openStream(), "UTF-8");
 			responseBody = mapper.readValue(inputStreamReader, Map.class);
 			logger.debug("\n"+responseBody);
 		} catch (MalformedURLException e) {
