@@ -7,7 +7,13 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 	console.log($scope.protocolOrder1sList);
 	$scope.prescribeOrder1sList = prescribeOrder1sList;
 	console.log($scope.prescribeOrder1sList);
-	$scope.prescribeOrder1sListOpen = prescribeOrder1sListOpen;
+	
+	if(typeof prescribeOrder1sListOpen === 'undefined'){
+		$scope.prescribeOrder1sListOpen = [];
+	}else{
+		$scope.prescribeOrder1sListOpen = prescribeOrder1sListOpen;
+	}
+	
 	console.log($scope.prescribeOrder1sListOpen);
 	$scope.prescribeListOrArchive = false;
 

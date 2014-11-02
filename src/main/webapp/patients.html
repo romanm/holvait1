@@ -26,9 +26,9 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<span class="navbar-right">
-				<a href="#" data-ng-click="patientListOrArchive = false; seekPatient = ''"> Список пацієнтів </a>
+				<a href="#" data-ng-click="archiveOrNot(false)"> Список пацієнтів </a>
 				|
-				<a href="#" data-ng-click="patientListOrArchive = true; seekPatient = ''"> Архів </a>
+				<a href="#" data-ng-click="archiveOrNot(true)"> Архів </a>
 			</span>
 		</div>
 	</div>
@@ -60,10 +60,14 @@
 						data-ng-dblclick="openItem($index)"
 					>
 					<td>{{patient.PATIENT_ID}}</td>
-					<td ng-context-menu="menuPatientList" ng-show="!patient.patientUpdateOpen">
-					<a id="patient_{{patient.PATIENT_ID}}" href="patient.html?id={{patient.PATIENT_ID}}"> {{patient.PATIENT_NAME}} </a>
-					</td>
-					<td ng-context-menu="menuPatientList" ng-show="patient.patientUpdateOpen">
+					<td ng-context-menu="menuPatientList"
+						ng-show="!patient.patientUpdateOpen"><a
+						id="patient_{{patient.PATIENT_ID}}"
+						href="patient.html?id={{patient.PATIENT_ID}}">
+							{{patient.PATIENT_NAME}} </a>
+							 PATIENT_ARCHIVE
+						{{patient.PATIENT_ARCHIVE}}</td>
+							<td ng-context-menu="menuPatientList" ng-show="patient.patientUpdateOpen">
 						<div class="row">
 							<div class="col-xs-5">
 								<input ng-model="patient.PATIENT_NAME" type="text" class="form-control" />

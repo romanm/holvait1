@@ -7,6 +7,10 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 	$scope.selectPatientIndex = null;
 	$scope.pageDeepPositionIndex = 1;
 
+	$scope.archiveOrNot = function(archiveOrNot){
+		$scope.patientListOrArchive = archiveOrNot;
+		$scope.filterPatients();
+	}
 	$scope.filterPatients = function(){
 		var f1 = $filter('filter')($scope.patient1sList, {PATIENT_ARCHIVE:$scope.patientListOrArchive});
 		var f2 = $filter('filter')(f1, $scope.seekPatient);

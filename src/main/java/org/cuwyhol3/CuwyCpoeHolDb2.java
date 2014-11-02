@@ -17,11 +17,19 @@ public class CuwyCpoeHolDb2 {
 	private JdbcTemplate jdbcTemplate;
 	
 	public CuwyCpoeHolDb2() {
-		String url = "jdbc:h2:file:~/01_hol/h2-db/holvait1/lp24protocol";
-//		String url = "jdbc:h2:file:~/01_hol/db-h2/hol-sec-2/lp24protocol";
-//		String url = "jdbc:h2:file:~/01_hol/db-h2/holweb/lp24protocol";
+		//install windows/clinic
+//		String url = "jdbc:h2:file:C:\\opt\\vait.curepathway\\db-h2\\holvait1-prodaction\\lp24protocol";
+		//develop tasclin/clinic
+		String url = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
+		//develop tasclin/hol-sec
+//		String url = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
+		//test install freehost.ua/holweb
+//		String url = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
+
+		//install windows/clinic old
 //		String url = "jdbc:h2:file:C:\\opt\\hol-vait\\db-h2\\cuwy-cpoe-hol1";
 		logger.debug(":: url = "+url);
+
 		SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 		dataSource.setDriverClass(Driver.class);
 		dataSource.setUrl(url);

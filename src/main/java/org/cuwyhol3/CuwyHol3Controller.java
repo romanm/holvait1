@@ -150,9 +150,8 @@ public class CuwyHol3Controller {
 	private String prescribeOrder1sListJsFileName = "prescribeOrder1sList.json.js";
 	private String prescribeOrder1sListOpenJsFileName = "prescribeOrder1sListOpen.json.js";
 //	String applicationFolderPfad = "C:\\opt\\hol-vait\\";
-//	String applicationFolderPfad = "/home/roman/01_hol/cuwy-cpoe-hol3/";
-	String applicationFolderPfad = "/home/roman/01_hol/holvait1/";
-//	String applicationFolderPfad = "/home/roman/01_hol/hol-sec-2";
+	String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
+//	String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
 	String innerDbFolderPfad = "src/main/webapp/db/";
 //	String innerDbFolderPfad = "src\\main\\webapp\\db\\";
 	String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
