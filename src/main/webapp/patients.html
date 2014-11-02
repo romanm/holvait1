@@ -64,10 +64,8 @@
 						ng-show="!patient.patientUpdateOpen"><a
 						id="patient_{{patient.PATIENT_ID}}"
 						href="patient.html?id={{patient.PATIENT_ID}}">
-							{{patient.PATIENT_NAME}} </a>
-							 PATIENT_ARCHIVE
-						{{patient.PATIENT_ARCHIVE}}</td>
-							<td ng-context-menu="menuPatientList" ng-show="patient.patientUpdateOpen">
+							{{patient.PATIENT_NAME}} </a></td>
+					<td ng-context-menu="menuPatientList" ng-show="patient.patientUpdateOpen">
 						<div class="row">
 							<div class="col-xs-5">
 								<input ng-model="patient.PATIENT_NAME" type="text" class="form-control" />
