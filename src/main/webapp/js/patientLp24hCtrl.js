@@ -1,7 +1,4 @@
 cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
-	console.log('patientLp24hCtrl');
-	console.log(isBrowser("Chrome"));
-	console.log(isBrowser("Firefox"));
 	var minPageDeepPositionIndex = -2;
 	$scope.numberOfChange = 0;
 	$scope.drug1sList = drug1sList;

@@ -7,15 +7,12 @@ if(window.location.search){
 }
 
 function skipLinkMinus1(){
-//	console.log(document.getElementById('focus_minus_1').getAttribute('href'));
-//	console.log(document.getElementById('focus_minus_1'));
 	if(isBrowser("Chrome")){
 		window.location.href = document.getElementById('focus_minus_1').getAttribute('href');
 		window.location.assign();
 	}else{ //if(isBrowser("Firefox")){
 		document.getElementById('focus_minus_1').click();
 	}
-	//	$("#focus_minus_1").focus();
 }
 function isBrowser(browserName){
 	return navigator.userAgent.indexOf(browserName) > 0;
