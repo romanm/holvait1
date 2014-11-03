@@ -533,7 +533,7 @@ $scope.keys.push({
 			}
 		}else
 		if($scope.p24hDoc.pageDeepPositionIndex == 0){
-			document.getElementById('focus_minus_1').click();
+			skipLinkMinus1();
 		}else 
 		if($scope.p24hDoc.pageDeepPositionIndex > minPageDeepPositionIndex){
 			$scope.p24hDoc.pageDeepPositionIndex--;

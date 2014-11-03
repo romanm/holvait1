@@ -1,4 +1,7 @@
 cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
+	console.log('patientLp24hCtrl');
+	console.log(isBrowser("Chrome"));
+	console.log(isBrowser("Firefox"));
 	var minPageDeepPositionIndex = -2;
 	$scope.numberOfChange = 0;
 	$scope.drug1sList = drug1sList;
@@ -533,7 +536,7 @@ $scope.keys.push({
 			}
 		}else
 		if($scope.patient.pageDeepPositionIndex == 0){
-			document.getElementById('focus_minus_1').click();
+			skipLinkMinus1();
 		}else 
 		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
 			$scope.patient.pageDeepPositionIndex--;
