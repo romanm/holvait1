@@ -1,7 +1,5 @@
 package org.cuwyhol3;
 
-
-//@Component("lp24Config")
 public class Lp24Config {
 	//windows
 	//install windows/clinic

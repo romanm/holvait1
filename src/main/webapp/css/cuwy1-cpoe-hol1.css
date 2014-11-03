@@ -1,5 +1,8 @@
 .selected{
+	background-color: DarkKhaki ;
+	/*
 	background-color: LightCyan ;
+	*/
 }
 .selectpath{
 	border: 1px dotted navy; 
