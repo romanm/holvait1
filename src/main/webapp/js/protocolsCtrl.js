@@ -130,5 +130,24 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		$itemScope.drug.updateDialogOpen = !$itemScope.drug.updateDialogOpen;
 	}]
 	];
+//---------------------keydown-------------------------------
+
+	$scope.keys = [];
+	$scope.keys.push({code : KeyCodes.F1, action : function() { $scope.openF1(); } });
+	$scope.openF1 = function(){ window.open("help.html#protocols", "", "width=1000, height=500"); }
+
+	$scope.$on('keydown', function(msg, obj) {
+		console.log(obj);
+		var code = obj.event.keyCode;
+		var ctrlKey = obj.event.ctrlKey;
+		$scope.keys.forEach(function(o) {
+			if (o.code !== code) return;
+			if(ctrlKey && !o.ctrlKey) return;
+			if(o.ctrlKey && !ctrlKey) return;
+			o.action();
+			$scope.$apply();
+		});
+	});
+//---------------------keydown---------------------END-------
 
 } ] );

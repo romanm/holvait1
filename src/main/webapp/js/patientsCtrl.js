@@ -67,17 +67,6 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 	}]
 	];
 
-	var KeyCodes = {
-		F1 : 112,
-		ArrowUp : 38,
-		ArrowDown : 40,
-		ArrowLeft : 37,
-		ArrowRight : 39,
-		Enter : 13,
-		Escape : 27,
-		SPACEBAR : 32,
-	};
-
 	$scope.keys = [];
 	$scope.keys.push({
 		code : KeyCodes.Escape,

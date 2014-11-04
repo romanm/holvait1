@@ -91,19 +91,6 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 		$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
 	}]
 	];
-	
-var KeyCodes = {
-	F1 : 112,
-	ArrowUp : 38,
-	ArrowDown : 40,
-	ArrowLeft : 37,
-	ArrowRight : 39,
-	Enter : 13,
-	BACKSPACE : 8,
-	TABKEY : 9,
-	Escape : 27,
-	SPACEBAR : 32,
-};
 
 $scope.keys = [];
 $scope.keys.push({

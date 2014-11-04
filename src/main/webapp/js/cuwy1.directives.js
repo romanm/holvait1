@@ -90,6 +90,19 @@ Date.prototype.addMonths2 = function (num) {
     return value;
 }
 
+var KeyCodes = {
+	F1 : 112,
+	ArrowUp : 38,
+	ArrowDown : 40,
+	ArrowLeft : 37,
+	ArrowRight : 39,
+	Enter : 13,
+	Escape : 27,
+	BACKSPACE : 8,
+	TABKEY : 9,
+	SPACEBAR : 32,
+};
+
 var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap', 'ngSanitize', 'textAngular']);
 
 cuwyApp.directive('autoFocus', function($timeout) {
