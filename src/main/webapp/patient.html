@@ -5,6 +5,7 @@
 	<title>{{patient.PATIENT_NAME}}{{siteMap.title}}</title>
 	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href="/css-vendor/datepicker.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
@@ -42,6 +43,7 @@
 				<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
 					data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)"
 					class="mouseover"
+					data-ng-context-menu="menuDayBlock"
 					data-ng-class="{selectpath:dayInSelectPath(prescribeHistoryIndex),
 									selected:daySelected(prescribeHistoryIndex) }"
 				>
@@ -49,20 +51,6 @@
 				<small>
 					{{prescribeHistory.date | date:'HH:mm'}}
 				</small>
-<!-- 
-				<input id="patientDob{{$index}}" name="patientDob{{$index}}" 
-					ng-model="prescribeHistory.date"
-					ng-click="open($event)"
-					is-open="opened"
-					datepicker-options="dateOptions"
-					datepicker-popup="dd-MM-yyyy" 
-				/>
-					class="form-control input-sm"
-					datepicker-popup="yyyy-MM-dd" 
-					class="form-control input-sm" type="text" placeholder="д.н. (дд-мм-рррр)"
-					datepicker-popup="dd-MM-yyyy" is-open="opened"
-					datepicker-options="dateOptions" ng-required="true"
- -->
 				</span>
 				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" >
 					<span class="glyphicon glyphicon-folder-{{!prescribeHistory.isCollapsed?'open':'close'}}"></span>
@@ -72,6 +60,23 @@
 					<span class="glyphicon glyphicon-print"></span>
 				</a>
 				</span>
+				<div data-ng-show="prescribeHistory.updateDialogOpen">
+					<div class="row">
+						<div class="col-xs-4">
+							<div class="well">
+								Дата <input value="11-02-2015" type="text" class="form-control"
+									ng-model="prescribeHistory.date" datepicker-popup="dd-MM-yyyy"
+									datepicker-options="dateOptions" date-min-date="minDate"
+									date-max-date="'2015-06-22'"
+									date-disabled="disabled(date, mode)" is-open="opened">
+								<button type="button" class="btn btn-default"
+									ng-click="open($event)">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
 				<table data-ng-show="!prescribeHistory.isCollapsed" class="tablehover">
 					<colgroup>
 						<col style="width: 2px;"></col>
@@ -263,24 +268,17 @@
 
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
 	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/bootstrap-datepicker.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js-vendor/angular-sanitize.min.js"></script>
-	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.2.js"></script>
 	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
 	<script src='/js-vendor/textAngular.min.js'></script>
 	<script src="/js/cuwy1.config.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/patient1sList.json.js"></script>
-
-	<script src="/js/cuwy1.config.js"></script>
-	<script src="/js/cuwy1.directives.js"></script>
-	<script src="/db/patient1sList.json.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
-	<!-- 
-	<script src="/js/patientLp24hCtrl.min.js"></script>
-	 -->
 	<script src="/js/patientLp24hCtrl.js"></script>
 	<script src="/js/taskInDayCtrl.js"></script>
-
 </body>
 </html>

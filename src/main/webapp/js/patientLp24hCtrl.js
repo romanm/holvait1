@@ -6,6 +6,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	$scope.siteMap = config.siteMap.siteMaps[4];
 	$scope.parameters = parameters;
 	var pageDeepPosition = ["page","day","task","edittask"];
+	
 	getDayHours = function(){
 		var dayHours = [];
 		for(var i=0;i<24;i++) dayHours.push(i);
@@ -19,10 +20,10 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		}
 		return tasksInDay;
 	}
+	/*
 	$scope.tasksInDay = getTasksInDay();
-	for(var ii=0;ii<19;ii++){
-		$scope.tasksInDay.push({i:ii,isCollapsed:false});
-	}
+	for(var ii=0;ii<19;ii++){ $scope.tasksInDay.push({i:ii,isCollapsed:false}); }
+	*/
 
 	$http({
 		method : 'GET',
@@ -34,6 +35,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	});
 
 	initPatientDocument = function(){
+	console.log("initPatientDocument");
 		if(null == $scope.patient.prescribesHistory){
 			$scope.newPrescribes();
 			$scope.numberOfChange++;
@@ -106,11 +108,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		$scope.opened = true;
 	};
 
-	$scope.dateOptions = {
-		formatYear: 'yyyy',
-		startingDay: 1
-	};
-
 	//---------data-ng-class-----------------------------------
 	$scope.dayInSelectPath = function(prescribeHistoryIndex){
 		return prescribeHistoryIndex == $scope.patient.selectPrescribesHistoryIndex;
@@ -129,6 +126,10 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
 		var prescribeHistory = $scope.patient.prescribesHistory[prescribeHistoryIndex];
+		if(prescribeHistory.updateDialogOpen){
+			prescribeHistory.updateDialogOpen = false;
+			return;
+		}
 		prescribeHistory.isCollapsed = !prescribeHistory.isCollapsed
 		if(prescribeHistory.isCollapsed)
 			return;
@@ -160,7 +161,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		} );
 		taskInDay.isCollapsed = !oldCollapsed;
 		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
-		console.log($scope.editedPrescribeDrug);
 		if(null == $scope.editedPrescribeDrug){
 			$scope.editedPrescribeDrug = 
 			{DRUG_NAME:"",
@@ -173,7 +173,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			};
 			insertDrugToTask($scope.editedPrescribeDrug, $scope.editedPrescribeHistory.selectDrugIndex, prescribeHistory);
 		}
-		console.log($scope.editedPrescribeDrug);
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug);
 		}
@@ -220,12 +219,7 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 }
 
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
-	console.log(1);
 	if(!taskInDay.isCollapsed){
-		console.log(taskInDayIndex+"/"+dayHourIndex);
-		console.log($scope.editedPrescribeDrug);
-		console.log($scope.editedPrescribeHistory.selectDrugIndex);
-		console.log(taskInDay);
 		if(!checkDrugEditedSelection(taskInDayIndex, prescribeHistory)) 
 			return;
 		if(!$scope.editedPrescribeDrug.times){
@@ -361,6 +355,12 @@ copy = function(taskIndex, prescribeHistory){
 		contextMenuCopy(drug); 
 	}
 }
+
+$scope.menuDayBlock = [
+	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
+	}]
+	];
 
 $scope.menuTask = [
 	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
@@ -650,13 +650,11 @@ $scope.keys.push({
 		console.log("ArrowUp");
 		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
-			console.log($scope.editedPrescribeHistory.selectDrugIndex);
 			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
 				$scope.editedPrescribeHistory.selectDrugIndex = 18;
 			}
-			console.log($scope.editedPrescribeHistory.selectDrugIndex);
-		}
-		else if($scope.patient.pageDeepPositionIndex == 1){
+		}else
+		if($scope.patient.pageDeepPositionIndex == 1){
 			$scope.patient.selectPrescribesHistoryIndex--;
 			if($scope.patient.selectPrescribesHistoryIndex < 0){
 				$scope.patient.selectPrescribesHistoryIndex = 
@@ -715,14 +713,18 @@ $scope.keys.push({
 	}
 });
 
-$scope.$on('keydown', function(msg, obj) {
+$scope.$on('keydown', function(msg, obj){
 	//console.log(obj);
 	var code = obj.event.keyCode;
 	var ctrlKey = obj.event.ctrlKey;
 	var altKey = obj.event.altKey;
 	var shiftKey = obj.event.shiftKey;
+	if(!$scope.editedPrescribeHistory.selectDrugIndex){
+		$scope.editedPrescribeHistory.selectDrugIndex = 0;
+	}
 	$scope.keys.forEach(function(o) {
 		if($scope.editedPrescribeHistory.tasksInDay 
+		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
 		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed
 		){
 			return;
@@ -736,5 +738,24 @@ $scope.$on('keydown', function(msg, obj) {
 	});
 });
 //---------------------keydown---------------------END-------
+//---------------datepicker-------------------------
+$scope.today = function() { $scope.dt = new Date(); };
+$scope.today(); 
+$scope.clear = function () { $scope.dt = null; };
+// Disable weekend selection
+$scope.disabled = function(date, mode) {
+	return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+};
+$scope.toggleMin = function() { $scope.minDate = $scope.minDate ? null : new Date(); };
+$scope.toggleMin();
+$scope.open = function($event) {
+	$event.preventDefault();
+	$event.stopPropagation();
+	$scope.opened = true;
+};
+$scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
+$scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+$scope.format = $scope.formats[0];
+//---------------datepicker-------------------------END
 }]);
 

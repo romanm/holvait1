@@ -21,4 +21,11 @@
 		<nature>org.springsource.ide.eclipse.gradle.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/main/webapp/tmp/research-datepicker</name>
+			<type>2</type>
+			<location>/home/roman/01_hol_2/research-datepicker</location>
+		</link>
+	</linkedResources>
 </projectDescription>

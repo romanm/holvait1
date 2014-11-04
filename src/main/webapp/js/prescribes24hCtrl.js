@@ -18,10 +18,10 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		}
 		return tasksInDay;
 	}
+	/*
 	$scope.tasksInDay = getTasksInDay();
-	for(var ii=0;ii<19;ii++){
-		$scope.tasksInDay.push({i:ii,isCollapsed:false});
-	}
+	for(var ii=0;ii<19;ii++){ $scope.tasksInDay.push({i:ii,isCollapsed:false}); }
+	*/
 
 	$scope.parameters = parameters;
 	var url = '/read';

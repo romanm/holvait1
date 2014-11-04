@@ -29,6 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/db/prescribe/**", 
 						"/js/**", 
 						"/js-vendor/**" 
+						,"/tmp/dp*" 
 						,"/home.html"
 						,"/help.html"
 						,"/showimg.html"
@@ -49,13 +50,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/prescribe1sList"
 						,"/save/prescribes"
 						//patient
-						,"/patients.html"
-						,"/patient.html"
+						,"/patient*"
+//						,"/patients.html"
+//						,"/patient1sList"
 						,"/saveNewPatient"
 						,"/save/patient"
 						,"/removePatient"
-						,"/updatePatient"
-						,"/patient1sList"
 						,"/updatePatient"
 						//edit
 						,"/session/copy"
