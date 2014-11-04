@@ -496,7 +496,7 @@ saveDrugDocument = function(){
 var KeyCodes = {
 	Escape : 27,
 	F1 : 112,
-	F9 : 120,
+	F4 : 115,
 	C : 67,
 	V : 86,
 	S : 83,
@@ -685,7 +685,7 @@ $scope.keys.push({
 });
 
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.S, action : function() { $scope.savePatient(); }});
-$scope.keys.push({code : KeyCodes.F9, action : function() { $scope.savePatient(); }});
+$scope.keys.push({code : KeyCodes.F4, action : function() { $scope.savePatient(); }});
 
 $scope.keys.push({
 	ctrlKey : true, code : KeyCodes.ArrowDown,
@@ -714,7 +714,7 @@ $scope.keys.push({
 });
 
 $scope.$on('keydown', function(msg, obj){
-	//console.log(obj);
+	console.log(obj);
 	var code = obj.event.keyCode;
 	var ctrlKey = obj.event.ctrlKey;
 	var altKey = obj.event.altKey;

@@ -12,7 +12,7 @@
 <body data-key-cuwytrap="" >
 	<a id="focus_minus_2"
 		data-ng-class="{'selected': patient.pageDeepPositionIndex == -2}"
-		href="home.html"><span class="glyphicon glyphicon-home"></span></a> 
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
 /	<a id="focus_minus_1"
 		data-ng-class="{'selected': patient.pageDeepPositionIndex == -1}"
 		href="patients.html">Список пацієнтів</a> 
@@ -23,14 +23,19 @@
 	</a>
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
-			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small> </a></li>
-			<li> <a data-ng-click="newPrescribes()" href="#"> новий лист призначень </a> </li>
-			<li data-ng-class="{'disabled': numberOfChange == 0}">
-				<a data-ng-click="savePatient()" href="#"  title="Запис (Ctrl_S, F9). {{numberOfChange}} незбережених змін">
-					<span class="glyphicon glyphicon-floppy-disk"></span>
-					{{numberOfChange}}
-				</a>
-			</li>
+			<li><a href="patients.html">пацієнти</a></li>
+			<li><sub>.</sub></li>
+			<li><a href="protocols.html">шаблони</a></li>
+			<li><a href="protocols.html">протоколи</a></li>
+			<li><a href="drugs.html">ліки</a></li>
+			<li><sub>.</sub></li>
+			<li><a href="#" data-ng-click="openF1()">підказка<small>(F1)</small></a></li>
+			<li><a data-ng-click="newPrescribes()" href="#">нове призначеня</a></li>
+			<li data-ng-class="{'disabled': numberOfChange == 0}"><a
+				data-ng-click="savePatient()" href="#"
+				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><span
+					class="glyphicon glyphicon-floppy-disk"></span>{{numberOfChange}}<small>(F4)</small>
+			</a></li>
 		</ul>
 	</span>
 <hr/>
@@ -280,5 +285,6 @@
 	<script src="/db/drug1sList.json.js"></script>
 	<script src="/js/patientLp24hCtrl.js"></script>
 	<script src="/js/taskInDayCtrl.js"></script>
+
 </body>
 </html>
