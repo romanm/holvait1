@@ -69,7 +69,8 @@
 					<div class="row">
 						<div class="col-xs-4">
 							<div class="well">
-								Дата <input value="11-02-2015" type="text" class="form-control"
+								Дата <small>(F9)</small>
+								 <input value="11-02-2015" type="text" class="form-control"
 									ng-model="prescribeHistory.date" datepicker-popup="dd-MM-yyyy"
 									datepicker-options="dateOptions" date-min-date="minDate"
 									date-max-date="'2015-06-22'"
@@ -86,8 +87,7 @@
 					<colgroup>
 						<col style="width: 2px;"></col>
 					</colgroup>
-					<caption>
-					</caption>
+					<caption></caption>
 					<thead>
 						<tr>
 				<th class="mouseover" data-ng-context-menu="menuTasksAll" colspan="2" >Призначене лікування</th>
@@ -146,19 +146,16 @@
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
-				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
 				<div >
 			<table class="dose">
 				<tr>
+					<td>{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}</td>
+					<td colspan="3">доза</td>
+					<td></td>
+					<td colspan="2">концентрація</td>
+				</tr>
+				<tr>
 					<th>Медикамент:_______</th>
-					<th title="Концентрація">--</th>
-					<th title="Одиниці виміру концентрації">
-						<span 
-						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
-						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
-						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
-					</th>
-					<th></th>
 					<th title="Кількість">--</th>
 					<th title="Одиниці виміру">
 						<span 
@@ -172,6 +169,14 @@
 						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
 						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
 					</th>
+					<th></th>
+					<th title="Концентрація">--</th>
+					<th title="Одиниці виміру концентрації">
+						<span 
+						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
+						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
+					</th>
 				</tr>
 				<tr>
 					<td><input type="text" class="form-control"
@@ -179,16 +184,6 @@
 						data-ng-change="filterDrugs()" auto-focus=""
 						data-ng-focus="changeDialogTab('drug')"
 						placeholder=" пошук / запис"></td>
-					<!-- 
-						data-ng-blur="changeDialogTab('dose')"
-					 -->
-					<td> <input id="dose1" 
-						data-ng-focus="changeDialogTab('dose')"
-						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
-					<td> <input
-						data-ng-focus="changeDialogTab('dose')"
-					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
-					<td>-</td>
 					<td> <input
 							data-ng-focus="changeDialogTab('dose')"
 					 ng-model="editedPrescribeDrug.dose.DOSE_NUMBER" type="text" class="form-control" /> </td>
@@ -198,7 +193,13 @@
 					<td> <input 
 					data-ng-focus="changeDialogTab('dose')"
 					ng-model="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
-					<td> &nbsp; </td>
+					<td>-</td>
+					<td> <input id="dose1" 
+						data-ng-focus="changeDialogTab('dose')"
+						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input
+						data-ng-focus="changeDialogTab('dose')"
+					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
 				</tr>
 				<tr>
 					<td></td>

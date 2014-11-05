@@ -30,7 +30,7 @@
 			<li><a href="#" data-ng-click="openF1()">підказка<small>(F1)</small></a></li>
 			<li><a data-ng-click="newPrescribes()" href="#">нове призначеня</a></li>
 			<li data-ng-class="{'disabled': numberOfChange == 0}"><a
-				data-ng-click="savePatient()" href="#"
+				data-ng-click="savePrescribes()" href="#"
 				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><span
 					class="glyphicon glyphicon-floppy-disk"></span>{{numberOfChange}}<small>(F4)</small>
 			</a></li>
@@ -61,20 +61,6 @@
 				<span title="{{prescribeHistory.date | date:'dd-MM-yyyy '}} {{prescribeHistory.date | date:'HH:mm'}}">
 					Дні/години захворювання {{prescribeHistory.prescribeHistoryDays}}
 				</span>
-<!-- 
-				<input id="patientDob{{$index}}" name="patientDob{{$index}}" 
-					ng-model="prescribeHistory.date"
-					ng-click="open($event)"
-					is-open="opened"
-					datepicker-options="dateOptions"
-					datepicker-popup="dd-MM-yyyy" 
-				/>
-					class="form-control input-sm"
-					datepicker-popup="yyyy-MM-dd" 
-					class="form-control input-sm" type="text" placeholder="д.н. (дд-мм-рррр)"
-					datepicker-popup="dd-MM-yyyy" is-open="opened"
-					datepicker-options="dateOptions" ng-required="true"
- -->
 				</span>
 				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" >
 					<span class="glyphicon glyphicon-folder-{{!prescribeHistory.isCollapsed?'open':'close'}}"></span>
@@ -170,19 +156,23 @@
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
-				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
 				<div >
 			<table class="dose">
+			<tr>
+				<td>
+				{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
+				</td>
+				<td colspan="3">
+				доза
+				</td>
+				<td>
+				</td>
+				<td colspan="2">
+				концентрація
+				</td>
+			</tr>
 				<tr>
 					<th>Медикамент:_______</th>
-					<th title="Концентрація">--</th>
-					<th title="Одиниці виміру концентрації">
-						<span 
-						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
-						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
-						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
-					</th>
-					<th></th>
 					<th title="Кількість">--</th>
 					<th title="Одиниці виміру">
 						<span 
@@ -196,6 +186,14 @@
 						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
 						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
 					</th>
+					<th></th>
+					<th title="Концентрація скільки">--</th>
+					<th title="Одиниці виміру концентрації">
+						<span 
+						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
+						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
+						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
+					</th>
 				</tr>
 				<tr>
 					<td><input type="text" class="form-control"
@@ -206,13 +204,6 @@
 					<!-- 
 						data-ng-blur="changeDialogTab('dose')"
 					 -->
-					<td> <input id="dose1" 
-						data-ng-focus="changeDialogTab('dose')"
-						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
-					<td> <input
-						data-ng-focus="changeDialogTab('dose')"
-					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
-					<td>-</td>
 					<td> <input
 							data-ng-focus="changeDialogTab('dose')"
 					 ng-model="editedPrescribeDrug.dose.DOSE_NUMBER" type="text" class="form-control" /> </td>
@@ -222,7 +213,13 @@
 					<td> <input 
 					data-ng-focus="changeDialogTab('dose')"
 					ng-model="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
-					<td> &nbsp; </td>
+					<td>-</td>
+					<td> <input id="dose1" 
+						data-ng-focus="changeDialogTab('dose')"
+						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
+					<td> <input
+						data-ng-focus="changeDialogTab('dose')"
+					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
 				</tr>
 				<tr>
 					<td></td>
