@@ -4,6 +4,7 @@
 	<meta charset="utf-8" />
 	<title>{{siteMap.title}}</title>
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
@@ -60,19 +61,36 @@
 	<div class="row">
 		<div class="col-xs-6">
 			<table width="100%" class="tablehover">
-				<thead><tr><th>Nr</th><th>Медикамент</th></tr></thead>
+				<thead>
+						<tr>
+							<th>#</th>
+							<th><a href="#"
+								data-ng-click="predicate = 'DRUG_NAME';reverse=!reverse;filterDrugs();">Медикамент
+							</a> <i data-ng-show="!reverse && predicate == 'DRUG_NAME';"
+								class="fa fa-angle-down"></i> <i
+								data-ng-show="reverse && predicate == 'DRUG_NAME';"
+								class="fa fa-angle-up"></i></th>
+							<th><a href="#"
+								data-ng-click="predicate = 'DRUG_ID';reverse=!reverse;filterDrugs();">ID
+							</a> <i data-ng-show="!reverse && predicate == 'DRUG_ID';"
+								class="fa fa-angle-down"></i> <i
+								data-ng-show="reverse && predicate == 'DRUG_ID';"
+								class="fa fa-angle-up"></i></th>
+						</tr>
+					</thead>
 				<tbody data-ng-repeat="drug in drug1sListFilter" >
 					<tr 
 						data-ng-class="{selected:drug1sListFilter[selectDrugIndex]==drug}"
 						data-ng-click="clickItem($index)"
 						data-ng-dblclick="openItem($index)"
 					>
-						<td>{{drug.DRUG_ID}}</td>
+						<td>{{$index+1}}</td>
 						<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
 							<a id="drug_{{drug.DRUG_ID}}" href="drug.html?id={{drug.DRUG_ID}}">
 							{{drug.DRUG_NAME}}
 							</a>
 						</td>
+						<td>{{drug.DRUG_ID}}</td>
 						<td ng-context-menu="menuDrugList" ng-show="drug.drugUpdateOpen">
 							<div class="row">
 								<div class="col-xs-5">
