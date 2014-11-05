@@ -94,6 +94,7 @@ public class Lp24ControllerImpl {
 				}
 			}
 		}
+		drug1sList();
 	}
 
 	private List getArray(Map map, String key) {
