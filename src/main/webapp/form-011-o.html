@@ -55,7 +55,9 @@ td, th {
 						style="text-align: center; vertical-align: text-top; font-size: 75%;">
 						Міністерство охорони здоров'я України</td>
 					<td style="text-align: center;">Дата <u>
-							{{prescribeHistory.date | date:'" dd " MMMM yyyy р.'}} </u>
+							{{prescribeHistory.date | date:'" dd " '}}
+							{{getMMMMUa(prescribeHistory.date)}} {{prescribeHistory.date |
+							date:'yyyy р.'}} </u>
 					</td>
 					<td colspan="3" style="text-align: center;">
 						<div class="bold">
@@ -74,7 +76,7 @@ td, th {
 					<td colspan="3">П.І.П. <u class="bold">
 							{{patient.PATIENT_NAME}} </u>
 					</td>
-					<td>Nr медичної карти</td>
+					<td>№ <u class="bold">{{patient.PATIENT_HISTORYID}}</u></td>
 					<td>Дієта</td>
 				</tr>
 			</table>
@@ -182,6 +184,7 @@ td, th {
 </table>
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/js/cuwy1.config.js"></script>
 	<script type="text/javascript">
 	parameters = {};
@@ -211,6 +214,8 @@ td, th {
 			$scope.tasksInDay.push({i:ii,isCollapsed:false});
 		}
 		
+
+		$scope.getMMMMUa = function (date){ return jsDate = new Date(date).getMMMMUa(); }
 
 		console.log("$scope.parameters");
 		console.log($scope.parameters);
@@ -255,6 +260,7 @@ td, th {
 			var lp24hour = getLp24hour(dayHour);
 			return (lp24hour>9?'':'0')+lp24hour;
 		}
+
 		getLp24hour= function(dayHour){
 			var lp24hour = dayHour + $scope.config.startHour24lp;
 			lp24hour = lp24hour>23?lp24hour-24:lp24hour;
