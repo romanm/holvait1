@@ -18,6 +18,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(
 						"/", 
 						"/i*", 
+						"/form*", 
 						"/print*", 
 						"/read/**", 
 						"/img/**", 

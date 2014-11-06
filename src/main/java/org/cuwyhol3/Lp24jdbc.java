@@ -93,14 +93,15 @@ public class Lp24jdbc {
 	public int updatePrescribeOrder(Map<String, Object> prescribeToUpdate) {
 		String prescribeName = (String) prescribeToUpdate.get("PRESCRIBE_NAME");
 		Boolean prescribeArchive = (Boolean) prescribeToUpdate.get("PRESCRIBE_ARCHIVE");
+		prescribeArchive = null == prescribeArchive ? false : prescribeArchive;
 		Boolean prescribeRecommend = (Boolean) prescribeToUpdate.get("PRESCRIBE_RECOMMEND");
+		prescribeRecommend = null == prescribeRecommend ? false : prescribeRecommend;
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
 		String sql = "UPDATE prescribe1 SET prescribe_name = ?"
 				+ ", prescribe_archive = ? "
 				+ ", PRESCRIBE_RECOMMEND = ? "
 				+ " WHERE prescribe_id = ? ";
-		int update = this.jdbcTemplate.update(sql,
-			prescribeName, prescribeArchive, prescribeRecommend, prescribeId);
+		int update = this.jdbcTemplate.update(sql, prescribeName, prescribeArchive, prescribeRecommend, prescribeId);
 		return update;
 	}
 	

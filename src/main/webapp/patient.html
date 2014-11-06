@@ -15,12 +15,12 @@
 		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
 /	<a id="focus_minus_1"
 		data-ng-class="{'selected': patient.pageDeepPositionIndex == -1}"
-		href="patients.html">Список пацієнтів</a> 
+		href="patients.html">Список пацієнтів</a>: 
 /	<a id="focus_0"
 		data-ng-class="{'selected': patient.pageDeepPositionIndex == 0}"
 		href="patient.html?id={{parameters.id}}"> <span class="h1">
-			<u>{{patient.PATIENT_NAME}}</u> {{siteMap.name}}</span>
-	</a>
+			<u>{{patient.PATIENT_NAME}}</u></span>
+	</a> {{siteMap.name}}
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
 			<li><a href="patients.html">пацієнти</a></li>
@@ -36,9 +36,13 @@
 				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><span
 					class="glyphicon glyphicon-floppy-disk"></span>{{numberOfChange}}<small>(F4)</small>
 			</a></li>
+			<li title="Поновити: вернутись до останнього збереженого стану">
+			<a href="patient.html?id={{parameters.id}}"><i class="fa fa-refresh"></i></a></li>
+			<li title="Меню"><a href="#"><i class="fa fa-bars"></i></a></li>
 		</ul>
 	</span>
 <hr/>
+
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12">
@@ -184,7 +188,7 @@
 						data-ng-change="filterDrugs()" auto-focus=""
 						data-ng-focus="changeDialogTab('drug')"
 						placeholder=" пошук / запис"></td>
-					<td> <input
+					<td> <input id="dose1" 
 							data-ng-focus="changeDialogTab('dose')"
 					 ng-model="editedPrescribeDrug.dose.DOSE_NUMBER" type="text" class="form-control" /> </td>
 					<td> <input 
@@ -194,7 +198,7 @@
 					data-ng-focus="changeDialogTab('dose')"
 					ng-model="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION" type="text" class="form-control" /> </td>
 					<td>-</td>
-					<td> <input id="dose1" 
+					<td> <input
 						data-ng-focus="changeDialogTab('dose')"
 						data-ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_NUMBER" type="text" class="form-control" /> </td>
 					<td> <input

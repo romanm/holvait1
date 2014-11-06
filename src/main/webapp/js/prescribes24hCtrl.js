@@ -494,9 +494,10 @@ saveDrugDocument = function(){
 
 //---------------------keydown-------------------------------
 var KeyCodes = {
+	F4 : 115,
 	Escape : 27,
 	F1 : 112,
-	F9 : 120,
+	//F9 : 120,
 	C : 67,
 	V : 86,
 	S : 83,
@@ -513,6 +514,7 @@ var KeyCodes = {
 };
 
 $scope.keys = [];
+$scope.keys.push({code : KeyCodes.F4, action : function() { $scope.savePrescribes(); }});
 $scope.keys.push({
 	code : KeyCodes.Escape,
 	action : function() {
@@ -685,7 +687,6 @@ $scope.keys.push({
 });
 
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.S, action : function() { $scope.savePrescribes(); }});
-$scope.keys.push({code : KeyCodes.F9, action : function() { $scope.savePrescribes(); }});
 
 $scope.keys.push({
 	ctrlKey : true, code : KeyCodes.ArrowDown,
@@ -713,7 +714,36 @@ $scope.keys.push({
 	}
 });
 
-$scope.$on('keydown', function(msg, obj) {
+$scope.$on('keydown', function(msg, obj){
+	//console.log(obj);
+	var code = obj.event.keyCode;
+	if(!$scope.editedPrescribeHistory.selectDrugIndex){
+		$scope.editedPrescribeHistory.selectDrugIndex = 0;
+	}
+	if($scope.editedPrescribeHistory.tasksInDay 
+	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
+	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed
+	){
+		if(code == $scope.keys[0].code){
+			//make save (F4)
+			 $scope.keys[0].action();
+		}
+		return;
+	}
+	var ctrlKey = obj.event.ctrlKey;
+	var altKey = obj.event.altKey;
+	var shiftKey = obj.event.shiftKey;
+	$scope.keys.forEach(function(o) {
+		if(o.code !== code) return;
+		if((ctrlKey && !o.ctrlKey) || (o.ctrlKey && !ctrlKey)) return;
+		if((altKey && !o.altKey) || (o.altKey && !altKey)) return;
+		if((shiftKey && !o.shiftKey) || (o.shiftKey && !shiftKey)) return;
+		o.action();
+		$scope.$apply();
+	});
+});
+
+$scope.$on('keydown-OldToDel', function(msg, obj) {
 	//console.log(obj);
 	var code = obj.event.keyCode;
 	var ctrlKey = obj.event.ctrlKey;

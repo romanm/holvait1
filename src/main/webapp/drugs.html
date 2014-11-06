@@ -69,13 +69,14 @@
 							</a> <i data-ng-show="!reverse && predicate == 'DRUG_NAME';"
 								class="fa fa-angle-down"></i> <i
 								data-ng-show="reverse && predicate == 'DRUG_NAME';"
-								class="fa fa-angle-up"></i></th>
+								class="fa fa-angle-up"></i> </th>
 							<th><a href="#"
 								data-ng-click="predicate = 'DRUG_ID';reverse=!reverse;filterDrugs();">ID
 							</a> <i data-ng-show="!reverse && predicate == 'DRUG_ID';"
 								class="fa fa-angle-down"></i> <i
 								data-ng-show="reverse && predicate == 'DRUG_ID';"
-								class="fa fa-angle-up"></i></th>
+								class="fa fa-angle-up"></i>
+								<small>({{drug1sListFilter.length}}/{{drug1sListFilterLength}})</small></th>
 						</tr>
 					</thead>
 				<tbody data-ng-repeat="drug in drug1sListFilter" >
