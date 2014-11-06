@@ -36,6 +36,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 
 	initPatientDocument = function(){
 	console.log("initPatientDocument");
+	$scope.workDoc = $scope.patient;
 		if(null == $scope.patient.prescribesHistory){
 			$scope.newPrescribes();
 			$scope.numberOfChange++;
@@ -352,9 +353,17 @@ copy = function(taskIndex, prescribeHistory){
 		$itemScope.$parent.prescribeHistory.prescribes.selectMultiple = true;
 		contextMenuCopy($itemScope.$parent.prescribeHistory.prescribes); 
 	}else{
-		contextMenuCopy(drug); 
+		contextMenuCopy(drug);
 	}
 }
+
+$scope.menuPatientUpdate = [
+['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+	console.debug('Edit');
+	console.log($itemScope);
+	$itemScope.patient.patientUpdateOpen = !$itemScope.patient.patientUpdateOpen;
+}]
+];
 
 $scope.menuDayBlock = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
@@ -713,16 +722,50 @@ $scope.keys.push({
 	}
 });
 
-$scope.$on('keydown', function(msg, obj){
-	//console.log(obj);
-	var code = obj.event.keyCode;
+isDrugEditDialogOpen = function(){
 	if(!$scope.editedPrescribeHistory.selectDrugIndex){
 		$scope.editedPrescribeHistory.selectDrugIndex = 0;
 	}
-	if($scope.editedPrescribeHistory.tasksInDay 
-	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
-	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed
-	){
+	var editDrugDialogOpen = 
+		$scope.editedPrescribeHistory.tasksInDay 
+		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
+		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed;
+	console.log(editDrugDialogOpen);
+	return editDrugDialogOpen;
+}
+
+var patientUpdateHash = "";
+$scope.checkPatientUpdated = function(){
+	if($scope.patient.patientUpdateOpen){
+		$scope.patient.patientUpdateOpen = false;
+		var checkUpdated = patientUpdateHash != ($scope.patient.PATIENT_NAME + $scope.patient.PATIENT_HISTORYID);
+		if(checkUpdated){
+			$scope.numberOfChange++;
+		}
+	}
+}
+$scope.isPatientUpdateOpen = function(){
+	if($scope.patient.patientUpdateOpen){
+		patientUpdateHash = $scope.patient.PATIENT_NAME + $scope.patient.PATIENT_HISTORYID
+	}
+}
+
+isEditDialogOpen = function(){
+	var editDialogOpen = 
+		false
+		|| $scope.workDoc.patientUpdateOpen
+		|| isDrugEditDialogOpen()
+		;
+	console.log(editDialogOpen);
+	return editDialogOpen;
+}
+
+$scope.$on('keydown', function(msg, obj){
+	console.log(obj);
+	var code = obj.event.keyCode;
+	console.log(code);
+	if(isEditDialogOpen()){
+		console.log("isEditDialogOpen");
 		if(code == $scope.keys[0].code){
 			//make save (F4)
 			 $scope.keys[0].action();

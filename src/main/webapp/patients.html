@@ -18,11 +18,9 @@
 	<span class="navbar-right">
 		<ul class="nav nav-pills">
 			<li><a href="patients.html">пацієнти</a></li>
-			<li><sub>.</sub></li>
 			<li><a href="protocols.html">шаблони</a></li>
 			<li><a href="protocols.html">протоколи</a></li>
 			<li><a href="drugs.html">ліки</a></li>
-			<li><sub>.</sub></li>
 			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small>
 			</a></li>
 		</ul>
@@ -58,7 +56,7 @@
 	<div class="row">
 		<div class="col-xs-8">
 			<table width="100%" class="tablehover">
-				<thead><tr><th>№ іх</th><th>ПІБ, Поступив, Діагноз </th></tr></thead>
+				<thead><tr><th>#</th><th>ПІБ, Поступив, Діагноз </th></tr></thead>
 				<tbody data-ng-repeat="patient in patient1sListFilter" >
 					<tr 
 						data-ng-class="{selected:patient1sListFilter[selectPatientIndex] == patient}"
@@ -68,9 +66,12 @@
 					<td>{{patient.PATIENT_ID}}</td>
 					<td ng-context-menu="menuPatientList"
 						ng-show="!patient.patientUpdateOpen"><a
-						id="patient_{{patient.PATIENT_ID}}"
-						href="patient.html?id={{patient.PATIENT_ID}}">
-							{{patient.PATIENT_NAME}} </a></td>
+								id="patient_{{patient.PATIENT_ID}}"
+								href="patient.html?id={{patient.PATIENT_ID}}">
+									{{patient.PATIENT_NAME}} <span
+									data-ng-show="patient.PATIENT_HISTORYID"> № іх <!-- ІХ -->
+										<u>{{patient.PATIENT_HISTORYID}} </u></span>
+							</a></td>
 					<td ng-context-menu="menuPatientList" ng-show="patient.patientUpdateOpen">
 						<div class="row">
 							<div class="col-xs-5">

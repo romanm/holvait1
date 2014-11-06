@@ -20,8 +20,9 @@ public class Lp24Config {
 
 	//test install freehost.ua/holweb
 //	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
-
 //	static String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
+	
+	//all linux
 	static String innerDbFolderPfad = "src/main/webapp/db/";
 	static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 

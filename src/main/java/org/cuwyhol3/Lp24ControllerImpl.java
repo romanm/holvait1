@@ -49,15 +49,15 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
 	}
-	public  Map<String, Object> savePatient(Map<String, Object> patient){
-		Integer patientId = (Integer) patient.get("PATIENT_ID");
+	public  Map<String, Object> savePatient(Map<String, Object> patientToSave){
+		Integer patientId = (Integer) patientToSave.get("PATIENT_ID");
 		String fileNameWithPathAdd = lp24Config.getPatientDbJsonName(patientId);
-		updateDrugs(patient);
-		writeToJsonDbFile(patient, fileNameWithPathAdd);
-		return patient;
+		updateDrugs(patientToSave);
+		writeToJsonDbFile(patientToSave, fileNameWithPathAdd);
+		updatePatient(patientToSave);
+		return patientToSave;
 	}
-	public List<Map<String, Object>> updatePatient(
-			Map<String, Object> patientToUpdate) {
+	public List<Map<String, Object>> updatePatient(Map<String, Object> patientToUpdate) {
 		logger.debug("patientToUpdate - "+patientToUpdate);
 		int updatePatient = lp24jdbc.updatePatient(patientToUpdate);
 		List<Map<String, Object>> patient1sList = patient1sList();
