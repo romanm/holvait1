@@ -730,7 +730,6 @@ isDrugEditDialogOpen = function(){
 		$scope.editedPrescribeHistory.tasksInDay 
 		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
 		&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed;
-	console.log(editDrugDialogOpen);
 	return editDrugDialogOpen;
 }
 
@@ -756,16 +755,13 @@ isEditDialogOpen = function(){
 		|| $scope.workDoc.patientUpdateOpen
 		|| isDrugEditDialogOpen()
 		;
-	console.log(editDialogOpen);
 	return editDialogOpen;
 }
 
 $scope.$on('keydown', function(msg, obj){
-	console.log(obj);
+	//console.log(obj);
 	var code = obj.event.keyCode;
-	console.log(code);
 	if(isEditDialogOpen()){
-		console.log("isEditDialogOpen");
 		if(code == $scope.keys[0].code){
 			//make save (F4)
 			 $scope.keys[0].action();
