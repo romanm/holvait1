@@ -153,6 +153,7 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
+
 	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
 	public List<Map<String, Object>> prescribe1sList() {
 		logger.debug("prescribe1sList");
@@ -160,6 +161,7 @@ public class Lp24ControllerImpl {
 		writeToJsDbFile("var prescribeOrder1sList = ", prescribe1sList, lp24Config.prescribeOrder1sListJsFileName);
 		return prescribe1sList;
 	}
+
 	public List<Map<String, Object>> prescribe1sListOpen() {
 		List<Map<String, Object>> prescribe1sList = lp24jdbc.prescribe1sListOpen();
 		writeToJsDbPathFile("var prescribeOrder1sListOpen = ", prescribe1sList,
@@ -168,7 +170,7 @@ public class Lp24ControllerImpl {
 				lp24Config.innerOpenDbFolderPfad + lp24Config.prescribeOrder1sListOpenJsFileName);
 		return prescribe1sList;
 	}
-	
+
 	private Map<String, Object> readPrescribe(String url) {
 		logger.debug(" FROM: "+url );
 		ObjectMapper mapper = new ObjectMapper();
@@ -185,12 +187,12 @@ public class Lp24ControllerImpl {
 		}
 		return responseBody;
 	}
-	
+
 	public Map<String, Object> readPrescribesInServer(String shortServerName, Integer prescribeId) {
 		String url = "http://"+ shortServerName+ ".curepathway.com/read/prescribe_"+prescribeId;
 		return readPrescribe(url);
 	}
-	
+
 	//------------------prescribe----------------------------END
 	//------------------drug----------------------------
 	public Map<String, Object> readDrug(Integer drugId) {
@@ -286,16 +288,18 @@ public class Lp24ControllerImpl {
 			e.printStackTrace();
 		}
 	}
+
 	public Map<String, Object> sessionCopy(Map<String, Object> copyObj,
 			HttpSession session) {
 		session.setAttribute("copyObj", copyObj);
 		return copyObj;
 	}
+
 	public Map<String, Object> sessionPaste(HttpSession session) {
 		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
 		return copyObj;
 	}
-	
+
 	public List<Map<String, Object>> removePrescribeOrder(
 			Map<String, Object> prescribeToRemove) {
 		logger.debug(" o - "+prescribeToRemove);

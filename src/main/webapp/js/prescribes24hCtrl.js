@@ -11,27 +11,22 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		return dayHours;
 	}
 	$scope.dayHours = getDayHours();
-	getTasksInDay = function(){
-		var tasksInDay = [];
-		for(var ii=0;ii<19;ii++){
-			tasksInDay.push({i:ii,isCollapsed:false});
-		}
-		return tasksInDay;
-	}
 	/*
 	$scope.tasksInDay = getTasksInDay();
 	for(var ii=0;ii<19;ii++){ $scope.tasksInDay.push({i:ii,isCollapsed:false}); }
 	*/
 
 	$scope.parameters = parameters;
-	var url = '/read';
+	var urlRead = '/read';
 	if($scope.parameters.s){
-		url += "/"+$scope.parameters.s;
+		urlRead += '/'+$scope.parameters.s;
 	}
-	url += '/prescribe_'+$scope.parameters.id;
+	urlRead += '/prescribe_'+$scope.parameters.id;
+	console.log("urlRead");
+	console.log(urlRead);
 	$http({
 		method : 'GET',
-		url : config.urlPrefix + url
+		url : config.urlPrefix + urlRead
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
 		$scope.patient = $scope.p24hDoc;
@@ -39,14 +34,26 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	}).error(function(data, status, headers, config) {
 	});
 
+	getTasksInDay = function(){
+		var tasksInDay = [];
+		for(var ii=0;ii<19;ii++){
+			tasksInDay.push({i:ii,isCollapsed:false});
+		}
+		return tasksInDay;
+	}
+
+	initPrescribesTasksInDay = function(){
+		$($scope.p24hDoc.prescribesHistory).each(function () {
+			this.tasksInDay = getTasksInDay();
+		} );
+	}
+
 	initPatientDocument = function(){
 		if(null == $scope.p24hDoc.prescribesHistory){
 			$scope.newPrescribes();
 			$scope.numberOfChange++;
 		}
-		$($scope.p24hDoc.prescribesHistory).each(function () {
-			this.tasksInDay = getTasksInDay();
-		} );
+		initPrescribesTasksInDay();
 		if(typeof $scope.p24hDoc.selectPrescribesHistoryIndex === 'undefined'){
 			$scope.p24hDoc.selectPrescribesHistoryIndex = 0;
 			$scope.numberOfChange++;
@@ -82,19 +89,21 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$scope.p24hDoc.prescribesHistory.splice(0, 0, prescribeHistory);
 	}
 
+	removeTemporaryObjFromDoc = function(){
+		$($scope.p24hDoc.prescribesHistory).each(function () {
+			this.tasksInDay = null;
+		} );
+	}
+
 	$scope.savePrescribes = function(){
-			$($scope.p24hDoc.prescribesHistory).each(function () {
-				this.tasksInDay = null;
-			} );
+		removeTemporaryObjFromDoc();
 		$http({
 			method : 'POST',
 			data : $scope.p24hDoc,
 			url : config.urlPrefix + "/save/prescribes"
 		}).success(function(data, status, headers, config){
 			$scope.p24hDoc = data;
-			$($scope.p24hDoc.prescribesHistory).each(function () {
-				this.tasksInDay = getTasksInDay();
-			} );
+			initPrescribesTasksInDay();
 			$scope.numberOfChange = 0;
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;

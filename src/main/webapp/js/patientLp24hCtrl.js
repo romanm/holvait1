@@ -139,11 +139,15 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		$scope.numberOfChange++;
 	}
 
+	setEditedPrescribeDrug = function(taskInDayIndex){
+		$scope.editedPrescribeHistory.selectDrugIndex = taskInDayIndex;
+		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+	}
+
 	checkDrugEditedSelection = function(taskInDayIndex, prescribeHistory){
 		$scope.editedPrescribeHistory = prescribeHistory;
 		if($scope.editedPrescribeHistory.selectDrugIndex != taskInDayIndex){
-			$scope.editedPrescribeHistory.selectDrugIndex = taskInDayIndex;
-			$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+			setEditedPrescribeDrug(taskInDayIndex);
 			$scope.patient.selectPrescribesHistoryIndex = $scope.patient.prescribesHistory.indexOf(prescribeHistory);
 			return false;
 		}
@@ -220,6 +224,18 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 }
 
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
+	console.log("----------"+taskInDayIndex);
+	if(taskInDayIndex != prescribeHistory.selectDrugIndex){
+		var oldSelectTaskInDay = prescribeHistory.tasksInDay[prescribeHistory.selectDrugIndex];
+		if(oldSelectTaskInDay.isCollapsed){
+			oldSelectTaskInDay.isCollapsed = false;
+		}
+		setEditedPrescribeDrug(taskInDayIndex);
+		console.log($scope.editedPrescribeDrug);
+		return;
+	}
+	console.log(taskInDay.isCollapsed);
+	console.log($scope.editedPrescribeDrug);
 	if(!taskInDay.isCollapsed){
 		if(!checkDrugEditedSelection(taskInDayIndex, prescribeHistory)) 
 			return;

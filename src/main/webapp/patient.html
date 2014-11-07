@@ -138,41 +138,41 @@
 					<tbody data-ng-repeat="taskInDay in prescribeHistory.tasksInDay"
 						data-ng-init="taskInDayIndex = $index"
 					>
-						<tr data-ng-class="{selected:prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple}">
-								<td class="hover"
-									data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
-									<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
-									<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
-								</td>
-								<td 
-									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
-									data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
-														selected:taskSelected(taskInDayIndex, prescribeHistory) }"
-									ng-context-menu="menuTask"
-									title="{{taskInDay.isCollapsed}}"
-								>
-								{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
-								? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-								<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
-									}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
-								</small>
-								<span>
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_NUMBER}}
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_UNIT}}
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_ROUTE_OF_ADMINISTRATION}}
-								</span>
-							</td>
-							<td data-ng-repeat="dayHour in dayHours"
-							 ng-init="dayHourIndex = $index"
-							 data-ng-click="useHour(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory)"
-							> . 
-								<span 
-								data-ng-show="isMinus(taskInDayIndex, dayHourIndex, prescribeHistory)"
-								class="glyphicon glyphicon-minus"></span>
-							</td>
-							<td>.</td>
-						</tr>
+			<tr data-ng-class="{selected:prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple}">
+					<td class="hover"
+						data-ng-click="selectMultiple(taskInDayIndex, prescribeHistory)">
+						<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
+						<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
+					</td>
+					<td 
+						data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
+						data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
+											selected:taskSelected(taskInDayIndex, prescribeHistory) }"
+						ng-context-menu="menuTask"
+						title="{{taskInDay.isCollapsed}}"
+					>
+					{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
+					? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
+					<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
+						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
+						}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
+					</small>
+					<span>
+						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_NUMBER}}
+						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_UNIT}}
+						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_ROUTE_OF_ADMINISTRATION}}
+					</span>
+				</td>
+				<td data-ng-repeat="dayHour in dayHours"
+				 ng-init="dayHourIndex = $index"
+				 data-ng-click="useHour(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory)"
+				> . 
+					<span 
+					data-ng-show="isMinus(taskInDayIndex, dayHourIndex, prescribeHistory)"
+					class="glyphicon glyphicon-minus"></span>
+				</td>
+				<td>.</td>
+			</tr>
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
