@@ -80,10 +80,15 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		$scope.patient.prescribesHistory.splice(0, 0, prescribeHistory);
 	}
 
+	cangePatientDocToSave = function(){
+		$($scope.patient.prescribesHistory).each(function () {
+			this.tasksInDay = null;
+		} );
+		$scope.patient.patientUpdateOpen = false;
+	}
+
 	$scope.savePatient = function(){
-			$($scope.patient.prescribesHistory).each(function () {
-				this.tasksInDay = null;
-			} );
+		cangePatientDocToSave();
 		$http({
 			method : 'POST',
 			data : $scope.patient,
@@ -408,20 +413,20 @@ $scope.menuDayBlock = [
 	];
 
 $scope.menuTask = [
-	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
+	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
 		var taskIndex = $itemScope.$index;
 		copy(taskIndex, $itemScope.$parent.prescribeHistory);
 	}],
-	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) { 
+	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
 		contextMenuPaste($itemScope.taskInDay, $itemScope.$parent.prescribeHistory); 
 	}],
 	null,
-	['<span class="glyphicon glyphicon-plus"></span> Додати строчку', function ($itemScope) {
-		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
+	['<span class="glyphicon glyphicon-plus"></span> Додати строчку <sub><kbd>Shift+⏎</kbd></sub>', function ($itemScope) {
+		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index+1, 0, null);
 		$scope.numberOfChange++;
 	}],
-	['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
+	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
 		var isMultipleSelect = false;
 		for(var i=$itemScope.$parent.prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
 			if($itemScope.$parent.prescribeHistory.prescribes.tasks[i] 
@@ -438,10 +443,10 @@ $scope.menuTask = [
 		}
 	}],
 	null,
-	['<span class="glyphicon glyphicon-arrow-up"></span> Догори', function ($itemScope) {
+	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
 		moveMinus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
 	}],
-	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу', function ($itemScope) {
+	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу <sub><kbd>Alt+↓</kbd></sub>', function ($itemScope) {
 		movePlus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index + 1);
 	}],
 	null,
@@ -453,10 +458,10 @@ $scope.menuTask = [
 ];
 
 $scope.menuTasksAll = [
-	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
+	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
 		contextMenuCopy($itemScope.prescribeHistory.prescribes); 
 	}],
-	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) { 
+	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		$http({
 			method : 'GET',
 			url : config.urlPrefix + '/session/paste'
@@ -642,8 +647,8 @@ openEditedPrescribeDrugDialog = function(){
 $scope.keys.push({
 	shiftKey : true, code : KeyCodes.Enter,
 	action : function() {
-		$scope.editedPrescribeHistory.selectDrugIndex++;
-		$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex, 0, null);
+		//$scope.editedPrescribeHistory.selectDrugIndex++;
+		$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex+1, 0, null);
 		$scope.numberOfChange++;
 	}
 });
