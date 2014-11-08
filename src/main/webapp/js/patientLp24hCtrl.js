@@ -134,8 +134,12 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	}
 	//---------data-ng-class--------------------END------------
 
+	$scope.phOpenUpdateDialog = function(prescribeHistoryIndex){
+		var prescribeHistory = $scope.workDoc.prescribesHistory[prescribeHistoryIndex];
+		prescribeHistory.updateDialogOpen = !prescribeHistory.updateDialogOpen;
+	}
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
-		var prescribeHistory = $scope.patient.prescribesHistory[prescribeHistoryIndex];
+		var prescribeHistory = $scope.workDoc.prescribesHistory[prescribeHistoryIndex];
 		if(prescribeHistory.updateDialogOpen){
 			prescribeHistory.updateDialogOpen = false;
 			return;
@@ -858,7 +862,8 @@ $scope.today();
 $scope.clear = function () { $scope.dt = null; };
 // Disable weekend selection
 $scope.disabled = function(date, mode) {
-	return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+	return false;
+//	return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
 };
 $scope.toggleMin = function() { $scope.minDate = $scope.minDate ? null : new Date(); };
 $scope.toggleMin();
