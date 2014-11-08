@@ -164,9 +164,11 @@
 					</span>
 				</td>
 				<td data-ng-repeat="dayHour in dayHours"
-				 ng-init="dayHourIndex = $index"
-				 data-ng-click="useHour(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory)"
-				> . 
+					ng-init="dayHourIndex = $index"
+					data-ng-class="{	selectpath:dayHourInSelectPath(dayHourIndex, taskInDayIndex, prescribeHistory),
+										selected:dayHourSelected(dayHourIndex, taskInDayIndex, prescribeHistory) }"
+					data-ng-click="useHour(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory)"
+				>.
 					<span 
 					data-ng-show="isMinus(taskInDayIndex, dayHourIndex, prescribeHistory)"
 					class="glyphicon glyphicon-minus"></span>

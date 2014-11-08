@@ -20,10 +20,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		}
 		return tasksInDay;
 	}
-	/*
-	$scope.tasksInDay = getTasksInDay();
-	for(var ii=0;ii<19;ii++){ $scope.tasksInDay.push({i:ii,isCollapsed:false}); }
-	*/
 
 	$http({
 		method : 'GET',
@@ -53,7 +49,8 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			$scope.editedPrescribeHistory.selectDrugIndex = 0;
 			$scope.numberOfChange++;
 		}
-		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+		initEditedPrescribeDrug();
+		initEditedPrescribeDrug();
 		if(typeof $scope.patient.pageDeepPositionIndex === 'undefined'){
 			$scope.numberOfChange++;
 			if($scope.editedPrescribeHistory.isCollapsed){
@@ -94,9 +91,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			url : config.urlPrefix + "/save/patient"
 		}).success(function(data, status, headers, config){
 			$scope.patient = data;
-			$($scope.patient.prescribesHistory).each(function () {
-				this.tasksInDay = getTasksInDay();
-			} );
+			initPatientDocument();
 			$scope.numberOfChange = 0;
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
@@ -123,6 +118,16 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		var dayInSelectPath = $scope.dayInSelectPath(getPrescribeIndex(prescribeHistory));
 		return dayInSelectPath && $scope.taskInSelectPath(taskInDayIndex, prescribeHistory) && ($scope.patient.pageDeepPositionIndex == 2);
 	}
+	$scope.dayHourInSelectPath = function(dayHourIndex, taskInDayIndex, prescribeHistory){
+		var dayInSelectPath = $scope.dayInSelectPath(getPrescribeIndex(prescribeHistory));
+		if(!dayInSelectPath) return false;
+		var taskInSelectPath = $scope.taskInSelectPath(taskInDayIndex, prescribeHistory);
+		if(!taskInSelectPath) return false;
+		return $scope.editedPrescribeHistory.dayHourIndex == dayHourIndex;
+	}
+	$scope.dayHourSelected = function(dayHourIndex, taskInDayIndex, prescribeHistory){
+		return $scope.dayHourInSelectPath(dayHourIndex, taskInDayIndex, prescribeHistory) && ($scope.patient.pageDeepPositionIndex == 3);
+	}
 	//---------data-ng-class--------------------END------------
 
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
@@ -142,45 +147,42 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		$scope.workDoc.selectPrescribesHistoryIndex = index;
 		initEditedPrescribeHistory();
 	}
+	initEditedPrescribeDrug = function(){
+		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+	}
 	initEditedPrescribeHistory = function(){
 		$scope.editedPrescribeHistory = $scope.workDoc.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
 	}
 	getPrescribeIndex = function(prescribeHistory){ return $scope.workDoc.prescribesHistory.indexOf(prescribeHistory); }
 	setEditedPrescribeDrug = function(taskInDayIndex){
 		$scope.editedPrescribeHistory.selectDrugIndex = taskInDayIndex;
-		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+		initEditedPrescribeDrug();
+	}
+
+	closeEditedPrescribeDrugDialog = function(){
+		console.log($scope.editedPrescribeHistory);
+		$scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed = false;
 	}
 
 	changeEditedSelection = function(taskInDayIndex, prescribeHistory){
 		var isWithoutChange = true;
 		var selectPrescribesHistoryIndex = getPrescribeIndex(prescribeHistory);
-		console.log(selectPrescribesHistoryIndex);
 		if(!$scope.dayInSelectPath(selectPrescribesHistoryIndex)){
-			$scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed = false;
+			closeEditedPrescribeDrugDialog();
 			setEditedPrescribeHistory(selectPrescribesHistoryIndex);
 			setEditedPrescribeDrug(taskInDayIndex);
 			isWithoutChange = false;
 		}
 		if(!$scope.taskInSelectPath(taskInDayIndex, prescribeHistory)){
+			closeEditedPrescribeDrugDialog();
 			setEditedPrescribeDrug(taskInDayIndex);
 			isWithoutChange = false;
 		}
 		return isWithoutChange;
 	}
-	//todel
-	checkDrugEditedSelection = function(taskInDayIndex, prescribeHistory){
-		$scope.editedPrescribeHistory = prescribeHistory;
-		if($scope.editedPrescribeHistory.selectDrugIndex != taskInDayIndex){
-			setEditedPrescribeDrug(taskInDayIndex);
-			$scope.patient.selectPrescribesHistoryIndex = $scope.patient.prescribesHistory.indexOf(prescribeHistory);
-			return false;
-		}
-		return true;
-	}
 	
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
 		$scope.patient.pageDeepPositionIndex = 2;
-		//if(!checkDrugEditedSelection(taskInDayIndex, prescribeHistory)) 
 		if(!changeEditedSelection(taskInDayIndex, prescribeHistory)) 
 			return;
 
@@ -248,26 +250,31 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 	$scope.numberOfChange++;
 }
 
+changeHour = function(dayHourIndex){
+	if(!$scope.editedPrescribeDrug.times){
+		$scope.editedPrescribeDrug.times = {};
+		$scope.editedPrescribeDrug.times.hours = getDayHoursEmpty();
+	}
+	console.log(dayHourIndex);
+	var hour =  getLp24hour(dayHourIndex);
+	console.log(hour);
+	if(!$scope.editedPrescribeDrug.times.hours[hour]){
+		$scope.editedPrescribeDrug.times.hours[hour] = "-";
+	}else{
+		$scope.editedPrescribeDrug.times.hours[hour] = null;
+	}
+}
+
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
-	console.log("----------"+taskInDayIndex);
-	if(!changeEditedSelection(taskInDayIndex, prescribeHistory)) 
-		return;
-	console.log($scope.editedPrescribeHistory);
+	$scope.workDoc.pageDeepPositionIndex = 3;
+	console.log("A1 = "+dayHourIndex+":"+taskInDayIndex);
+	var isWithoutChange = changeEditedSelection(taskInDayIndex, prescribeHistory);
 	console.log($scope.editedPrescribeDrug);
+	$scope.editedPrescribeHistory.dayHourIndex = dayHourIndex;
+	if(!isWithoutChange) 
+		return;
 	if(!taskInDay.isCollapsed){
-		//if(!checkDrugEditedSelection(taskInDayIndex, prescribeHistory)) 
-		if(!changeEditedSelection(taskInDayIndex, prescribeHistory)) 
-			return;
-		if(!$scope.editedPrescribeDrug.times){
-			$scope.editedPrescribeDrug.times = {};
-			$scope.editedPrescribeDrug.times.hours = getDayHoursEmpty();
-		}
-		var hour =  getLp24hour(dayHourIndex);
-		if(!$scope.editedPrescribeDrug.times.hours[hour]){
-			$scope.editedPrescribeDrug.times.hours[hour] = "-";
-		}else{
-			$scope.editedPrescribeDrug.times.hours[hour] = null;
-		}
+		changeHour(dayHourIndex);
 	}else
 	if(taskInDay.isCollapsed){
 		var hour =  getLp24hour(dayHourIndex);
@@ -621,11 +628,23 @@ $scope.keys.push({
 			$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
 		}else
 		if($scope.patient.pageDeepPositionIndex == 2){
-			var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
-			$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+			openEditedPrescribeDrugDialog();
+		}else
+		if($scope.patient.pageDeepPositionIndex == 3){
+			initEditedPrescribeDrug();
+			if(null == $scope.editedPrescribeDrug)
+				openEditedPrescribeDrugDialog();
+			else{
+				changeHour($scope.editedPrescribeHistory.dayHourIndex);
+				$scope.numberOfChange++;
+			}
 		}
 	}
 });
+openEditedPrescribeDrugDialog = function(){
+	var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
+	$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+}
 $scope.keys.push({
 	shiftKey : true, code : KeyCodes.Enter,
 	action : function() {
@@ -637,8 +656,11 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowRight,
 	action : function() {
+		console.log("ArrowRight - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.patient.pageDeepPositionIndex <= 2){
 			$scope.patient.pageDeepPositionIndex++;
+			if($scope.patient.pageDeepPositionIndex == 3)
+				return;
 		}
 		if($scope.patient.pageDeepPositionIndex < 0){
 			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
@@ -652,29 +674,40 @@ $scope.keys.push({
 			if($scope.editedPrescribeHistory.isCollapsed){
 				$scope.editedPrescribeHistory.isCollapsed = false;
 			}
+		}else
+		if($scope.patient.pageDeepPositionIndex == 3){
+			$scope.editedPrescribeHistory.dayHourIndex++;
+			if(24 == $scope.editedPrescribeHistory.dayHourIndex)
+				$scope.editedPrescribeHistory.dayHourIndex = 0;
 		}
 	}
 });
 $scope.keys.push({
 	code : KeyCodes.ArrowLeft,
 	action : function() {
-		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
-			$scope.patient.pageDeepPositionIndex--;
+		console.log("ArrowLeft - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			$scope.editedPrescribeHistory.dayHourIndex--;
+			if($scope.editedPrescribeHistory.dayHourIndex >=0)
+				return;
 		}
-		if($scope.patient.pageDeepPositionIndex == 0){
+		if($scope.workDoc.pageDeepPositionIndex > minPageDeepPositionIndex){
+			$scope.workDoc.pageDeepPositionIndex--;
+		}
+		if($scope.workDoc.pageDeepPositionIndex == 0){
 			$("#focus_0").focus();
-			$scope.patient.selectPrescribesHistoryIndex = 0;
+			$scope.workDoc.selectPrescribesHistoryIndex = 0;
 			initEditedPrescribeHistory();
 		}else
-		if($scope.patient.pageDeepPositionIndex < 0){
-			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
+		if($scope.workDoc.pageDeepPositionIndex < 0){
+			$("#focus_minus_"+(0-$scope.workDoc.pageDeepPositionIndex)).focus();
 		}
 	}
 });
 $scope.keys.push({
 	code : KeyCodes.ArrowDown,
 	action : function() {
-		if($scope.patient.pageDeepPositionIndex == 2){
+		if($scope.patient.pageDeepPositionIndex >= 2){
 			$scope.editedPrescribeHistory.selectDrugIndex++;
 			if($scope.editedPrescribeHistory.selectDrugIndex >= 19){
 				$scope.editedPrescribeHistory.selectDrugIndex = 0;
@@ -692,8 +725,8 @@ $scope.keys.push({
 $scope.keys.push({
 	code : KeyCodes.ArrowUp,
 	action : function() {
-		console.log("ArrowUp");
-		if($scope.patient.pageDeepPositionIndex == 2){
+		console.log("ArrowUp - deep - "+$scope.patient.pageDeepPositionIndex);
+		if($scope.patient.pageDeepPositionIndex >= 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
 			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
 				$scope.editedPrescribeHistory.selectDrugIndex = 18;
