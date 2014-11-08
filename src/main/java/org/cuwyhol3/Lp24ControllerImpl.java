@@ -83,6 +83,9 @@ public class Lp24ControllerImpl {
 					Map<String, Object> drugDocument;
 					Integer drugId = (Integer) drug.get("DRUG_ID");
 					if(null == drugId){
+						Object drugName = drug.get("DRUG_NAME");
+						if(null == drugName || "" == drugName)
+							continue;
 						drugDocument = lp24jdbc.newDrug(drug);
 						drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
 					}else{

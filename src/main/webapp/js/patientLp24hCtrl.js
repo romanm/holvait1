@@ -413,6 +413,10 @@ $scope.menuDayBlock = [
 	];
 
 $scope.menuTask = [
+	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
+		$scope.openPrescribeDrugDialog($itemScope.taskInDay, $itemScope.taskInDayIndex, $itemScope.$parent.prescribeHistory);
+	}],
+	null,
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
 		var taskIndex = $itemScope.$index;
 		copy(taskIndex, $itemScope.$parent.prescribeHistory);
