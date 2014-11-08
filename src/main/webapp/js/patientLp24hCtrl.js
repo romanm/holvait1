@@ -50,7 +50,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			$scope.numberOfChange++;
 		}
 		initEditedPrescribeDrug();
-		initEditedPrescribeDrug();
 		if(typeof $scope.patient.pageDeepPositionIndex === 'undefined'){
 			$scope.numberOfChange++;
 			if($scope.editedPrescribeHistory.isCollapsed){
@@ -160,7 +159,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	}
 
 	closeEditedPrescribeDrugDialog = function(){
-		console.log($scope.editedPrescribeHistory);
 		$scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed = false;
 	}
 
@@ -255,9 +253,7 @@ changeHour = function(dayHourIndex){
 		$scope.editedPrescribeDrug.times = {};
 		$scope.editedPrescribeDrug.times.hours = getDayHoursEmpty();
 	}
-	console.log(dayHourIndex);
 	var hour =  getLp24hour(dayHourIndex);
-	console.log(hour);
 	if(!$scope.editedPrescribeDrug.times.hours[hour]){
 		$scope.editedPrescribeDrug.times.hours[hour] = "-";
 	}else{
@@ -269,7 +265,6 @@ $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHist
 	$scope.workDoc.pageDeepPositionIndex = 3;
 	console.log("A1 = "+dayHourIndex+":"+taskInDayIndex);
 	var isWithoutChange = changeEditedSelection(taskInDayIndex, prescribeHistory);
-	console.log($scope.editedPrescribeDrug);
 	$scope.editedPrescribeHistory.dayHourIndex = dayHourIndex;
 	if(!isWithoutChange) 
 		return;
@@ -402,7 +397,6 @@ copy = function(taskIndex, prescribeHistory){
 $scope.menuPatientUpdate = [
 ['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 	console.debug('Edit');
-	console.log($itemScope);
 	$itemScope.patient.patientUpdateOpen = !$itemScope.patient.patientUpdateOpen;
 }]
 ];
