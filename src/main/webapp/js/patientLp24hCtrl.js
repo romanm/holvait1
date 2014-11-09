@@ -468,6 +468,7 @@ $scope.menuTask = [
 			$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
 			$scope.numberOfChange++;
 		}
+		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
 	}],
 	null,
 	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
@@ -483,6 +484,24 @@ $scope.menuTask = [
 		});
 	}]
 ];
+
+deleteSelected = function(taskIndex, prescribeHistory){
+	var isMultipleSelect = false;
+	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
+		if(prescribeHistory.prescribes.tasks[i] 
+		&& prescribeHistory.prescribes.tasks[i].selectMultiple
+		){
+			prescribeHistory.prescribes.tasks.splice(i, 1);
+			isMultipleSelect = true;
+			$scope.numberOfChange++;
+		}
+	}
+	if(!isMultipleSelect){
+		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
+		$scope.numberOfChange++;
+	}
+
+}
 
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
@@ -632,6 +651,9 @@ $scope.openF1 = function(){
 $scope.keys.push({
 	code : KeyCodes.Delete,
 	action : function() {
+		if($scope.workDoc.pageDeepPositionIndex == 2){
+			deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}
 	}
 });
 $scope.keys.push({
