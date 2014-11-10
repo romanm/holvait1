@@ -11,26 +11,21 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		return dayHours;
 	}
 	$scope.dayHours = getDayHours();
-	/*
-	$scope.tasksInDay = getTasksInDay();
-	for(var ii=0;ii<19;ii++){ $scope.tasksInDay.push({i:ii,isCollapsed:false}); }
-	*/
 
 	$scope.parameters = parameters;
-	var urlRead = '/read';
+	var urlServer = '';
 	if($scope.parameters.s){
-		urlRead += '/'+$scope.parameters.s;
+		urlServer += '/'+$scope.parameters.s;
 	}
-	urlRead += '/prescribe_'+$scope.parameters.id;
-	console.log("urlRead");
-	console.log(urlRead);
+	console.log("urlServer "+urlServer);
+
 	$http({
 		method : 'GET',
-		url : config.urlPrefix + urlRead
+		url : config.urlPrefix + '/read' + urlServer + '/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
 		$scope.patient = $scope.p24hDoc;
-		initPatientDocument();
+		initWorkDocument();
 	}).error(function(data, status, headers, config) {
 	});
 
@@ -48,7 +43,8 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		} );
 	}
 
-	initPatientDocument = function(){
+	initWorkDocument = function(){
+		$scope.workDoc = $scope.patient;
 		if(null == $scope.p24hDoc.prescribesHistory){
 			$scope.newPrescribes();
 			$scope.numberOfChange++;
@@ -100,10 +96,10 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$http({
 			method : 'POST',
 			data : $scope.p24hDoc,
-			url : config.urlPrefix + "/save/prescribes"
+			url : config.urlPrefix + '/save' + urlServer + '/prescribes'
 		}).success(function(data, status, headers, config){
 			$scope.p24hDoc = data;
-			initPrescribesTasksInDay();
+			initWorkDocument();
 			$scope.numberOfChange = 0;
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
@@ -366,40 +362,31 @@ copy = function(taskIndex, prescribeHistory){
 }
 
 $scope.menuTask = [
-	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) { 
+	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
+		$scope.openPrescribeDrugDialog($itemScope.taskInDay, $itemScope.taskInDayIndex, $itemScope.$parent.prescribeHistory);
+	}],
+	null,
+	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
 		var taskIndex = $itemScope.$index;
 		copy(taskIndex, $itemScope.$parent.prescribeHistory);
 	}],
-	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) { 
+	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
 		contextMenuPaste($itemScope.taskInDay, $itemScope.$parent.prescribeHistory); 
 	}],
 	null,
-	['<span class="glyphicon glyphicon-plus"></span> Додати строчку', function ($itemScope) {
+	['<span class="glyphicon glyphicon-plus"></span> Додати строчку <sub><kbd>Shift+⏎</kbd></sub>', function ($itemScope) {
 		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
 		$scope.numberOfChange++;
 	}],
-	['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
-		var isMultipleSelect = false;
-		for(var i=$itemScope.$parent.prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
-			if($itemScope.$parent.prescribeHistory.prescribes.tasks[i] 
-			&& $itemScope.$parent.prescribeHistory.prescribes.tasks[i].selectMultiple
-			){
-				$itemScope.$parent.prescribeHistory.prescribes.tasks.splice(i, 1);
-				isMultipleSelect = true;
-				$scope.numberOfChange++;
-			}
-		}
-		if(!isMultipleSelect){
-			$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
-			$scope.numberOfChange++;
-		}
+	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
+		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
 	}],
 	null,
-	['<span class="glyphicon glyphicon-arrow-up"></span> Догори', function ($itemScope) {
+	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
 		moveMinus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
 	}],
-	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу', function ($itemScope) {
+	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу <sub><kbd>Alt+↓</kbd></sub>', function ($itemScope) {
 		movePlus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index + 1);
 	}],
 	null,
@@ -438,6 +425,23 @@ $scope.menuTasksAll = [
 		});
 	}]
 ];
+
+deleteSelected = function(taskIndex, prescribeHistory){
+	var isMultipleSelect = false;
+	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
+		if(prescribeHistory.prescribes.tasks[i] 
+		&& prescribeHistory.prescribes.tasks[i].selectMultiple
+		){
+			prescribeHistory.prescribes.tasks.splice(i, 1);
+			isMultipleSelect = true;
+			$scope.numberOfChange++;
+		}
+	}
+	if(!isMultipleSelect){
+		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
+		$scope.numberOfChange++;
+	}
+};
 
 contextMenuPaste = function(taskInDay, prescribeHistory){
 	$http({
@@ -564,6 +568,9 @@ $scope.openF1 = function(){
 $scope.keys.push({
 	code : KeyCodes.Delete,
 	action : function() {
+		if($scope.workDoc.pageDeepPositionIndex == 2){
+			deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}
 	}
 });
 $scope.keys.push({

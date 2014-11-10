@@ -3,7 +3,11 @@ package org.cuwyhol3;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,6 +18,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,6 +201,33 @@ public class Lp24ControllerImpl {
 		return readPrescribe(url);
 	}
 
+	public Map<String, Object> savePrescribesInServer(String shortServerName,
+			Map<String, Object> prescribes) {
+		ObjectMapper mapper = new ObjectMapper();
+		String url = "http://"+ shortServerName+ ".curepathway.com/save/prescribes";
+		URL obj = null;
+		try {
+			obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("POST");
+			con.setDoOutput(true);
+			con.setRequestProperty("Content-Type", "application/json"); 
+			con.setRequestProperty("charset", "utf-8");
+
+			mapper.writeValue(con.getOutputStream(), prescribes);
+
+			InputStream requestBody = con.getInputStream();
+			Map readValue = mapper.readValue(requestBody, Map.class);
+			logger.debug("\n"+readValue);
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	//------------------prescribe----------------------------END
 	//------------------drug----------------------------
 	public Map<String, Object> readDrug(Integer drugId) {
@@ -311,4 +343,5 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
+	
 }

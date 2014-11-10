@@ -101,6 +101,14 @@ public class Lp24RestController {
 			, @PathVariable Integer prescribeId) {
 		return lp24Controller.readPrescribesInServer(shortServerName, prescribeId);
 	}
+	@RequestMapping(value = "/save/{shortServerName}/prescribes", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> savePrescribesInServer(
+			@PathVariable String shortServerName
+			,@RequestBody Map<String, Object> prescribes){
+		logger.debug("/save/" + shortServerName + "/prescribes");
+		logger.debug(" - o - "+prescribes);
+		return lp24Controller.savePrescribesInServer(shortServerName, prescribes);
+	}
 	//------------------prescribe----------------------END
 
 	@RequestMapping(value = "/session/paste", method = RequestMethod.GET)

@@ -9,6 +9,14 @@
 .selectpath{
 	border: 1px dotted navy; 
 }
+.selectedServer{
+	background-color: BurlyWood ;
+	/*
+	background-color: DarkKhaki ;
+	background-color: DarkSeaGreen ;
+	background-color: LightCyan ;
+	*/
+}
 table.dose{
 	width: 600px;
 	/*

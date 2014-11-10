@@ -50,6 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/updatePrescribe"
 						,"/prescribe1sList"
 						,"/save/prescribes"
+						,"/save/sah/prescribes"
 						//patient
 						,"/patient*"
 //						,"/patients.html"

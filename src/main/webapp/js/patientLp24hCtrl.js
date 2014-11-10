@@ -26,12 +26,12 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		url : config.urlPrefix + '/read/patient_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.patient = data;
-		initPatientDocument();
+		initWorkDocument();
 	}).error(function(data, status, headers, config) {
 	});
 
-	initPatientDocument = function(){
-		console.log("initPatientDocument");
+	initWorkDocument = function(){
+		console.log("initWorkDocument");
 		$scope.workDoc = $scope.patient;
 		if(null == $scope.patient.prescribesHistory){
 			$scope.newPrescribes();
@@ -98,7 +98,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			url : config.urlPrefix + "/save/patient"
 		}).success(function(data, status, headers, config){
 			$scope.patient = data;
-			initPatientDocument();
+			initWorkDocument();
 			$scope.numberOfChange = 0;
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
@@ -171,7 +171,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		if($scope.patient.selectPrescribesHistoryIndex < 0){
 			return;
 		}
-		$scope.editedPrescribeHistory = $scope.workDoc.prescribesHistory[$scope.patient.selectPrescribesHistoryIndex];
+		$scope.editedPrescribeHistory = $scope.workDoc.prescribesHistory[$scope.workDoc.selectPrescribesHistoryIndex];
 	}
 	getPrescribeIndex = function(prescribeHistory){ return $scope.workDoc.prescribesHistory.indexOf(prescribeHistory); }
 	setEditedPrescribeDrug = function(taskInDayIndex){
@@ -454,20 +454,6 @@ $scope.menuTask = [
 		$scope.numberOfChange++;
 	}],
 	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
-		var isMultipleSelect = false;
-		for(var i=$itemScope.$parent.prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
-			if($itemScope.$parent.prescribeHistory.prescribes.tasks[i] 
-			&& $itemScope.$parent.prescribeHistory.prescribes.tasks[i].selectMultiple
-			){
-				$itemScope.$parent.prescribeHistory.prescribes.tasks.splice(i, 1);
-				isMultipleSelect = true;
-				$scope.numberOfChange++;
-			}
-		}
-		if(!isMultipleSelect){
-			$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
-			$scope.numberOfChange++;
-		}
 		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
 	}],
 	null,
@@ -484,24 +470,6 @@ $scope.menuTask = [
 		});
 	}]
 ];
-
-deleteSelected = function(taskIndex, prescribeHistory){
-	var isMultipleSelect = false;
-	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
-		if(prescribeHistory.prescribes.tasks[i] 
-		&& prescribeHistory.prescribes.tasks[i].selectMultiple
-		){
-			prescribeHistory.prescribes.tasks.splice(i, 1);
-			isMultipleSelect = true;
-			$scope.numberOfChange++;
-		}
-	}
-	if(!isMultipleSelect){
-		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
-		$scope.numberOfChange++;
-	}
-
-}
 
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
@@ -525,6 +493,23 @@ $scope.menuTasksAll = [
 		});
 	}]
 ];
+
+deleteSelected = function(taskIndex, prescribeHistory){
+	var isMultipleSelect = false;
+	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
+		if(prescribeHistory.prescribes.tasks[i] 
+		&& prescribeHistory.prescribes.tasks[i].selectMultiple
+		){
+			prescribeHistory.prescribes.tasks.splice(i, 1);
+			isMultipleSelect = true;
+			$scope.numberOfChange++;
+		}
+	}
+	if(!isMultipleSelect){
+		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
+		$scope.numberOfChange++;
+	}
+};
 
 contextMenuPaste = function(taskInDay, prescribeHistory){
 	$http({
@@ -618,18 +603,22 @@ $scope.keys.push({
 		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.patient.pageDeepPositionIndex--;
 		}else
-		if($scope.patient.pageDeepPositionIndex == 1){
-			var calcNotCollapsed = 0;
-			$($scope.patient.prescribesHistory).each(function () {
-				if(!this.isCollapsed) calcNotCollapsed++;
-			} );
-			if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
-				$scope.editedPrescribeHistory.isCollapsed = true;
-			}else{
-				$scope.patient.pageDeepPositionIndex--;
-				$("#focus_0").focus();
-			}
-		}else
+			if($scope.patient.pageDeepPositionIndex == 1){
+				if($scope.workDoc.selectPrescribesHistoryIndex == -1){
+					$scope.patient.patientUpdateOpen = false;
+				}else{
+					var calcNotCollapsed = 0;
+					$($scope.patient.prescribesHistory).each(function () {
+						if(!this.isCollapsed) calcNotCollapsed++;
+					} );
+					if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
+						$scope.editedPrescribeHistory.isCollapsed = true;
+					}else{
+						$scope.patient.pageDeepPositionIndex--;
+						$("#focus_0").focus();
+					}
+				}
+			}else
 		if($scope.patient.pageDeepPositionIndex == 0){
 			skipLinkMinus1();
 		}else 
@@ -910,8 +899,11 @@ $scope.$on('keydown', function(msg, obj){
 	var code = obj.event.keyCode;
 	if(isEditDialogOpen()){
 		if(code == $scope.keys[0].code){
-			//make save (F4)
-			 $scope.keys[0].action();
+			$scope.keys[0].action(); //make save (F4)
+		}else
+		if(code == $scope.keys[1].code){
+			$scope.keys[1].action(); //make Escape
+			$scope.$apply();
 		}
 		return;
 	}
