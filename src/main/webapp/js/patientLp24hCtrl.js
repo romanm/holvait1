@@ -694,17 +694,17 @@ $scope.keys.push({
 	code : KeyCodes.Enter,
 	action : function() {
 		console.log("Enter");
-		if($scope.patient.pageDeepPositionIndex == 1){
-			if($scope.patient.selectPrescribesHistoryIndex == -1){
+		if($scope.workDoc.pageDeepPositionIndex == 1){
+			if($scope.workDoc.selectPrescribesHistoryIndex == -1){
 				$scope.updatePatient();
 			}else{
-				$scope.collapseDayPrescribe($scope.patient.selectPrescribesHistoryIndex);
+				$scope.collapseDayPrescribe($scope.workDoc.selectPrescribesHistoryIndex);
 			}
 		}else
-		if($scope.patient.pageDeepPositionIndex == 2){
+		if($scope.workDoc.pageDeepPositionIndex == 2){
 			openEditedPrescribeDrugDialog();
 		}else
-		if($scope.patient.pageDeepPositionIndex == 3){
+		if($scope.workDoc.pageDeepPositionIndex == 3){
 			initEditedPrescribeDrug();
 			if(null == $scope.editedPrescribeDrug)
 				openEditedPrescribeDrugDialog();
@@ -742,6 +742,7 @@ $scope.keys.push({
 			}
 		}else
 		if($scope.patient.pageDeepPositionIndex == 3){
+		console.log(1);
 			$scope.editedPrescribeHistory.dayHourIndex++;
 			if(24 == $scope.editedPrescribeHistory.dayHourIndex)
 				$scope.editedPrescribeHistory.dayHourIndex = 0;
