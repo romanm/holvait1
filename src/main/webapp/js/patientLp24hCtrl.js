@@ -283,6 +283,7 @@ changeHour = function(dayHourIndex){
 	}else{
 		$scope.editedPrescribeDrug.times.hours[hour] = null;
 	}
+	$scope.numberOfChange++;
 }
 
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
@@ -409,11 +410,12 @@ contextMenuCopy = function(copyObject){
 }
 
 copy = function(taskIndex, prescribeHistory){
-	var drug = prescribeHistory.prescribes.tasks[taskIndex];
-	if(drug.selectMultiple){
-		$itemScope.$parent.prescribeHistory.prescribes.selectMultiple = true;
-		contextMenuCopy($itemScope.$parent.prescribeHistory.prescribes); 
+	//var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	//if(drug.selectMultiple){
+	if(prescribeHistory.prescribes.selectMultiple){
+		contextMenuCopy(prescribeHistory.prescribes); 
 	}else{
+		var drug = prescribeHistory.prescribes.tasks[taskIndex];
 		contextMenuCopy(drug);
 	}
 }
@@ -429,11 +431,21 @@ $scope.updatePatient = function(){
 	$scope.patient.patientUpdateOpen = !$scope.patient.patientUpdateOpen;
 }
 
+$scope.menuNoDelDayBlock = [
+	['<span class="glyphicon glyphicon-remove"></span> Скасувати видалення ', function ($itemScope) {
+		$itemScope.prescribeHistory.deleteDay = false;
+	}]
+];
+
 $scope.menuDayBlock = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
+	}],
+	null,
+	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
+		deleteDay($itemScope.prescribeHistory);
 	}]
-	];
+];
 
 $scope.menuTask = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
@@ -465,11 +477,17 @@ $scope.menuTask = [
 	}],
 	null,
 	['<i class="fa fa-reply-all"></i> Скасувати вибір', function ($itemScope) {
-		$($itemScope.$parent.prescribeHistory.prescribes.tasks).each(function () {
-			this.selectMultiple = false;
-		});
+		escapeSelectMultiple($itemScope.$parent.prescribeHistory);
 	}]
 ];
+
+escapeSelectMultiple = function(prescribeHistory){
+	$(prescribeHistory.prescribes.tasks).each(function () {
+		this.selectMultiple = false;
+	});
+	prescribeHistory.prescribes.selectMultiple = false;
+}
+
 
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
@@ -493,6 +511,14 @@ $scope.menuTasksAll = [
 		});
 	}]
 ];
+
+deleteDay = function(prescribeHistory){
+	if(prescribeHistory.deleteDay){
+		$scope.workDoc.prescribesHistory.splice($scope.workDoc.selectPrescribesHistoryIndex, 1);
+	}else{
+		prescribeHistory.deleteDay = true;
+	}
+}
 
 deleteSelected = function(taskIndex, prescribeHistory){
 	var isMultipleSelect = false;
@@ -545,6 +571,7 @@ $scope.selectMultiple = function(taskInDayIndex, prescribeHistory){
 		prescribeHistory.prescribes.tasks[taskInDayIndex] = {};
 	}
 	prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple = !prescribeHistory.prescribes.tasks[taskInDayIndex].selectMultiple;
+	prescribeHistory.prescribes.selectMultiple = true;
 }
 
 //----------------drug document----------------------------
@@ -600,25 +627,29 @@ $scope.keys.push({
 	code : KeyCodes.Escape,
 	action : function() {
 		console.log("Escape");
+		if($scope.editedPrescribeHistory.prescribes.selectMultiple){
+			escapeSelectMultiple($scope.editedPrescribeHistory);
+			return;
+		}
 		if($scope.patient.pageDeepPositionIndex == 2){
 			$scope.patient.pageDeepPositionIndex--;
 		}else
-			if($scope.patient.pageDeepPositionIndex == 1){
-				if($scope.workDoc.selectPrescribesHistoryIndex == -1){
+		if($scope.patient.pageDeepPositionIndex == 1){
+			if($scope.workDoc.selectPrescribesHistoryIndex == -1){
 					$scope.patient.patientUpdateOpen = false;
+			}else{
+				var calcNotCollapsed = 0;
+				$($scope.patient.prescribesHistory).each(function () {
+					if(!this.isCollapsed) calcNotCollapsed++;
+				} );
+				if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
+					$scope.editedPrescribeHistory.isCollapsed = true;
 				}else{
-					var calcNotCollapsed = 0;
-					$($scope.patient.prescribesHistory).each(function () {
-						if(!this.isCollapsed) calcNotCollapsed++;
-					} );
-					if(calcNotCollapsed > 1 && !$scope.editedPrescribeHistory.isCollapsed){
-						$scope.editedPrescribeHistory.isCollapsed = true;
-					}else{
-						$scope.patient.pageDeepPositionIndex--;
-						$("#focus_0").focus();
-					}
+					$scope.patient.pageDeepPositionIndex--;
+					$("#focus_0").focus();
 				}
-			}else
+			}
+		}else
 		if($scope.patient.pageDeepPositionIndex == 0){
 			skipLinkMinus1();
 		}else 
@@ -640,7 +671,12 @@ $scope.openF1 = function(){
 $scope.keys.push({
 	code : KeyCodes.Delete,
 	action : function() {
+		if($scope.workDoc.pageDeepPositionIndex == 1){
+			deleteDay($scope.editedPrescribeHistory);
+		}else
 		if($scope.workDoc.pageDeepPositionIndex == 2){
+//			var antwort = alert("Видалити елемент з схеми ліквання?");
+//			console.log(antwort);
 			deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
 		}
 	}
@@ -655,6 +691,14 @@ $scope.keys.push({
 		if($scope.patient.pageDeepPositionIndex == 2){
 			var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
 			$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}else
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			initEditedPrescribeDrug();
+			if(null == $scope.editedPrescribeDrug)
+				openEditedPrescribeDrugDialog();
+			else{
+				changeHour($scope.editedPrescribeHistory.dayHourIndex);
+			}
 		}
 	}
 });
@@ -710,7 +754,6 @@ $scope.keys.push({
 				openEditedPrescribeDrugDialog();
 			else{
 				changeHour($scope.editedPrescribeHistory.dayHourIndex);
-				$scope.numberOfChange++;
 			}
 		}
 	}
@@ -742,7 +785,6 @@ $scope.keys.push({
 			}
 		}else
 		if($scope.patient.pageDeepPositionIndex == 3){
-		console.log(1);
 			$scope.editedPrescribeHistory.dayHourIndex++;
 			if(24 == $scope.editedPrescribeHistory.dayHourIndex)
 				$scope.editedPrescribeHistory.dayHourIndex = 0;
@@ -779,6 +821,7 @@ $scope.keys.push({
 			if($scope.editedPrescribeHistory.selectDrugIndex >= 19){
 				$scope.editedPrescribeHistory.selectDrugIndex = 0;
 			}
+			initEditedPrescribeDrug();
 		}else
 		if($scope.workDoc.pageDeepPositionIndex == 1){
 			$scope.workDoc.selectPrescribesHistoryIndex++;
@@ -798,6 +841,7 @@ $scope.keys.push({
 			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
 				$scope.editedPrescribeHistory.selectDrugIndex = 18;
 			}
+			initEditedPrescribeDrug();
 		}else
 		if($scope.workDoc.pageDeepPositionIndex == 1){
 			$scope.workDoc.selectPrescribesHistoryIndex--;
@@ -842,6 +886,20 @@ $scope.keys.push({
 	}
 });
 
+$scope.keys.push({
+	altKey : true, code : KeyCodes.ArrowRight,
+	action : function() {
+		console.log($scope.editedPrescribeHistory.dayHourIndex);
+		var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex);
+		console.log(hour);
+		if($scope.editedPrescribeDrug.times.hours[hour]){
+			$scope.editedPrescribeDrug.times.hours[hour] = null;
+			var hourNext = hour+1;
+			$scope.editedPrescribeDrug.times.hours[hourNext] = "-";
+			console.log(hourNext);
+		}
+	}
+});
 $scope.keys.push({
 	altKey : true, code : KeyCodes.ArrowDown,
 	action : function() {
