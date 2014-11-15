@@ -81,6 +81,8 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			$scope.patient.prescribesHistory = [];
 		}
 		$scope.patient.prescribesHistory.splice(0, 0, prescribeHistory);
+		$scope.workDoc.selectPrescribesHistoryIndex = 0;
+		initEditedPrescribeHistory();
 	}
 
 	cangePatientDocToSave = function(){
@@ -555,7 +557,7 @@ contextMenuPaste = function(taskInDay, prescribeHistory){
 		}
 	}).error(function(data, status, headers, config) {
 	});
-}
+};
 
 $scope.drugToTask2 = function(drug, taskInDay, prescribeHistory){
 	var position = taskInDay.i;
@@ -611,6 +613,10 @@ var KeyCodes = {
 	S : 83,
 	P0 : 48,//Ctrl_P
 	Delete : 46,
+	PageUp : 33,
+	PageDown : 34,
+	End : 35,
+	Home : 36,
 	ArrowUp : 38,
 	ArrowDown : 40,
 	ArrowLeft : 37,
@@ -681,6 +687,7 @@ $scope.keys.push({
 		}
 	}
 });
+
 $scope.keys.push({
 	code : KeyCodes.SPACEBAR,
 	action : function() {
@@ -702,6 +709,7 @@ $scope.keys.push({
 		}
 	}
 });
+
 $scope.keys.push({
 	code : KeyCodes.F2,
 	action : function() {
@@ -769,7 +777,12 @@ $scope.keys.push({
 		if($scope.patient.pageDeepPositionIndex <= 2){
 			$scope.patient.pageDeepPositionIndex++;
 			if($scope.patient.pageDeepPositionIndex == 3)
+			{
+				if($scope.editedPrescribeHistory.dayHourIndex == -1){
+					$scope.editedPrescribeHistory.dayHourIndex = 0;
+				}
 				return;
+			}
 		}
 		if($scope.patient.pageDeepPositionIndex < 0){
 			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
@@ -791,6 +804,54 @@ $scope.keys.push({
 		}
 	}
 });
+
+$scope.keys.push({
+	code : KeyCodes.End,
+	action : function() {
+		console.log("End - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			$scope.editedPrescribeHistory.dayHourIndex = 23;
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.PageDown,
+	action : function() {
+		console.log("PageDown - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex >= 2){
+			console.log($scope.editedPrescribeHistory.prescribes.tasks.length);
+			console.log($scope.editedPrescribeHistory.selectDrugIndex);
+			if($scope.editedPrescribeHistory.selectDrugIndex < $scope.editedPrescribeHistory.prescribes.tasks.length - 1){
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length - 1;
+			}else{
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.tasksInDay.length - 1;
+			}
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.PageUp,
+	action : function() {
+		console.log("PageUp - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex >= 2){
+			$scope.editedPrescribeHistory.selectDrugIndex = 0;
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.Home,
+	action : function() {
+		console.log("Home - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			console.log($scope.editedPrescribeHistory.dayHourIndex);
+			$scope.editedPrescribeHistory.dayHourIndex = 0;
+		}
+	}
+});
+
 $scope.keys.push({
 	code : KeyCodes.ArrowLeft,
 	action : function() {
@@ -813,6 +874,7 @@ $scope.keys.push({
 		}
 	}
 });
+
 $scope.keys.push({
 	code : KeyCodes.ArrowDown,
 	action : function() {
@@ -886,20 +948,72 @@ $scope.keys.push({
 	}
 });
 
+hourYesHourNo = function (hourYes, hourNo){
+	$scope.editedPrescribeDrug.times.hours[hourYes] = "-";
+	$scope.editedPrescribeDrug.times.hours[hourNo] = null;
+}
+var dayStartHour = 8;
 $scope.keys.push({
-	altKey : true, code : KeyCodes.ArrowRight,
+	ctrlKey : true, code : KeyCodes.ArrowLeft,
 	action : function() {
-		console.log($scope.editedPrescribeHistory.dayHourIndex);
-		var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex);
-		console.log(hour);
-		if($scope.editedPrescribeDrug.times.hours[hour]){
-			$scope.editedPrescribeDrug.times.hours[hour] = null;
-			var hourNext = hour+1;
-			$scope.editedPrescribeDrug.times.hours[hourNext] = "-";
-			console.log(hourNext);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			console.log($scope.editedPrescribeHistory.dayHourIndex);
+			var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex);
+			if($scope.editedPrescribeDrug.times.hours[hour]){
+				hourYesHourNo(hour - 1, hour);
+				$scope.editedPrescribeHistory.dayHourIndex--;
+			}else{
+				var moved = false;
+				var selectedHour = hour;
+				for (var hour = dayStartHour; hour < selectedHour; hour++) {
+					if($scope.editedPrescribeDrug.times.hours[hour]){
+						if(hour == 8) break; // no move to other day
+						hourYesHourNo(hour - 1, hour);
+						var moved = true;
+					}
+				}
+				if(moved)
+					$scope.editedPrescribeHistory.dayHourIndex--;
+			}
 		}
 	}
 });
+
+$scope.keys.push({
+	ctrlKey : true, code : KeyCodes.ArrowRight,
+	action : function() {
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex);
+			if($scope.editedPrescribeDrug.times.hours[hour]){
+				hourYesHourNo(hour + 1, hour);
+				$scope.editedPrescribeHistory.dayHourIndex++;
+			}else{
+				var moved = false;
+				var selectedHour = hour;
+				var isBreak = false;
+				for (var hour = dayStartHour - 1; hour > selectedHour || (selectedHour >= dayStartHour && hour >= 0); hour--) 
+					if($scope.editedPrescribeDrug.times.hours[hour]){
+						if(hour == (dayStartHour - 1)){
+							isBreak = true;
+							break; // no move to other day
+						}
+						hourYesHourNo(hour + 1, hour);
+						var moved = true;
+					}
+				if(!isBreak)
+					for (var hour = 23; hour > selectedHour; hour--) 
+						if($scope.editedPrescribeDrug.times.hours[hour]){
+							var hourYes = (hour == 23)? 0:hour + 1;
+							hourYesHourNo(hourYes, hour);
+							var moved = true;
+						}
+				if(moved)
+					$scope.editedPrescribeHistory.dayHourIndex++;
+			}
+		}
+	}
+});
+
 $scope.keys.push({
 	altKey : true, code : KeyCodes.ArrowDown,
 	action : function() {
@@ -954,7 +1068,7 @@ isEditDialogOpen = function(){
 }
 
 $scope.$on('keydown', function(msg, obj){
-	//console.log(obj);
+	console.log(obj);
 	var code = obj.event.keyCode;
 	if(isEditDialogOpen()){
 		if(code == $scope.keys[0].code){
