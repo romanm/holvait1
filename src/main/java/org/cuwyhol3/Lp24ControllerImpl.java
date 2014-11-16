@@ -5,11 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +18,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +52,21 @@ public class Lp24ControllerImpl {
 		logger.debug(" o - "+newPatient);
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
+	}
+	public  Map<String, Object> autoSavePatient(Map<String, Object> patientToSave){
+		Integer patientId = (Integer) patientToSave.get("PATIENT_ID");
+		final String patientDbJsonName = Lp24Config.jsonDbPhad +  Lp24Config.getPatientDbJsonName(patientId);
+		logger.debug(patientDbJsonName);
+		final String patientDbJsonNameArchive = Lp24Config.jsonDbPhad + Lp24Config.getPatientDbJsonNameArchive(patientId);
+		logger.debug(patientDbJsonNameArchive);
+		final Path sourceFile = new File (patientDbJsonName).toPath();
+		final Path targetArchive = new File (patientDbJsonNameArchive).toPath();
+		try {
+			Files.copy(sourceFile, targetArchive);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return patientToSave;
 	}
 	public  Map<String, Object> savePatient(Map<String, Object> patientToSave){
 		Integer patientId = (Integer) patientToSave.get("PATIENT_ID");

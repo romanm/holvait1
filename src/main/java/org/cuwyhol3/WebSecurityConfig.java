@@ -56,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //						,"/patients.html"
 //						,"/patient1sList"
 						,"/saveNewPatient"
+						,"/autosave/patient"
 						,"/save/patient"
 						,"/removePatient"
 						,"/updatePatient"

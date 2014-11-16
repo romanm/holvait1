@@ -1,9 +1,13 @@
 package org.cuwyhol3;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Lp24Config {
 	//windows
 	//install windows/clinic
-//	static String applicationFolderPfad = "C:\\opt\\vait.curepathway\\server\\";
+//	final static String applicationFolderPfad = "C:\\opt\\vait.curepathway\\server\\";
 //	static String urlDb = "jdbc:h2:file:C:\\opt\\vait.curepathway\\db-h2\\holvait1-prodaction\\lp24protocol";
 //	static String innerDbFolderPfad = "src\\main\\webapp\\db\\";
 
@@ -13,24 +17,40 @@ public class Lp24Config {
 	//linux
 	//develop tasclin/clinic
 	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
-	static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
+	final static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
 
 	//develop tasclin/hol-sec
 //	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
 
 	//test install freehost.ua/holweb
 //	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
-//	static String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
+//	final static String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
 	
 	//all linux
-	static String innerDbFolderPfad = "src/main/webapp/db/";
-	static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
+	final static String innerDbFolderPfad = "src/main/webapp/db/";
+	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 
+	final static String jsonDbPhad = applicationFolderPfad + innerDbFolderPfad;
+	final static String archivePrefix = "archive/";
+	final static String patientDbPrefix = "patient/patient_";
+	final static DateFormat df_ymdhms = new SimpleDateFormat("yyyy-MM-dd'_'HH:mm:ss");
+	private static String archiveDateStamp() {
+		String formatDate = df_ymdhms.format(new Date());
+		return formatDate;
+	}
+	static String getPatientDbJsonNameArchive(Integer patientId) {
+		final String archiveDateStamp = archiveDateStamp();
+		System.out.println(" o - "+archiveDateStamp);
+		return archivePrefix + patientDbPrefix + patientId+ ""
+				+ "__"
+				+ archiveDateStamp
+				+ ".json";
+	}
 	static String getPrescribeDbJsonName(Integer prescribeId) {
 		return "prescribe/prescribe_"+ prescribeId+ ".json";
 	}
 	static String getPatientDbJsonName(Integer patientId) {
-		return "patient/patient_"+ patientId+ ".json";
+		return patientDbPrefix+ patientId+ ".json";
 	}
 	static String getDrugDbJsonName(Integer drugId) {
 		return "drug/drug_"+ drugId+ ".json";

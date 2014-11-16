@@ -31,8 +31,8 @@
 			<li><a data-ng-click="newPrescribes()" href="#">нове призначеня</a></li>
 			<li data-ng-class="{'disabled': numberOfChange == 0}"><a
 				data-ng-click="savePatient()" href="#"
-				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><span
-					class="glyphicon glyphicon-floppy-disk"></span>{{numberOfChange}}<small>(F4)</small>
+				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><sub>{{numberOfAutoSavedChange}}</sub><span
+					class="glyphicon glyphicon-floppy-disk"><sup>{{numberOfChange}}</sup></span><small>(F4)</small>
 			</a></li>
 			<li title="Поновити: вернутись до останнього збереженого стану">
 			<a href="patient.html?id={{parameters.id}}"><i class="fa fa-refresh"></i></a></li>
