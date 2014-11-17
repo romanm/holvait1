@@ -53,29 +53,63 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> patient1sList = patient1sList();
 		return patient1sList;
 	}
+	
+	public Map<String, Object> autoSaveDocument(Map<String, Object> documentToSave){
+		if(documentToSave.containsKey("PATIENT_ID")){
+			autoSavePatient(documentToSave);
+		}else if(documentToSave.containsKey("PRESCRIBE_ID")){
+			autoSavePrescribes(documentToSave);
+		}
+		return documentToSave;
+	}
+	public  Map<String, Object> autoSavePrescribes(Map<String, Object> prescribesToSave){
+		savePrescribesToFile(prescribesToSave, (Integer) prescribesToSave.get("PRESCRIBE_ID"));
+		return prescribesToSave;
+	}
 	public  Map<String, Object> autoSavePatient(Map<String, Object> patientToSave){
+		savePatienToFile(patientToSave, (Integer) patientToSave.get("PATIENT_ID"));
+		return patientToSave;
+	}
+	public  Map<String, Object> savePrescribes(Map<String, Object> prescribesToSave){
+		final Integer prescribesId = (Integer) prescribesToSave.get("PRESCRIBE_ID");
+		savePrescribesToFile(prescribesToSave, prescribesId);
+		archiveLastSave(prescribesId, Lp24Config.getPrescribeDbJsonName(prescribesId)
+				, Lp24Config.getDocumentDbJsonNameArchive(prescribesId, Lp24Config.prescribeDbPrefix));
+		return prescribesToSave;
+	}
+	public  Map<String, Object> savePatient(Map<String, Object> patientToSave){
 		Integer patientId = (Integer) patientToSave.get("PATIENT_ID");
-		final String patientDbJsonName = Lp24Config.jsonDbPhad +  Lp24Config.getPatientDbJsonName(patientId);
-		logger.debug(patientDbJsonName);
-		final String patientDbJsonNameArchive = Lp24Config.jsonDbPhad + Lp24Config.getPatientDbJsonNameArchive(patientId);
-		logger.debug(patientDbJsonNameArchive);
-		final Path sourceFile = new File (patientDbJsonName).toPath();
-		final Path targetArchive = new File (patientDbJsonNameArchive).toPath();
+		savePatienToFile(patientToSave, patientId);
+		archiveLastSave(patientId, Lp24Config.getPatientDbJsonName(patientId)
+				, Lp24Config.getDocumentDbJsonNameArchive(patientId, Lp24Config.patientDbPrefix));
+		return patientToSave;
+	}
+	private void archiveLastSave(Integer patientId, final String patientDbJsonName, final String patientDbJsonNameArchive) {
+		final Path sourceFile = new File (Lp24Config.jsonDbPhad +  patientDbJsonName).toPath();
+		final Path targetArchive = new File (Lp24Config.jsonDbPhad + patientDbJsonNameArchive).toPath();
 		try {
 			Files.copy(sourceFile, targetArchive);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return patientToSave;
 	}
-	public  Map<String, Object> savePatient(Map<String, Object> patientToSave){
-		Integer patientId = (Integer) patientToSave.get("PATIENT_ID");
-		String fileNameWithPathAdd = lp24Config.getPatientDbJsonName(patientId);
+	private void savePrescribesToFile(Map<String, Object> patientToSave, Integer prescribesId) {
 		updateDrugs(patientToSave);
-		writeToJsonDbFile(patientToSave, fileNameWithPathAdd);
-		updatePatient(patientToSave);
-		return patientToSave;
+		writeToJsonDbFile(patientToSave, Lp24Config.getPrescribeDbJsonName(prescribesId));
+		lp24jdbc.updatePrescribeOrder(patientToSave);
+		prescribe1sList();
 	}
+	private void savePatienToFile(Map<String, Object> patientToSave, Integer patientId) {
+		updateDrugs(patientToSave);
+		writeToJsonDbFile(patientToSave, Lp24Config.getPatientDbJsonName(patientId));
+		updatePatient(patientToSave);
+	}
+	
+	/**
+	 * Update patient name in DB and list of patient file.
+	 * @param patientToUpdate
+	 * @return
+	 */
 	public List<Map<String, Object>> updatePatient(Map<String, Object> patientToUpdate) {
 		logger.debug("patientToUpdate - "+patientToUpdate);
 		int updatePatient = lp24jdbc.updatePatient(patientToUpdate);
@@ -154,14 +188,6 @@ public class Lp24ControllerImpl {
 		newPrescribe = lp24jdbc.newPrescribe(newPrescribe);
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
-	}
-	public  Map<String, Object> savePrescribes(Map<String, Object> prescribes){
-		Integer prescribeId = (Integer) prescribes.get("PRESCRIBE_ID");
-		updateDrugs(prescribes);
-		writeToJsonDbFile(prescribes, lp24Config.getPrescribeDbJsonName(prescribeId));
-		lp24jdbc.updatePrescribeOrder(prescribes);
-		prescribe1sList();
-		return prescribes;
 	}
 	public List<Map<String, Object>> updatePrescribe(
 			Map<String, Object> prescribeToUpdate) {

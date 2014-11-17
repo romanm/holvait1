@@ -213,3 +213,57 @@ cuwyApp.directive('ngBlur', function() {
 		});
 	};
 });
+
+//--------------patientLp24/prescribes24------------------------------
+cangePatientDocToSave = function($scope){
+	var docToSave = angular.copy($scope.patient);
+	$(docToSave.prescribesHistory).each(function () {
+		this.tasksInDay = null;
+	});
+	docToSave.patientUpdateOpen = false;
+	return docToSave;
+}
+var autoSaveLimit = 5;
+
+changeSaveControl = function($scope, $http){
+	$scope.numberOfChange++;
+	console.log($scope.numberOfChange+"/"+$scope.numberOfAutoSavedChange);
+	if(($scope.numberOfChange - $scope.numberOfAutoSavedChange) >= autoSaveLimit){
+		console.log("-------------");
+		var docToSave = cangePatientDocToSave($scope);
+		$http({
+			method : 'POST',
+			data : docToSave,
+			url : config.urlPrefix + "/autosave/patient"
+		}).success(function(data, status, headers, config){
+			console.log("numberOfAutoSavedChange = "+$scope.numberOfAutoSavedChange);
+			$scope.numberOfAutoSavedChange = $scope.numberOfChange;
+			console.log("numberOfAutoSavedChange = "+$scope.numberOfAutoSavedChange);
+		}).error(function(data, status, headers, config) {
+			$scope.error = data;
+		});
+	}
+};
+
+getDayHoursEmpty = function(){
+	var dayHours = [];
+	for(var i=0;i<24;i++) dayHours.push(null);
+	return dayHours;
+};
+
+changeHour = function(dayHourIndex, $scope, $http){
+	if(!$scope.editedPrescribeDrug.times){
+		$scope.editedPrescribeDrug.times = {};
+		$scope.editedPrescribeDrug.times.hours = getDayHoursEmpty();
+	}
+	var hour =  getLp24hour(dayHourIndex);
+	if(!$scope.editedPrescribeDrug.times.hours[hour]){
+		$scope.editedPrescribeDrug.times.hours[hour] = "-";
+	}else{
+		$scope.editedPrescribeDrug.times.hours[hour] = null;
+	}
+	changeSaveControl($scope, $http);
+};
+
+//--------------patientLp24/prescribes24------------------------------END
+

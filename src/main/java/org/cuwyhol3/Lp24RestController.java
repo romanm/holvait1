@@ -48,9 +48,9 @@ public class Lp24RestController {
 		return lp24Controller.savePatient(patient);
 	}
 	@RequestMapping(value = "/autosave/patient", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> autoSavePatient(@RequestBody Map<String, Object> patient){
-		logger.debug("/autoSavePatient");
-		return lp24Controller.autoSavePatient(patient);
+	public @ResponseBody Map<String, Object> autoSavePatient(@RequestBody Map<String, Object> documentToSave){
+		logger.debug("/autoSaveDocument");
+		return lp24Controller.autoSaveDocument(documentToSave);
 	}
 	@RequestMapping(value = "/patient1sList", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> patient1sList() {

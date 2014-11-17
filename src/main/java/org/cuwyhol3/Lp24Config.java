@@ -32,22 +32,22 @@ public class Lp24Config {
 
 	final static String jsonDbPhad = applicationFolderPfad + innerDbFolderPfad;
 	final static String archivePrefix = "archive/";
-	final static String patientDbPrefix = "patient/patient_";
+	public final static String patientDbPrefix = "patient/patient_";
+	public final static String prescribeDbPrefix = "prescribe/prescribe_";
 	final static DateFormat df_ymdhms = new SimpleDateFormat("yyyy-MM-dd'_'HH:mm:ss");
 	private static String archiveDateStamp() {
 		String formatDate = df_ymdhms.format(new Date());
 		return formatDate;
 	}
-	static String getPatientDbJsonNameArchive(Integer patientId) {
+	static String getDocumentDbJsonNameArchive(Integer patientId, String documentDbPrefix) {
 		final String archiveDateStamp = archiveDateStamp();
-		System.out.println(" o - "+archiveDateStamp);
-		return archivePrefix + patientDbPrefix + patientId+ ""
+		return archivePrefix + documentDbPrefix + patientId+ ""
 				+ "__"
 				+ archiveDateStamp
 				+ ".json";
 	}
 	static String getPrescribeDbJsonName(Integer prescribeId) {
-		return "prescribe/prescribe_"+ prescribeId+ ".json";
+		return prescribeDbPrefix+ prescribeId+ ".json";
 	}
 	static String getPatientDbJsonName(Integer patientId) {
 		return patientDbPrefix+ patientId+ ".json";

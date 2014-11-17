@@ -1,6 +1,8 @@
 cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	var minPageDeepPositionIndex = -2;
+	var autoSaveLimit = 5;
 	$scope.numberOfChange = 0;
+	$scope.numberOfAutoSavedChange = 0;
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
 	$scope.siteMap = config.siteMap.siteMaps[2];
@@ -47,21 +49,21 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$scope.workDoc = $scope.patient;
 		if(null == $scope.p24hDoc.prescribesHistory){
 			$scope.newPrescribes();
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 		}
 		initPrescribesTasksInDay();
 		if(typeof $scope.p24hDoc.selectPrescribesHistoryIndex === 'undefined'){
 			$scope.p24hDoc.selectPrescribesHistoryIndex = 0;
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 		}
 		$scope.editedPrescribeHistory = $scope.p24hDoc.prescribesHistory[$scope.p24hDoc.selectPrescribesHistoryIndex];
 		if(typeof $scope.editedPrescribeHistory.selectDrugIndex === 'undefined'){
 			$scope.editedPrescribeHistory.selectDrugIndex = 0;
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 		}
 		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
 		if(typeof $scope.p24hDoc.pageDeepPositionIndex === 'undefined'){
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 			if($scope.editedPrescribeHistory.isCollapsed){
 				$scope.p24hDoc.pageDeepPositionIndex = 1;
 			}else{
@@ -101,6 +103,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 			$scope.p24hDoc = data;
 			initWorkDocument();
 			$scope.numberOfChange = 0;
+			$scope.numberOfAutoSavedChange = 0;
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});
@@ -150,7 +153,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 			return;
 		$scope.p24hDoc.selectPrescribesHistoryIndex = prescribeHistoryIndex;
 		$scope.editedPrescribeHistory = prescribeHistory;
-		$scope.numberOfChange++;
+		changeSaveControl($scope, $http);
 	}
 
 	checkDrugEditedSelection = function(taskInDayIndex, prescribeHistory){
@@ -230,20 +233,7 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 	}else{
 		prescribeHistory.prescribes.tasks[position] = drug;
 	}
-	$scope.numberOfChange++;
-}
-
-changeHour = function(dayHourIndex){
-	if(!$scope.editedPrescribeDrug.times){
-		$scope.editedPrescribeDrug.times = {};
-		$scope.editedPrescribeDrug.times.hours = getDayHoursEmpty();
-	}
-	var hour =  getLp24hour(dayHourIndex);
-	if(!$scope.editedPrescribeDrug.times.hours[hour]){
-		$scope.editedPrescribeDrug.times.hours[hour] = "-";
-	}else{
-		$scope.editedPrescribeDrug.times.hours[hour] = null;
-	}
+	changeSaveControl($scope, $http);
 }
 
 $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHistory){
@@ -254,7 +244,7 @@ $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHist
 	if(!isWithoutChange) 
 		return;
 	if(!taskInDay.isCollapsed){
-		changeHour(dayHourIndex);
+		changeHour(dayHourIndex, $scope, $http);
 	}else
 	if(taskInDay.isCollapsed){
 		var hour =  getLp24hour(dayHourIndex);
@@ -268,7 +258,7 @@ $scope.useHour = function(taskInDay, taskInDayIndex, dayHourIndex, prescribeHist
 		}else{
 			editedDrug.times.hours[hour] = null;
 		}
-		$scope.numberOfChange++;
+		changeSaveControl($scope, $http);
 		taskInDay.dialogTab = "times";
 	}
 }
@@ -377,7 +367,7 @@ $scope.prescribeHoursRight = function(drugForEdit){
 moveTo = function(arrayToSort, indexFrom, indexTo){
 	var el = arrayToSort.splice(indexFrom, 1);
 	arrayToSort.splice(indexTo, 0, el[0]);
-	$scope.numberOfChange++;
+	changeSaveControl($scope, $http);
 }
 
 moveUp = function(arrayToSort, index){
@@ -435,7 +425,7 @@ $scope.menuTask = [
 	null,
 	['<span class="glyphicon glyphicon-plus"></span> Додати строчку <sub><kbd>Shift+⏎</kbd></sub>', function ($itemScope) {
 		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
-		$scope.numberOfChange++;
+		changeSaveControl($scope, $http);
 	}],
 	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
 		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
@@ -492,12 +482,12 @@ deleteSelected = function(taskIndex, prescribeHistory){
 		){
 			prescribeHistory.prescribes.tasks.splice(i, 1);
 			isMultipleSelect = true;
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 		}
 	}
 	if(!isMultipleSelect){
 		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
-		$scope.numberOfChange++;
+		changeSaveControl($scope, $http);
 	}
 };
 
@@ -547,7 +537,7 @@ $scope.addNewDrugDocumentDose = function(){
 	$scope.addDoseToPrescribeDrug($scope.newDrugDocumentDose);
 	saveDrugDocument();
 	$scope.newDrugDocumentDose = {};
-	$scope.numberOfChange++;
+	changeSaveControl($scope, $http);
 };
 
 saveDrugDocument = function(){
@@ -641,6 +631,14 @@ $scope.keys.push({
 		if($scope.p24hDoc.pageDeepPositionIndex == 2){
 			var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
 			$scope.openPrescribeDrugDialog(taskInDay, $scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+		}else
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			initEditedPrescribeDrug();
+			if(null == $scope.editedPrescribeDrug)
+				openEditedPrescribeDrugDialog();
+			else{
+				changeHour($scope.editedPrescribeHistory.dayHourIndex, $scope, $http);
+			}
 		}
 	}
 });
@@ -663,8 +661,8 @@ $scope.keys.push({
 			if(null == $scope.editedPrescribeDrug)
 				openEditedPrescribeDrugDialog();
 			else{
-				changeHour($scope.editedPrescribeHistory.dayHourIndex);
-				$scope.numberOfChange++;
+				changeHour($scope.editedPrescribeHistory.dayHourIndex, $scope, $http);
+				changeSaveControl($scope, $http);
 			}
 		}
 	}
@@ -678,7 +676,7 @@ $scope.keys.push({
 	action : function() {
 		$scope.editedPrescribeHistory.selectDrugIndex++;
 		$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex, 0, null);
-		$scope.numberOfChange++;
+		changeSaveControl($scope, $http);
 	}
 });
 $scope.keys.push({
