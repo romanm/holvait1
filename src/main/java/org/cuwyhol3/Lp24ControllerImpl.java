@@ -173,6 +173,9 @@ public class Lp24ControllerImpl {
 			hashSet.add(dose);
 		return new ArrayList<Map>(hashSet);
 	}
+	public List<Map<String, Object>> elexRea() {
+		return null;
+	}
 	//------------------prescribe----------------------------
 	public Map<String, Object> readPrescribes(Integer prescribeId) {
 		String fileNameWithPathAdd = lp24Config.getPrescribeDbJsonName(prescribeId);

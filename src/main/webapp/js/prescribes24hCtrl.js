@@ -26,7 +26,6 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		url : config.urlPrefix + '/read' + urlServer + '/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
-		$scope.patient = $scope.p24hDoc;
 		initWorkDocument();
 	}).error(function(data, status, headers, config) {
 	});
@@ -46,6 +45,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	}
 
 	initWorkDocument = function(){
+		$scope.patient = $scope.p24hDoc;
 		$scope.workDoc = $scope.patient;
 		if(null == $scope.p24hDoc.prescribesHistory){
 			$scope.newPrescribes();
@@ -87,17 +87,11 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		$scope.p24hDoc.prescribesHistory.splice(0, 0, prescribeHistory);
 	}
 
-	removeTemporaryObjFromDoc = function(){
-		$($scope.p24hDoc.prescribesHistory).each(function () {
-			this.tasksInDay = null;
-		} );
-	}
-
 	$scope.savePrescribes = function(){
-		removeTemporaryObjFromDoc();
+		var docToSave = cangePatientDocToSave($scope);
 		$http({
 			method : 'POST',
-			data : $scope.p24hDoc,
+			data : docToSave,
 			url : config.urlPrefix + '/save' + urlServer + '/prescribes'
 		}).success(function(data, status, headers, config){
 			$scope.p24hDoc = data;
@@ -564,6 +558,10 @@ var KeyCodes = {
 	S : 83,
 	P0 : 48,//Ctrl_P
 	Delete : 46,
+	PageUp : 33,
+	PageDown : 34,
+	End : 35,
+	Home : 36,
 	ArrowUp : 38,
 	ArrowDown : 40,
 	ArrowLeft : 37,
@@ -642,6 +640,7 @@ $scope.keys.push({
 		}
 	}
 });
+
 $scope.keys.push({
 	code : KeyCodes.Enter,
 	action : function() {
@@ -679,14 +678,65 @@ $scope.keys.push({
 		changeSaveControl($scope, $http);
 	}
 });
+
+$scope.keys.push({
+	code : KeyCodes.PageDown,
+	action : function() {
+		console.log("PageDown - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex >= 2){
+			console.log($scope.editedPrescribeHistory.prescribes.tasks.length);
+			console.log($scope.editedPrescribeHistory.selectDrugIndex);
+			if($scope.editedPrescribeHistory.selectDrugIndex < $scope.editedPrescribeHistory.prescribes.tasks.length - 1){
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length - 1;
+			}else{
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.tasksInDay.length - 1;
+			}
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.Home,
+	action : function() {
+		console.log("Home - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			console.log($scope.editedPrescribeHistory.dayHourIndex);
+			$scope.editedPrescribeHistory.dayHourIndex = 0;
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.End,
+	action : function() {
+		console.log("End - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex == 3){
+			$scope.editedPrescribeHistory.dayHourIndex = 23;
+		}
+	}
+});
+
+$scope.keys.push({
+	code : KeyCodes.PageUp,
+	action : function() {
+		console.log("PageUp - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if($scope.workDoc.pageDeepPositionIndex >= 2){
+			$scope.editedPrescribeHistory.selectDrugIndex = 0;
+		}
+	}
+});
+
+
 $scope.keys.push({
 	code : KeyCodes.ArrowRight,
 	action : function() {
 		console.log("ArrowRight - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.patient.pageDeepPositionIndex <= 2){
 			$scope.patient.pageDeepPositionIndex++;
-			if($scope.patient.pageDeepPositionIndex == 3)
+			if($scope.patient.pageDeepPositionIndex == 3){
+				console.log($scope.editedPrescribeHistory.dayHourIndex);
 				return;
+			}
 		}
 		if($scope.p24hDoc.pageDeepPositionIndex < 0){
 			$("#focus_minus_"+(0-$scope.p24hDoc.pageDeepPositionIndex)).focus();
@@ -714,7 +764,9 @@ $scope.keys.push({
 	action : function() {
 		console.log("ArrowLeft - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex == 3){
+			console.log("----");
 			$scope.editedPrescribeHistory.dayHourIndex--;
+			console.log($scope.editedPrescribeHistory.dayHourIndex);
 			if($scope.editedPrescribeHistory.dayHourIndex >=0)
 				return;
 		}

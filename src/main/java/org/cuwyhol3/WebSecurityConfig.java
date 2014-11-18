@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/js-vendor/**" 
 						,"/tmp/dp*" 
 						,"/home.html"
+						,"/elexRean.html"
 						,"/help.html"
 						,"/showimg.html"
 						//drug
@@ -63,6 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						//edit
 						,"/session/copy"
 						,"/session/paste"
+						//elex
+						,"/elexRea"
 						).permitAll()
 				.anyRequest().authenticated();
 		http

@@ -146,7 +146,9 @@
 					<caption></caption>
 					<thead>
 						<tr>
-				<th class="mouseover" data-ng-context-menu="menuTasksAll" colspan="2" >Призначене лікування</th>
+				<th class="mouseover" data-ng-context-menu="menuTasksAll" colspan="2" 
+					data-ng-class="{selected:allDaySelect(prescribeHistoryIndex)}"
+				>Призначене лікування</th>
 				<th data-ng-repeat="dayHour in dayHours"
 					data-ng-init="lpHour = getLp24hourStr(dayHour)"
 				>

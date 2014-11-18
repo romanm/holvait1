@@ -110,6 +110,9 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	};
 
 	//---------data-ng-class-----------------------------------
+	$scope.allDaySelect = function(prescribeHistoryIndex){
+		return $scope.dayInSelectPath(prescribeHistoryIndex) && ($scope.workDoc.pageDeepPositionIndex == 2) && $scope.editedPrescribeHistory.selectDrugIndex == -1 ;
+	}
 	$scope.dayInSelectPath = function(prescribeHistoryIndex){
 		return prescribeHistoryIndex == $scope.workDoc.selectPrescribesHistoryIndex;
 	}
@@ -879,7 +882,7 @@ $scope.keys.push({
 		console.log("ArrowUp - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex >= 2){
 			$scope.editedPrescribeHistory.selectDrugIndex--;
-			if($scope.editedPrescribeHistory.selectDrugIndex < 0){
+			if($scope.editedPrescribeHistory.selectDrugIndex < -1){
 				$scope.editedPrescribeHistory.selectDrugIndex = 18;
 			}
 			initEditedPrescribeDrug();
