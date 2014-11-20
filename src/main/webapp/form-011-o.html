@@ -107,6 +107,7 @@ td, th {
 		<td></td>
 		<td colspan="3">
 			<span data-ng-show="prescribes.tasks[$index].DRUG_NAME == null">.</span>
+			<span data-ng-show="prescribes.tasks[$index].DRUG_NAME == ''">,</span>
 			{{prescribes.tasks[$index].DRUG_NAME == null ? "":prescribes.tasks[$index].DRUG_NAME}}
 			<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
 				{{prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER}}{{prescribes.tasks[$index].dose.DOSECONCENTRATON_UNIT}}
