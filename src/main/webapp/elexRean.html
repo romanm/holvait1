@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html data-ng-app="erApp" data-ng-controller="erCtrl">
+<head>
+<meta charset="utf-8" />
+</head>
+<body>
+	<h1>elex rean</h1>
+	<table>
+		<tr><th colspan="2">П/В</th><th>Коди/%</th></tr>
+		<tbody data-ng-repeat="qRow in questAnesthesia.DATAPACKET.ROWDATA.ROW" 
+		data-ng-init="qRowIndex = $index;" >
+			<tr>
+				<td colspan="2" 
+				id="q_{{qRow._KodQuestion}}"
+				>{{qRow._KodQuestion}}:: <b>
+						{{qRow._Question}} </b><small>
+						{{qRow._KodTema}} / {{qRow._VesFirst}} / {{qRow._VesHi}} /
+						{{qRow._VesLo}} / {{qRow._VesSecond}}</small></td>
+			</tr>
+			<tr data-ng-repeat="aRow in qRow.aArray"
+				id="q_{{qRow._KodQuestion}}:a_{{aRow.aNumber}}-v_{{aRow._VesAnswer}}"
+			>
+				<td>{{aRow.aNumber}}</td>
+				<td>{{aRow._Answer}}</td>
+				<td>{{aRow._VesAnswer}}</td>
+			</tr>
+		</tbody>
+	</table>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/db/elex/Quest-anesthesia.json.js"></script>
+	<script src="/db/elex/Answer-anesthesia.json.js"></script>
+	<script type="text/javascript">
+
+	var erApp = angular.module('erApp',[]);
+	erApp.controller('erCtrl', [ '$scope', '$http', function ($scope, $http) {
+		console.log("--erCtrl----------------erApp--");
+		$scope.questAnesthesia = questAnesthesia;
+		var qList = questAnesthesia.DATAPACKET.ROWDATA.ROW;
+		var qListIndex = 0;
+		console.log(qList);
+		$scope.answerAnesthesia = answerAnesthesia;
+		console.log(answerAnesthesia.DATAPACKET.ROWDATA.ROW);
+		var l = answerAnesthesia.DATAPACKET.ROWDATA.ROW.length;
+		console.log(l);
+		for(var i = 0; i < l; i++){
+			if(answerAnesthesia.DATAPACKET.ROWDATA.ROW[i]._KodQuestion != qList[qListIndex]._KodQuestion){
+				if(qListIndex < 4)
+					console.log(qList[qListIndex]);
+				qListIndex++;
+			}
+			if(answerAnesthesia.DATAPACKET.ROWDATA.ROW[i]._KodQuestion == qList[qListIndex]._KodQuestion){
+				if(typeof qList[qListIndex].aArray === 'undefined'){
+					qList[qListIndex].aArray = [];
+				}
+				var answer = answerAnesthesia.DATAPACKET.ROWDATA.ROW[i];
+				answer.aNumber = parseInt(answer._NumAnswer)+1;
+				qList[qListIndex].aArray.push(answer);
+			}
+		}
+	}]);
+
+	</script>
+</body>
+</html>
