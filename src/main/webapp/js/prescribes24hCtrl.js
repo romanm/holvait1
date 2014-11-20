@@ -98,6 +98,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 			initWorkDocument();
 			$scope.numberOfChange = 0;
 			$scope.numberOfAutoSavedChange = 0;
+			readDrug1sList($scope, $http);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});

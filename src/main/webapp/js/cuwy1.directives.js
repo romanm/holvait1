@@ -224,6 +224,17 @@ cangePatientDocToSave = function($scope){
 	return docToSave;
 }
 
+readDrug1sList = function($scope, $http){
+	$http({
+		method : 'GET',
+		url : config.urlPrefix + '/drug1sList'
+	}).success(function(data, status, headers, config) {
+		$scope.drug1sList = data;
+		console.log($scope.drug1sList);
+	}).error(function(data, status, headers, config) {
+	});
+}
+
 var autoSaveLimit = 5;
 changeSaveControl = function($scope, $http){
 	$scope.numberOfChange++;

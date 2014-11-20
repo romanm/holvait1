@@ -102,6 +102,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 			initWorkDocument();
 			$scope.numberOfChange = 0;
 			$scope.numberOfAutoSavedChange = 0;
+			readDrug1sList($scope, $http);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});
