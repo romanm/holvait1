@@ -5,6 +5,17 @@
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 	<title>{{siteMap.title}}</title>
+	<style type="text/css">
+	
+.uppercase {
+	text-transform: uppercase;
+}
+
+.fontsmall {
+	font-size: 75%;
+}
+	
+	</style>
 </head>
 
 <body key-cuwytrap="">
@@ -25,11 +36,12 @@
 	</div>
 	<hr/>
 	<div class="row">
-		<div class="col-xs-4">
+		<div class="col-xs-8">
 			<h3
 				data-ng-class="{selected:selectIndex == 2}"
 				data-ng-click="openItem(2)"
 			> <a id="link_2" href="{{siteMap.siteMaps[3].url}}">{{siteMap.siteMaps[3].name}}</a> </h3>
+			
 		</div>
 		<div class="col-xs-4">
 			<h3
@@ -41,16 +53,60 @@
 		</div>
 	</div>
 	<hr/>
+	<div class="row">
+		<div class="col-xs-2">
+			<h3>
+				<a href="help.html"> Підказка. </a>
+			</h3>
+		</div>
+			<div class="col-xs-10">
+				<div>Додаток для веденя</div>
+				<div class="bold">
+					<span class="uppercase"> Медичної документації </span> <i> -
+						Форма Nr 011/о </i>
+				</div>
+				<span class="fontsmall"> Затверджена МОЗ України 26.07.99 р.
+					№184, доповнена </span>
+				<p>
+				Призначення пишуться з чистого листа.
+				Також можливо зробити копію і зміни призначен дня, що минув або заздалегіть підготовленої схеми.
+				</p>
+				<p>
+					В розділі <b> <a href="http://localhost:8080/protocols.html">
+							Призначеня::Клінічні протоколи </a></b> ви можете вести базу даних
+					локальних стандартів лікування.
+				</p>
+				<p>
+				Цей розділ розвивається і вдосконалюється до досягнення рівня інтерактивних клінічних протоколів.
+				</p>
+				<p>
+					Спостерігайте за новою версією на сайті <a
+						href="http://sah.curepathway.com/home.html">sah.curepathway.com</a>.
+				</p>
+				<p>
+				Обмін схемами лікування між <a
+						href="http://sah.curepathway.com/home.html">sah.curepathway.com</a> і 
+				локальною інсталяцією працює в обох напрямках.
+				</p>
+			</div>
+		</div>
+	<hr/>
+	<div class="row">
+		<div class="col-xs-5"></div>
+		<div class="col-xs-7">
+			<small> З питань інсталяції, побажань і рекомендацій щодо вдосконалення додатку, звертаїтесь
+				відділення реанімації або орг-метод відділ <a
+				href="http://hol.khmelnitskiy.ua/"> Хмельницької обласної
+					лікарні</a>.
+				<div>
+					З повагою, <a target="_top"
+						href="mailto:roman.mishchenko@gmail.com?Subject=sah.curepathway.com : ">
+						roman.mishchenko@gmail.com </a>
+				</div>
+			</small>
+		</div>
+		</div>
 	<div>
-	Спостерігайте за новою версією на сайті <a
-		href="http://cuwy.in.ua/cuwy.html"> Протоколів діагностики та
-		лікування</a>. Демо версія <a href="http://cuwy.in.ua/home.html">відкрита для ознайомлення</a>. 
-		<br/>
-		<small> Для зворотнього зв'язку, щодо використання,
-			побажань, помилок звертатись <a target="_top"
-			href="mailto:roman.mishchenko@gmail.com?Subject=cuwy.in.ua : ">
-				roman.mishchenko@gmail.com </a>
-		</small>
 	</div>
 	</div>
 	

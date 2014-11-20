@@ -23,6 +23,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>src/main/webapp/elex-rean-stat.html</name>
+			<type>1</type>
+			<location>/home/roman/1doc-folder/specialization/elex-rean-stat.html</location>
+		</link>
+		<link>
 			<name>src/main/webapp/tmp/research-datepicker</name>
 			<type>2</type>
 			<location>/home/roman/01_hol_2/research-datepicker</location>

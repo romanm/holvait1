@@ -79,12 +79,16 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 				prescribes:{tasks:[]}
 		}
 		prescribeHistory.tasksInDay = getTasksInDay();
-		if(null == $scope.patient.prescribesHistory){
-			$scope.patient.prescribesHistory = [];
+		if(null == $scope.workDoc.prescribesHistory){
+			$scope.workDoc.prescribesHistory = [];
 		}
-		$scope.patient.prescribesHistory.splice(0, 0, prescribeHistory);
-		$scope.workDoc.selectPrescribesHistoryIndex = 0;
-		initEditedPrescribeHistory();
+		$scope.workDoc.prescribesHistory.splice(0, 0, prescribeHistory);
+		$scope.savePatient();
+//		$scope.workDoc.prescribesHistory.splice(1, 0, prescribeHistory);
+		//moveMinus($scope.workDoc.prescribesHistory, 1);
+		//$scope.workDoc.selectPrescribesHistoryIndex = 1;
+		//console.log($scope.workDoc.selectPrescribesHistoryIndex);
+		//initEditedPrescribeHistory();
 	}
 
 	$scope.savePatient = function(){
@@ -169,10 +173,11 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 		$scope.editedPrescribeDrug =  $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
 	}
 	initEditedPrescribeHistory = function(){
-		if($scope.patient.selectPrescribesHistoryIndex < 0){
+		if($scope.workDoc.selectPrescribesHistoryIndex < 0){
 			return;
 		}
 		$scope.editedPrescribeHistory = $scope.workDoc.prescribesHistory[$scope.workDoc.selectPrescribesHistoryIndex];
+		console.log($scope.editedPrescribeHistory);
 	}
 	getPrescribeIndex = function(prescribeHistory){ return $scope.workDoc.prescribesHistory.indexOf(prescribeHistory); }
 	setEditedPrescribeDrug = function(taskInDayIndex){
@@ -363,7 +368,7 @@ moveTo = function(arrayToSort, indexFrom, indexTo){
 }
 
 moveUp = function(arrayToSort, index){
-	moveTo(arrayToSort, index,index-1);
+	moveTo(arrayToSort, index, index-1);
 }
 
 movePlus = function(arrayToSort, index){
@@ -420,10 +425,13 @@ $scope.menuNoDelDayBlock = [
 ];
 
 $scope.menuDayBlock = [
-	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
 		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
 	}],
 	null,
+	['<span class="glyphicon glyphicon-plus"></span> Нове призначення <sub><kbd>Shift+⏎</kbd></sub>', function ($itemScope) {
+		$scope.newPrescribes();
+	}],
 	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
 		deleteDay($itemScope.prescribeHistory);
 	}]
@@ -654,6 +662,20 @@ $scope.keys.push({
 $scope.openF1 = function(){
 	window.open("help.html#patient", "", "width=1000, height=500");
 }
+
+deleteAllDrugs = function(){
+	var answer = confirm("Видалити всі ліки ("+$scope.editedPrescribeHistory.prescribes.tasks.length+") з схеми ліквання?");
+	if (answer) {
+		for(var i=$scope.editedPrescribeHistory.prescribes.tasks.length-1;i>=0;i--){
+			if($scope.editedPrescribeHistory.prescribes.tasks[i] 
+			){
+				$scope.editedPrescribeHistory.prescribes.tasks.splice(i, 1);
+			}
+		}
+		changeSaveControl($scope, $http);
+	}
+};
+
 $scope.keys.push({
 	code : KeyCodes.Delete,
 	action : function() {
@@ -661,9 +683,11 @@ $scope.keys.push({
 			deleteDay($scope.editedPrescribeHistory);
 		}else
 		if($scope.workDoc.pageDeepPositionIndex == 2){
-//			var antwort = alert("Видалити елемент з схеми ліквання?");
-//			console.log(antwort);
-			deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+			if($scope.editedPrescribeHistory.selectDrugIndex == -1){
+				deleteAllDrugs();
+			}else{
+				deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
+			}
 		}
 	}
 });
@@ -704,8 +728,8 @@ $scope.keys.push({
 		}
 	}
 });
-$scope.keys.push({
-	ctrlKey : true, code : KeyCodes.Enter,
+
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.Enter,
 	action : function() {
 		console.log("Ctrl + Enter");
 		if($scope.patient.pageDeepPositionIndex == 1){
@@ -715,12 +739,15 @@ $scope.keys.push({
 	}
 });
 
-$scope.keys.push({
-	shiftKey : true, code : KeyCodes.Enter,
+$scope.keys.push({ shiftKey : true, code : KeyCodes.Enter,
 	action : function() {
-		//$scope.editedPrescribeHistory.selectDrugIndex++;
-		$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex+1, 0, null);
-		changeSaveControl($scope, $http);
+		if($scope.workDoc.pageDeepPositionIndex == 1){
+			$scope.newPrescribes();
+		}else
+		if($scope.workDoc.pageDeepPositionIndex == 2){
+			$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex+1, 0, null);
+			changeSaveControl($scope, $http);
+		}
 	}
 });
 $scope.keys.push({
@@ -876,8 +903,7 @@ $scope.keys.push({
 		}
 	}
 });
-$scope.keys.push({
-	code : KeyCodes.ArrowUp,
+$scope.keys.push({ code : KeyCodes.ArrowUp,
 	action : function() {
 		console.log("ArrowUp - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex >= 2){
@@ -924,8 +950,7 @@ $scope.keys.push({
 	action : function() {
 	}
 });
-$scope.keys.push({
-	ctrlKey : true, code : KeyCodes.ArrowUp,
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowUp,
 	action : function() {
 	}
 });
@@ -1003,8 +1028,7 @@ $scope.keys.push({
 		$scope.editedPrescribeHistory.selectDrugIndex++;
 	}
 });
-$scope.keys.push({
-	altKey : true, code : KeyCodes.ArrowUp,
+$scope.keys.push({ altKey : true, code : KeyCodes.ArrowUp,
 	action : function() {
 		moveMinus($scope.editedPrescribeHistory.prescribes.tasks, $scope.editedPrescribeHistory.selectDrugIndex);
 		$scope.editedPrescribeHistory.selectDrugIndex--;

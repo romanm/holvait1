@@ -223,8 +223,8 @@ cangePatientDocToSave = function($scope){
 	docToSave.patientUpdateOpen = false;
 	return docToSave;
 }
-var autoSaveLimit = 5;
 
+var autoSaveLimit = 5;
 changeSaveControl = function($scope, $http){
 	$scope.numberOfChange++;
 	console.log($scope.numberOfChange+"/"+$scope.numberOfAutoSavedChange);

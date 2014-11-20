@@ -64,6 +64,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 			$scope.error = data;
 		});
 	}
+
 	postProtocol = function (postUrl, editProtocolOrder){
 		$http({
 			method : 'POST',

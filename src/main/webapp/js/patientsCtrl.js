@@ -40,6 +40,7 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 			url : urlPost
 		}).success(function(data, status, headers, config){
 			$scope.patient1sList = data;
+			$scope.filterPatients();
 			console.log(data);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
@@ -115,6 +116,8 @@ cuwyApp.controller('patientsCtrl', [ '$scope', '$http', '$filter', function ($sc
 		$scope.selectPatientIndex = drugIndex;
 	}
 	$scope.openItem = function(drugIndex) {
+		if(null == drugIndex)
+			return;
 		$scope.selectPatientIndex = drugIndex;
 		var patient=$scope.patient1sListFilter[$scope.selectPatientIndex];
 		document.getElementById("patient_"+patient.PATIENT_ID).click();

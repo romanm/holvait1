@@ -33,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/tmp/dp*" 
 						,"/home.html"
 						,"/elexRean.html"
+						,"/elexReanStat.html"
 						,"/help.html"
 						,"/showimg.html"
 						//drug

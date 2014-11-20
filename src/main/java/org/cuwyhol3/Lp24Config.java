@@ -7,17 +7,17 @@ import java.util.Date;
 public class Lp24Config {
 	//windows
 	//install windows/clinic
-//	final static String applicationFolderPfad = "C:\\opt\\vait.curepathway\\server\\";
-//	static String urlDb = "jdbc:h2:file:C:\\opt\\vait.curepathway\\db-h2\\holvait1-prodaction\\lp24protocol";
-//	static String innerDbFolderPfad = "src\\main\\webapp\\db\\";
+//	final static String applicationFolderPfad = "C:\\opt\\vait-meddoc\\server\\";
+//	final static String urlDb = "jdbc:h2:file:C:\\opt\\vait-meddoc\\db-h2\\vait-meddoc\\lp24protocol";
+//	final static String innerDbFolderPfad = "src\\main\\webapp\\db\\";
 
 	//install windows/clinic old
 //	static String url = "jdbc:h2:file:C:\\opt\\hol-vait\\db-h2\\cuwy-cpoe-hol1";
 
 	//linux
 	//develop tasclin/clinic
-	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
 	final static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
+	final static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
 
 	//develop tasclin/hol-sec
 //	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
