@@ -16,6 +16,10 @@ col.nameCol {
 	width: 50mm;
 }
 
+.nowrap {
+	white-space: nowrap;
+}
+
 col.hourCol {
 	width: 8mm;
 }
@@ -47,10 +51,13 @@ td, th {
 		<caption>
 			<table width="100%">
 				<colgroup>
+					<col style="width: 90mm;" />
+					<col style="width: 70mm;" />
 					<col />
-					<col style="width: 80mm;" />
-					<col style="width: 30mm" />
 					<col />
+					<!-- 
+					<col style="width: 50mm" />
+					 -->
 					<col />
 				</colgroup>
 				<tr>
@@ -87,8 +94,11 @@ td, th {
 		<colgroup>
 		<col class="hourCol"></col>
 		<col class=""></col>
-		<col style="width: 38mm;"></col>
-		<col class=""></col>
+		<!-- 
+		<col></col>
+		 -->
+		<col style="width: 30mm;"></col>
+		<col class="nowrap"></col>
 		<col class="hourCol" data-ng-repeat="dayHour in dayHours"></col>
 		<col class="hourCol"></col>
 	</colgroup>
@@ -138,7 +148,7 @@ td, th {
 	<tr class="fontsmall">
 		<td class="bold" colspan="2">В/в введено</td>
 		<td></td>
-		<td>АТ, mm Hg</td>
+		<td class="nowrap">АТ, mm Hg</td>
 		<td data-ng-repeat="dayHour in dayHours">
 		</td>
 		<td rowspan="6" style="transform: rotate(-90deg);">
@@ -158,7 +168,7 @@ td, th {
 		</td>
 	</tr>
 	<tr class="fontsmall">
-		<td class="bold" colspan="2">Компоненти крові</td>
+		<td class="bold nowrap" colspan="2">Ком-ти крові</td>
 		<td></td>
 		<td>t°C</td>
 		<td data-ng-repeat="dayHour in dayHours">
@@ -167,7 +177,7 @@ td, th {
 	<tr class="fontsmall">
 		<td class="bold" colspan="2">Діурез</td>
 		<td></td>
-		<td>ЦВТ, мм вод</td>
+		<td class="nowrap">ЦВТ, мм вод</td>
 		<td data-ng-repeat="dayHour in dayHours">
 		</td>
 	</tr>

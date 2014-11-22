@@ -34,7 +34,7 @@ public class Lp24Config {
 	final static String archivePrefix = "archive/";
 	public final static String patientDbPrefix = "patient/patient_";
 	public final static String prescribeDbPrefix = "prescribe/prescribe_";
-	final static DateFormat df_ymdhms = new SimpleDateFormat("yyyy-MM-dd'_'HH:mm:ss");
+	final static DateFormat df_ymdhms = new SimpleDateFormat("yyyy-MM-dd'_'HH-mm-ss");
 	private static String archiveDateStamp() {
 		String formatDate = df_ymdhms.format(new Date());
 		return formatDate;
