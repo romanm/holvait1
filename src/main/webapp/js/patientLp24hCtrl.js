@@ -2,6 +2,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function 
 	var minPageDeepPositionIndex = -2;
 	$scope.numberOfChange = 0;
 	$scope.numberOfAutoSavedChange = 0;
+	$scope.printForm = getCookie('printForm');
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
 	$scope.siteMap = config.siteMap.siteMaps[4];
@@ -1121,4 +1122,3 @@ $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
 $scope.format = $scope.formats[0];
 //---------------datepicker-------------------------END
 }]);
-

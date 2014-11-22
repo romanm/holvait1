@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html data-ng-app="confApp" data-ng-controller="confCtrl">
+<head>
+<meta charset="utf-8" />
+<link href="/css-vendor/bootstrap.css" rel="stylesheet" />
+<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet" />
+<title>Config</title>
+</head>
+
+<body key-cuwytrap="">
+	<a id="focus_minus_2"
+		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -2}"
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a> /
+	<span class="h1"> <a id="focus_0"
+		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == 0}"
+		href="prescribes24h.html?id={{parameters.id}}"> <u>{{p24hDoc.PRESCRIBE_NAME}}</u>
+	</a>Налаштунки
+	</span>
+	<hr />
+	<!-- 
+	<h2>Налаштунки</h2>
+ -->
+	Остання відкрита форма друку буде використовуватись за замовчуванням.
+	<div>
+		<small> (Для цього використовується <b>HTTP-cookie</b>, «<b>Ку́кі</b>»
+			або «<b>реп'яшки</b>»)
+		</small>
+	</div>
+	<h3>
+		<a href="form-011-o.html"> Форма 011-о мінздрав </a> <small
+			class="selected" data-ng-show="printForm == '011-o'">використовується
+			за замовчуванням</small>
+	</h3>
+	<h3>
+		<a href="form-l8l.html">Лікарня 8 Львів </a> <small class="selected"
+			data-ng-show="printForm == 'l8l'">використовується за
+			замовчуванням</small>
+	</h3>
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script type="text/javascript">
+		angular.module('confApp', []).controller('confCtrl',
+				[ '$scope', '$http', function($scope, $http) {
+					console.log("----------confCtrl----------");
+					$scope.printForm = getCookie('printForm');
+					console.log($scope.printForm);
+				} ]);
+	</script>
+</body>
+</html>

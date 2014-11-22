@@ -98,8 +98,11 @@
 					<!--
 				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" ></a>
 					-->
-				<span class="navbar-right"> <a
-						id="print2_{{prescribeHistoryIndex}}"
+					<span class="navbar-right"> <a
+						id="print3_{{prescribeHistoryIndex}}"
+						href="/form-{{printForm}}.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
+							<span class="glyphicon glyphicon-print"></span>
+					</a> -- <a id="print2_{{prescribeHistoryIndex}}"
 						href="/form-011-o.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
 							<span class="glyphicon glyphicon-print"></span>
 					</a>

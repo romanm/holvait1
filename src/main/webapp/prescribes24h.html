@@ -66,13 +66,17 @@
 				</span>
 				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" >
 					<span class="glyphicon glyphicon-folder-{{!prescribeHistory.isCollapsed?'open':'close'}}"></span>
-				</a>
-				<span class="navbar-right">
-				<a id="print2_{{prescribeHistoryIndex}}" href="/form-011-o.html?pid={{parameters.id}}&phi={{prescribeHistoryIndex}}">
-					<span class="glyphicon glyphicon-print"></span>
+				</a> 
+				<span class="navbar-right"> <a
+					id="print3_{{prescribeHistoryIndex}}"
+					href="/form-{{printForm}}.html?id={{parameters.id}}&phi={{prescribeHistoryIndex}}">
+						<span class="glyphicon glyphicon-print"></span>
+				</a> -- <a id="print2_{{prescribeHistoryIndex}}"
+					href="/form-011-o.html?id={{parameters.id}}&phi={{prescribeHistoryIndex}}">
+						<span class="glyphicon glyphicon-print"></span>
 				</a>
 				</span>
-				<div data-ng-show="prescribeHistory.updateDialogOpen">
+					<div data-ng-show="prescribeHistory.updateDialogOpen">
 					<div class="row">
 						<div class="col-xs-4">
 						День/Дні:

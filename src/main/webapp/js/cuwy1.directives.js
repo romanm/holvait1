@@ -215,6 +215,75 @@ cuwyApp.directive('ngBlur', function() {
 });
 
 //--------------patientLp24/prescribes24------------------------------
+readPrescribes = function($scope, $http){
+	var urlStr;
+	if(parameters.pid){
+		urlStr = '/read/patient_'+parameters.pid;
+	}else{
+		urlStr = '/read/prescribe_'+parameters.id;
+	}
+	$http({ method : 'GET', url : urlStr
+	}).success(function(data, status, headers, config) {
+		$scope.patient = data;
+		$scope.prescribeHistory = data.prescribesHistory[parameters.phi];
+		$scope.prescribes = $scope.prescribeHistory.prescribes;
+	}).error(function(data, status, headers, config) {
+	});
+}
+
+getTasksInDay = function($scope){
+	$scope.tasksInDay = [];
+	for(var ii = 0;ii <= $scope.tasksInDayNumber; ii++){
+		$scope.tasksInDay.push({i:ii,isCollapsed:false});
+	}
+}
+
+getLp24hour= function(dayHour, $scope){
+	var lp24hour = dayHour + $scope.startHour24lp;
+	lp24hour = lp24hour>23?lp24hour-24:lp24hour;
+	return lp24hour;
+}
+
+initDeclarePrescribes = function($scope, $http, $sce){
+	readPrescribes($scope, $http);
+	getTasksInDay($scope);
+	$scope.dayHours = getDayHours();
+
+	$scope.taskDescription = function($index){
+		if(typeof $scope.prescribes === 'undefined') return;
+		if($index >= $scope.prescribes.tasks.length) return ".";
+		var drug = $scope.prescribes.tasks[$index];
+		if(drug === null || drug.DRUG_NAME === "") return ".";
+		var taskDescription = drug.DRUG_NAME + " ";
+		if(typeof drug.dose !== 'undefined'){
+			if(drug.dose.DOSECONCENTRATON_NUMBER){
+				taskDescription +=
+					$sce.trustAsHtml( "<small>" + drug.dose.DOSECONCENTRATON_NUMBER+drug.dose.DOSECONCENTRATON_UNIT + "</small> ");
+			}
+			taskDescription += drug.dose.DOSE_NUMBER+" "+drug.dose.DOSE_UNIT;
+			if(typeof drug.dose.DOSE_ROUTE_OF_ADMINISTRATION !== 'undefined'){
+				taskDescription += " "+drug.dose.DOSE_ROUTE_OF_ADMINISTRATION;
+			}
+		}
+		return taskDescription;
+	};
+
+	$scope.getLp24hourStr = function(dayHour){
+		var lp24hour = getLp24hour(dayHour, $scope);
+		return (lp24hour>9?'':'0')+lp24hour;
+	}
+
+	$scope.isMinus = function(taskInDayIndex, $index){
+		if(!$scope.prescribes || !$scope.prescribes.tasks[taskInDayIndex]
+		|| !$scope.prescribes.tasks[taskInDayIndex].times
+		)
+			return false;
+		var lp24hour = getLp24hour($index, $scope);
+		var isMinus = ('-' == $scope.prescribes.tasks[taskInDayIndex].times.hours[lp24hour]);
+		return isMinus;
+	}
+}
+
 cangePatientDocToSave = function($scope){
 	var docToSave = angular.copy($scope.patient);
 	$(docToSave.prescribesHistory).each(function () {
@@ -256,9 +325,15 @@ changeSaveControl = function($scope, $http){
 	}
 };
 
+getDayHours = function(){
+	var dayHours = [];
+	for(var i = 0; i < 24; i++) dayHours.push(i);
+	return dayHours;
+}
+
 getDayHoursEmpty = function(){
 	var dayHours = [];
-	for(var i=0;i<24;i++) dayHours.push(null);
+	for(var i = 0; i < 24; i++) dayHours.push(null);
 	return dayHours;
 };
 
@@ -278,3 +353,20 @@ changeHour = function(dayHourIndex, $scope, $http){
 
 //--------------patientLp24/prescribes24------------------------------END
 
+setCookieDaysLong = function(c_name,value,exdays){
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate() + exdays);
+	var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+	document.cookie=c_name + "=" + c_value;
+}
+
+getCookie = function(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0; i<ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1);
+		if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+	}
+	return "";
+}

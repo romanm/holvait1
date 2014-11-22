@@ -3,6 +3,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 	var autoSaveLimit = 5;
 	$scope.numberOfChange = 0;
 	$scope.numberOfAutoSavedChange = 0;
+	$scope.printForm = getCookie('printForm');
 	$scope.drug1sList = drug1sList;
 	$scope.config = config;
 	$scope.siteMap = config.siteMap.siteMaps[2];
@@ -26,6 +27,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', function ($sco
 		url : config.urlPrefix + '/read' + urlServer + '/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		$scope.p24hDoc = data;
+		console.log($scope.p24hDoc);
 		initWorkDocument();
 	}).error(function(data, status, headers, config) {
 	});
