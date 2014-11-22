@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html data-ng-app="form011oApp" data-ng-controller="form011oCtrl" moznomarginboxes mozdisallowselectionprint>
+<head>
+	<meta charset="utf-8" />
+	<title>{{siteMap.title}}</title>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
+	<style type="text/css">
+	
+table {
+	border-collapse: collapse;
+}
+
+td, th {
+	border: solid;
+	border-width: 1px 1px;
+}
+	
+	</style>
+</head>
+<body>
+l8l
+<table class="form011o">
+	<tr>
+		<td>Час</td>
+		<th data-ng-repeat="dayHour in dayHours"
+			data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Артеріальний тиск/ЦВТ</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Пульс</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Частота дихання</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Температура</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td>Всього</td>
+	</tr>
+	<tr>
+		<td>Інфузія</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Випито</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Діурез/Дренаж</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>ПРИЗНАЧЕНО</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+		<tr data-ng-repeat="taskInDay in tasksInDay"
+		data-ng-init="taskInDayIndex = $index"
+	>
+		<td>.</td>
+		<td data-ng-repeat="dayHour in dayHours">
+		</td>
+		<td></td>
+	</tr>
+	
+</table>
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/js/cuwy1.config.js"></script>
+	<script type="text/javascript">
+
+	angular.module('form011oApp', []).controller('form011oCtrl',['$scope', '$http', function($scope, $http) {
+		console.log("----------form011oCtrl----------");
+		$scope.config = config;
+		$scope.parameters = parameters;
+		if(!$scope.parameters.id)
+			$scope.parameters.id = 0;
+
+		getDayHours = function(){
+			var dayHours = [];
+			for(var i=0;i<24;i++) dayHours.push(i);
+			return dayHours;
+		}
+		$scope.dayHours = getDayHours();
+
+		$scope.getLp24hourStr = function(dayHour){
+			var lp24hour = getLp24hour(dayHour);
+			return (lp24hour>9?'':'0')+lp24hour;
+		}
+
+		getLp24hour= function(dayHour){
+			var lp24hour = dayHour + 10;
+			//var lp24hour = dayHour + $scope.config.startHour24lp;
+			lp24hour = lp24hour>23?lp24hour-24:lp24hour;
+			return lp24hour;
+		}
+
+		$scope.tasksInDay = [];
+		for(var ii=0;ii<=20;ii++){
+			$scope.tasksInDay.push({i:ii,isCollapsed:false});
+		}
+
+	}]);
+
+	</script>
+</body>
+</html>
