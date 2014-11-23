@@ -38,7 +38,7 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 		dT.DRUG_ARCHIVE = dS.DRUG_ARCHIVE;
 		dT.DRUG_ID = dS.DRUG_ID;
 		dT.DRUG_NAME = dS.DRUG_NAME;
-		readDrugDocument(dT);
+		readDrugDocument(dT, $scope, $http);
 		$scope.numberOfChange++;
 		$scope.taskInDay.dialogTab = "dose";
 		$('#dose1').focus();

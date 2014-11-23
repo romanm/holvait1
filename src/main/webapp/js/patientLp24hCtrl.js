@@ -1,4 +1,4 @@
-cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter, $sce) {
+cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', function ($scope, $http, $filter, $sce) {
 	var urlServer = '';
 	$scope.siteMap = config.siteMap.siteMaps[4];
 	$scope.startHour24lp = config.startHour24lp;
@@ -218,7 +218,7 @@ $scope.keys.push({
 		if($scope.patient.pageDeepPositionIndex == 0){
 			skipLinkMinus1();
 		}else 
-		if($scope.patient.pageDeepPositionIndex > minPageDeepPositionIndex){
+		if($scope.patient.pageDeepPositionIndex > $scope.minPageDeepPositionIndex){
 			$scope.patient.pageDeepPositionIndex--;
 			$("#focus_minus_"+(0-$scope.patient.pageDeepPositionIndex)).focus();
 		}
@@ -445,7 +445,7 @@ $scope.keys.push({
 			if($scope.editedPrescribeHistory.dayHourIndex >=0)
 				return;
 		}
-		if($scope.workDoc.pageDeepPositionIndex > minPageDeepPositionIndex){
+		if($scope.workDoc.pageDeepPositionIndex > $scope.minPageDeepPositionIndex){
 			$scope.workDoc.pageDeepPositionIndex--;
 		}
 		if($scope.workDoc.pageDeepPositionIndex == 0){

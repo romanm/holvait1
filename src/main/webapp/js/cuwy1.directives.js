@@ -310,7 +310,7 @@ newPrescribesCommon = function($scope){
 	$scope.p24hDoc.prescribesHistory.splice(0, 0, prescribeHistory);
 }
 
-initWorkDocument = function(data, $scope){
+initWorkDocument = function(data, $scope, $http){
 	console.log("initWorkDocument");
 	$scope.workDoc = data;
 	$scope.p24hDoc = $scope.workDoc;
@@ -333,6 +333,7 @@ initWorkDocument = function(data, $scope){
 		changeSaveControl($scope, $http);
 	}
 	initEditedPrescribeDrug($scope);
+	console.log("$scope.patient.pageDeepPositionIndex = "+$scope.patient.pageDeepPositionIndex);
 	if(typeof $scope.patient.pageDeepPositionIndex === 'undefined'){
 		changeSaveControl($scope, $http);
 		if($scope.editedPrescribeHistory.isCollapsed){
@@ -340,12 +341,13 @@ initWorkDocument = function(data, $scope){
 		}else{
 			$scope.patient.pageDeepPositionIndex = 2;
 		}
+		console.log("$scope.patient.pageDeepPositionIndex = "+$scope.patient.pageDeepPositionIndex);
 	}
 }
 
 initDeclarePrescribesEdit = function($scope, $http, $sce){
 	initDeclarePrescribesCommon($scope, $http, $sce);
-	var minPageDeepPositionIndex = -2;
+	$scope.minPageDeepPositionIndex = -2;
 	var autoSaveLimit = 5;
 	$scope.tasksInDayNumber = 19;
 	$scope.numberOfChange = 0;
@@ -615,21 +617,14 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 		return isMinus;
 	}
 
-}
-
-initDeclarePrescribesPrint = function($scope, $http, $sce){
-	readPrescribes($scope, $http);
-	initDeclarePrescribesCommon($scope, $http, $sce);
-	$scope.tasksInDay = getTasksInDay($scope);
-	$scope.dayHours = getDayHours();
-
-	$scope.taskDescription = function($index){
-		if(typeof $scope.prescribes === 'undefined' || $index >= $scope.prescribes.tasks.length) return ".";
-		var drug = $scope.prescribes.tasks[$index];
+	$scope.taskDescription = function($index, prescribeHistory){
+		if(typeof prescribeHistory.prescribes === 'undefined' || $index >= prescribeHistory.prescribes.tasks.length) return ".";
+		var drug = prescribeHistory.prescribes.tasks[$index];
 		if(drug === null || drug.DRUG_NAME === "") return ".";
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
 			if(drug.dose.DOSECONCENTRATON_NUMBER){
+				console.log($sce);
 				taskDescription +=
 					$sce.trustAsHtml( "<small>" + drug.dose.DOSECONCENTRATON_NUMBER+drug.dose.DOSECONCENTRATON_UNIT + "</small> ");
 			}
@@ -640,6 +635,14 @@ initDeclarePrescribesPrint = function($scope, $http, $sce){
 		}
 		return taskDescription;
 	};
+	
+}
+
+initDeclarePrescribesPrint = function($scope, $http, $sce){
+	readPrescribes($scope, $http);
+	initDeclarePrescribesCommon($scope, $http, $sce);
+	$scope.tasksInDay = getTasksInDay($scope);
+	$scope.dayHours = getDayHours();
 
 }
 
@@ -668,7 +671,7 @@ saveWorkDoc = function(url, $scope, $http){
 	var docToSave = cangePatientDocToSave($scope);
 	$http({ method : 'POST', data : docToSave, url : url
 	}).success(function(data, status, headers, config){
-		initWorkDocument(data, $scope);
+		initWorkDocument(data, $scope, $http);
 		$scope.numberOfChange = 0;
 		$scope.numberOfAutoSavedChange = 0;
 		readDrug1sList($scope, $http);

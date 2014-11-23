@@ -113,7 +113,7 @@ td, th {
 	>
 		<td></td>
 		<td colspan="3">
-			<span ng-bind-html="taskDescription($index)"></span>
+			<span ng-bind-html="taskDescription($index, prescribeHistory)"></span>
 		</td>
 		<td data-ng-repeat="dayHour in dayHours">
 			<i data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>

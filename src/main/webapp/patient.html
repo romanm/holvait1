@@ -182,17 +182,7 @@
 						ng-context-menu="menuTask"
 						title="{{taskInDay.isCollapsed}}"
 					>
-					{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
-					? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-					<small data-ng-show="prescribes.tasks[$index].dose.DOSECONCENTRATON_NUMBER">
-						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
-						}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
-					</small>
-					<span>
-						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_NUMBER}}
-						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_UNIT}}
-						{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_ROUTE_OF_ADMINISTRATION}}
-					</span>
+					<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
 				</td>
 				<td data-ng-repeat="dayHour in dayHours"
 					ng-init="dayHourIndex = $index"

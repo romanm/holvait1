@@ -1,84 +1,115 @@
 <!DOCTYPE html>
 <html data-ng-app="f8lApp" data-ng-controller="f8lCtrl" moznomarginboxes mozdisallowselectionprint>
+<!-- 
+<html data-ng-app="f8lApp" data-ng-controller="f8lCtrl">
+ -->
 <head>
 	<meta charset="utf-8" />
-	<title>{{siteMap.title}}</title>
+	<title>l8l</title>
 	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
 	<style type="text/css">
-	
 table {
 	border-collapse: collapse;
+	/*
+	-fs-table-paginate: paginate;
+	*/
 }
 
 td, th {
 	border: solid;
 	border-width: 1px 1px;
+	height: 23px;
 }
-	</style>
+
+.bold {
+	font-weight: bold;
+}
+
+.right {
+	text-align: right;
+}
+</style>
 </head>
 <body>
 	<table class="f8l">
-		<tr>
-			<td>Час</td>
-			<th data-ng-repeat="dayHour in dayHours"
-				data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Артеріальний тиск/ЦВТ</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Пульс</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Частота дихання</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Температура</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td>Всього</td>
-		</tr>
-		<tr>
-			<td>Інфузія</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Випито</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>Діурез/Дренаж</td>
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>ПРИЗНАЧЕНО</td>
-			<!-- 
-			<td data-ng-repeat="dayHour in dayHours"></td>
-			<td data-ng-repeat="dayHour in dayHours"
-				data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</td>
-			 -->
-			<th data-ng-repeat="dayHour in dayHours"
-				data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
-			<td></td>
-		</tr>
-		<tr data-ng-repeat="taskInDay in tasksInDay"
-			data-ng-init="taskInDayIndex = $index">
-			<td><span ng-bind-html="taskDescription($index)"></span></td>
-			<td data-ng-repeat="dayHour in dayHours"><i
-				data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
-			</td>
-			<td></td>
-		</tr>
-
+		<caption>Лист призначень</caption>
+		<thead>
+			<tr>
+				<td colspan="26">
+					<table width="100%" class="captiontable">
+						<colgroup>
+							<col style="width: 12%"/>
+							<col style="width: 5%"/>
+							<col style="width: 8%"/>
+							<col style="width: 47%"/>
+							<col style="width: 16%"/>
+							<col style="width: 12%"/>
+						</colgroup>
+						<tr>
+							<td>Група крові</td><td></td>
+							<td>Хворий</td><td class="bold"> {{patient.PATIENT_NAME}} </td>
+							<td>Історія хвороби</td><td class="bold">{{patient.PATIENT_HISTORYID}}</td>
+						</tr>
+						<tr>
+							<td class="right">Rh</td><td></td>
+							<td>Діагноз</td><td></td>
+							<td class="right">Дата</td>
+							<td>{{prescribeHistory.date | date:'dd-MM-yyyy'}}
+								</td>
+								<!-- 
+							<td>{{prescribeHistory.date | date:'" dd " '}}
+								{{getMMMMUa(prescribeHistory.date)}} {{prescribeHistory.date |
+								date:'yyyy р.'}}</td>
+								 -->
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>Час</td>
+				<th data-ng-repeat="dayHour in dayHours"
+					data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+				<td></td>
+			</tr>
+			<tr>
+				<td><small> Артеріальний тиск / ЦВТ </small></td>
+				<td data-ng-repeat="dayHour in dayHours"></td>
+				<td></td>
+			</tr>
+			<tr> <td>Пульс</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr> <td>Частота дихання</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr> <td>Температура</td> <td data-ng-repeat="dayHour in dayHours"></td> <td>Всього</td> </tr>
+			<tr> <td>Інфузія</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr> <td>Випито</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr> <td>Діурез/Дренаж</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr>
+				<td>ПРИЗНАЧЕНО</td>
+				<!-- 
+				<td data-ng-repeat="dayHour in dayHours"></td>
+				<td data-ng-repeat="dayHour in dayHours"
+					data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</td>
+				 -->
+				<th data-ng-repeat="dayHour in dayHours"
+					data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+				<td></td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr data-ng-repeat="taskInDay in tasksInDay"
+				data-ng-init="taskInDayIndex = $index">
+				<td><span ng-bind-html="taskDescription($index, prescribeHistory)"></span></td>
+				<td data-ng-repeat="dayHour in dayHours"><i
+					data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
+				</td>
+				<td></td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="10">Підпис лікаря</td>
+				<td colspan="16">Підпис медсестри</td>
+			</tr>
+		</tfoot>
 	</table>
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
@@ -93,6 +124,7 @@ td, th {
 		$scope.tasksInDayNumber = 20;
 		$scope.startHour24lp = 10;
 		initDeclarePrescribesPrint($scope, $http, $sce);
+		$scope.getMMMMUa = function (date){ return jsDate = new Date(date).getMMMMUa(); }
 	}]);
 
 	</script>
