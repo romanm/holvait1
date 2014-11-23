@@ -35,7 +35,7 @@ td, th {
 		<caption>Лист призначень</caption>
 		<thead>
 			<tr>
-				<td colspan="26">
+				<td colspan="27">
 					<table width="100%" class="captiontable">
 						<colgroup>
 							<col style="width: 12%"/>
@@ -69,19 +69,21 @@ td, th {
 				<td>Час</td>
 				<th data-ng-repeat="dayHour in dayHours"
 					data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+				<th>{{startHour24lp}}</th>
 				<td></td>
 			</tr>
 			<tr>
 				<td><small> Артеріальний тиск / ЦВТ </small></td>
 				<td data-ng-repeat="dayHour in dayHours"></td>
 				<td></td>
+				<td></td>
 			</tr>
-			<tr> <td>Пульс</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
-			<tr> <td>Частота дихання</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
-			<tr> <td>Температура</td> <td data-ng-repeat="dayHour in dayHours"></td> <td>Всього</td> </tr>
-			<tr> <td>Інфузія</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
-			<tr> <td>Випито</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
-			<tr> <td>Діурез/Дренаж</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> </tr>
+			<tr> <td>Пульс</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td><td></td> </tr>
+			<tr> <td>Частота дихання</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td><td></td> </tr>
+			<tr> <td>Температура</td> <td data-ng-repeat="dayHour in dayHours"></td><td></td> <td>Всього</td> </tr>
+			<tr> <td>Інфузія</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> <td></td></tr>
+			<tr> <td>Випито</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td> <td></td></tr>
+			<tr> <td>Діурез/Дренаж</td> <td data-ng-repeat="dayHour in dayHours"></td> <td></td><td></td> </tr>
 			<tr>
 				<td>ПРИЗНАЧЕНО</td>
 				<!-- 
@@ -91,6 +93,7 @@ td, th {
 				 -->
 				<th data-ng-repeat="dayHour in dayHours"
 					data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+				<th>{{startHour24lp}}</th>
 				<td></td>
 			</tr>
 		</thead>
@@ -102,12 +105,13 @@ td, th {
 					data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
 				</td>
 				<td></td>
+				<td></td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
 				<td colspan="10">Підпис лікаря</td>
-				<td colspan="16">Підпис медсестри</td>
+				<td colspan="17">Підпис медсестри</td>
 			</tr>
 		</tfoot>
 	</table>
