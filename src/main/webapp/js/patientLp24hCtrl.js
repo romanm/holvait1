@@ -649,7 +649,8 @@ isEditDialogOpen = function(){
 }
 
 $scope.$on('keydown', function(msg, obj){
-	console.log(obj);
+//	console.log(obj);
+//	console.log(obj.event);
 	var code = obj.event.keyCode;
 	if(isEditDialogOpen()){
 		if(code == $scope.keys[0].code){

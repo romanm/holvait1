@@ -19,12 +19,9 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 		var f1 = $filter('filter')($scope.drug1sList, {DRUG_ARCHIVE:false});
 		var f2 = $filter('filter')(f1, $scope.editedPrescribeDrug.DRUG_NAME);
 		$scope.drug1sListFilter = $filter('limitTo')(f2, 12);
-		console.log($scope.drug1sListFilter);
 		adaptSelectDrugToFilterList();
-		console.log($scope.selectDrugIndex);
 		if($scope.selectDrugIndex == null)
 			$scope.selectDrugIndex = 0;
-		console.log($scope.selectDrugIndex);
 	}
 	$scope.filterDrugs();
 

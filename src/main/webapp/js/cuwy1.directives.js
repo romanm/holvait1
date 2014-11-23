@@ -22,9 +22,8 @@ function isMiddleWeek(index, countPatientsProWeeks){
 	return index !=0 && !(index == countPatientsProWeeks.length - 1);
 }
 
-Date.prototype.getMMMMUa = function (){
-	return this.getMonthUa(this.getMonth());
-}
+Date.prototype.getMMMMUa = function (){return this.getMonthUa(this.getMonth());}
+
 Date.prototype.getMonthUa = function (month){
 	var monthsUa = ["Січень", "Лютий"
 		, "Березень", "Квітень", "Травень"
@@ -333,7 +332,6 @@ initWorkDocument = function(data, $scope, $http){
 		changeSaveControl($scope, $http);
 	}
 	initEditedPrescribeDrug($scope);
-	console.log("$scope.patient.pageDeepPositionIndex = "+$scope.patient.pageDeepPositionIndex);
 	if(typeof $scope.patient.pageDeepPositionIndex === 'undefined'){
 		changeSaveControl($scope, $http);
 		if($scope.editedPrescribeHistory.isCollapsed){
@@ -624,7 +622,6 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
 			if(drug.dose.DOSECONCENTRATON_NUMBER){
-				console.log($sce);
 				taskDescription +=
 					$sce.trustAsHtml( "<small>" + drug.dose.DOSECONCENTRATON_NUMBER+drug.dose.DOSECONCENTRATON_UNIT + "</small> ");
 			}
@@ -661,7 +658,6 @@ readDrug1sList = function($scope, $http){
 		url : config.urlPrefix + '/drug1sList'
 	}).success(function(data, status, headers, config) {
 		$scope.drug1sList = data;
-		console.log($scope.drug1sList);
 	}).error(function(data, status, headers, config) {
 	});
 }
