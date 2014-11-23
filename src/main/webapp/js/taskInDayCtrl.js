@@ -1,7 +1,7 @@
 cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	console.log("---------taskInDayCtrl------------");
 	$scope.taskInDay.dialogTab = "drug";
-	var isJustOpened = true;
+	$scope.isJustOpened = true;
 	$scope.selectDrugIndex = null;
 	$scope.selectDoseIndex = null;
 
@@ -60,13 +60,14 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 			$scope.patient.pageDeepPositionIndex = 2;
 		}
 	});
+
 	$scope.keys.push({
 		code : KeyCodes.Enter,
 		shiftKey : true,
 		action : function() {
 			console.log("Enter");
-			if(isJustOpened){
-				isJustOpened = false;
+			if($scope.isJustOpened){
+				$scope.isJustOpened = false;
 				return;
 			}
 			if($scope.taskInDay.dialogTab == "drug"){
@@ -77,6 +78,7 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 			}
 		}
 	});
+
 	$scope.keys.push({
 		code : KeyCodes.ArrowUp,
 		action : function() {

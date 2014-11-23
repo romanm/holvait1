@@ -4,6 +4,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 	$scope.startHour24lp = config.startHour24lp;
 	initDeclarePrescribesEdit($scope, $http, $sce);
 
+	console.log("------patientLp24hCtrl-------------");
 	$http({ method : 'GET', url : config.urlPrefix + '/read/patient_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
 		initWorkDocument(data, $scope);
@@ -187,9 +188,8 @@ var KeyCodes = {
 };
 
 $scope.keys = [];
-$scope.keys.push({code : KeyCodes.F4, action : function() { $scope.savePatient(); }});
-$scope.keys.push({
-	code : KeyCodes.Escape,
+$scope.keys.push({ code : KeyCodes.F4, action : function() { $scope.savePatient(); }});
+$scope.keys.push({ code : KeyCodes.Escape,
 	action : function() {
 		console.log("Escape");
 		if($scope.editedPrescribeHistory.prescribes.selectMultiple){
@@ -224,8 +224,7 @@ $scope.keys.push({
 		}
 	}
 });
-$scope.keys.push({
-	code : KeyCodes.F1,
+$scope.keys.push({ code : KeyCodes.F1,
 	action : function() {
 		$scope.openF1();
 	}
@@ -324,7 +323,7 @@ $scope.keys.push({ shiftKey : true, code : KeyCodes.Enter,
 $scope.keys.push({
 	code : KeyCodes.Enter,
 	action : function() {
-		console.log("Enter");
+		console.log("Enter "+"/"+$scope.workDoc.pageDeepPositionIndex+"/"+$scope.workDoc.selectPrescribesHistoryIndex);
 		if($scope.workDoc.pageDeepPositionIndex == 1){
 			if($scope.workDoc.selectPrescribesHistoryIndex == -1){
 				$scope.updatePatient();
@@ -337,9 +336,9 @@ $scope.keys.push({
 		}else
 		if($scope.workDoc.pageDeepPositionIndex == 3){
 			initEditedPrescribeDrug($scope);
-			if(null == $scope.editedPrescribeDrug)
+			if(null == $scope.editedPrescribeDrug){
 				openEditedPrescribeDrugDialog();
-			else{
+			}else{
 				changeHour($scope.editedPrescribeHistory.dayHourIndex, $scope, $http);
 			}
 		}
@@ -355,6 +354,9 @@ $scope.keys.push({
 	code : KeyCodes.ArrowRight,
 	action : function() {
 		console.log("ArrowRight - deep - "+$scope.workDoc.pageDeepPositionIndex);
+		if(document.activeElement.id.indexOf('focus') >= 0){
+			$("#"+document.activeElement.id).blur();
+		}
 		if($scope.patient.pageDeepPositionIndex <= 2){
 			$scope.patient.pageDeepPositionIndex++;
 			if($scope.patient.pageDeepPositionIndex == 3){
@@ -400,8 +402,6 @@ $scope.keys.push({
 	action : function() {
 		console.log("PageDown - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex >= 2){
-			console.log($scope.editedPrescribeHistory.prescribes.tasks.length);
-			console.log($scope.editedPrescribeHistory.selectDrugIndex);
 			if($scope.editedPrescribeHistory.selectDrugIndex < $scope.editedPrescribeHistory.prescribes.tasks.length - 1){
 				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length - 1;
 			}else{
@@ -425,19 +425,16 @@ $scope.keys.push({
 	}
 });
 
-$scope.keys.push({
-	code : KeyCodes.Home,
+$scope.keys.push({ code : KeyCodes.Home,
 	action : function() {
 		console.log("Home - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex == 3){
-			console.log($scope.editedPrescribeHistory.dayHourIndex);
 			$scope.editedPrescribeHistory.dayHourIndex = 0;
 		}
 	}
 });
 
-$scope.keys.push({
-	code : KeyCodes.ArrowLeft,
+$scope.keys.push({ code : KeyCodes.ArrowLeft,
 	action : function() {
 		console.log("ArrowLeft - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex == 3){
@@ -535,11 +532,9 @@ hourYesHourNo = function (hourYes, hourNo){
 	$scope.editedPrescribeDrug.times.hours[hourNo] = null;
 }
 var dayStartHour = 8;
-$scope.keys.push({
-	ctrlKey : true, code : KeyCodes.ArrowLeft,
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowLeft,
 	action : function() {
 		if($scope.workDoc.pageDeepPositionIndex == 3){
-			console.log($scope.editedPrescribeHistory.dayHourIndex);
 			var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex, $scope);
 			if($scope.editedPrescribeDrug.times.hours[hour]){
 				hourYesHourNo(hour - 1, hour);
@@ -561,8 +556,7 @@ $scope.keys.push({
 	}
 });
 
-$scope.keys.push({
-	ctrlKey : true, code : KeyCodes.ArrowRight,
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowRight,
 	action : function() {
 		if($scope.workDoc.pageDeepPositionIndex == 3){
 			var hour =  getLp24hour($scope.editedPrescribeHistory.dayHourIndex, $scope);

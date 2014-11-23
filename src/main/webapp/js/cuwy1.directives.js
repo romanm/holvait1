@@ -346,7 +346,7 @@ initWorkDocument = function(data, $scope, $http){
 initDeclarePrescribesEdit = function($scope, $http, $sce){
 	initDeclarePrescribesCommon($scope, $http, $sce);
 	$scope.minPageDeepPositionIndex = -2;
-	var autoSaveLimit = 5;
+	$scope.autoSaveLimit = 5;
 	$scope.tasksInDayNumber = 19;
 	$scope.numberOfChange = 0;
 	$scope.numberOfAutoSavedChange = 0;
@@ -662,7 +662,6 @@ readDrug1sList = function($scope, $http){
 	});
 }
 
-var autoSaveLimit = 5;
 saveWorkDoc = function(url, $scope, $http){
 	var docToSave = cangePatientDocToSave($scope);
 	$http({ method : 'POST', data : docToSave, url : url
@@ -678,8 +677,8 @@ saveWorkDoc = function(url, $scope, $http){
 
 changeSaveControl = function($scope, $http){
 	$scope.numberOfChange++;
-	console.log($scope.numberOfChange+"/"+$scope.numberOfAutoSavedChange);
-	if(($scope.numberOfChange - $scope.numberOfAutoSavedChange) >= autoSaveLimit){
+	console.log($scope.numberOfChange+"/"+$scope.numberOfAutoSavedChange+"/"+$scope.autoSaveLimit);
+	if(($scope.numberOfChange - $scope.numberOfAutoSavedChange) >= $scope.autoSaveLimit){
 		console.log("-------------");
 		var docToSave = cangePatientDocToSave($scope);
 		$http({ method : 'POST', data : docToSave, url : config.urlPrefix + "/autosave/patient"
@@ -691,6 +690,7 @@ changeSaveControl = function($scope, $http){
 			$scope.error = data;
 		});
 	}
+	console.log(1);
 };
 
 getDayHours = function(){
