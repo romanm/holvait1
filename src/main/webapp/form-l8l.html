@@ -74,7 +74,7 @@ td, th {
 			data-ng-init="taskInDayIndex = $index">
 			<td><span ng-bind-html="taskDescription($index)"></span></td>
 			<td data-ng-repeat="dayHour in dayHours"><i
-				data-ng-show="isMinus(taskInDayIndex, $index)" class="fa fa-minus"></i>
+				data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
 			</td>
 			<td></td>
 		</tr>
@@ -92,7 +92,7 @@ td, th {
 		setCookieDaysLong('printForm','l8l',365);
 		$scope.tasksInDayNumber = 20;
 		$scope.startHour24lp = 10;
-		initDeclarePrescribes($scope, $http, $sce);
+		initDeclarePrescribesPrint($scope, $http, $sce);
 	}]);
 
 	</script>

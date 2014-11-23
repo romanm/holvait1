@@ -116,12 +116,12 @@ td, th {
 			<span ng-bind-html="taskDescription($index)"></span>
 		</td>
 		<td data-ng-repeat="dayHour in dayHours">
-			<i data-ng-show="isMinus(taskInDayIndex, $index)" class="fa fa-minus"></i>
+			<i data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
 		</td>
 		<td data-ng-show="taskInDayIndex == 0" rowspan="14" style="transform: rotate(-90deg);">
 		М
 		</td>
-		<td data-ng-show="taskInDayIndex == 14" rowspan="7" style="transform: rotate(-90deg);">
+		<td data-ng-show="taskInDayIndex == 14" rowspan="6" style="transform: rotate(-90deg);">
 		С
 		</td>
 	</tr>
@@ -194,7 +194,7 @@ td, th {
 		setCookieDaysLong('printForm','011-o',365);
 		$scope.tasksInDayNumber = 19;
 		$scope.startHour24lp = config.startHour24lp;
-		initDeclarePrescribes($scope, $http, $sce);
+		initDeclarePrescribesPrint($scope, $http, $sce);
 		$scope.getMMMMUa = function (date){ return jsDate = new Date(date).getMMMMUa(); }
 	}]);
 	</script>
