@@ -295,12 +295,14 @@ getLp24hour= function(dayHour, $scope){
 }
 
 newPrescribesCommon = function($scope){
+	var newDayTasks = angular.copy($scope.workDoc.prescribesHistory[0].prescribes.tasks);
 	var today = new Date();
 	var prescribeHistory = {
 			date:today,
 			prescribeHistoryDays: "1",
 			selectDrugIndex:0,
-			prescribes:{tasks:[]}
+			prescribes:{tasks:newDayTasks}
+//	prescribes:{tasks:[]}
 	}
 	prescribeHistory.tasksInDay = getTasksInDay($scope);
 	if(null == $scope.p24hDoc.prescribesHistory){
@@ -588,6 +590,7 @@ contextMenuPaste = function(taskInDay, prescribeHistory, $scope, $http){
 };
 
 contextMenuCopy = function(copyObject, $http){
+	console.log(copyObject);
 	$http({ method : 'POST', data : copyObject, url : config.urlPrefix + "/session/copy"
 	}).success(function(data, status, headers, config){
 	}).error(function(data, status, headers, config) {
@@ -683,6 +686,7 @@ changeSaveControl = function($scope, $http){
 		var docToSave = cangePatientDocToSave($scope);
 		$http({ method : 'POST', data : docToSave, url : config.urlPrefix + "/autosave/patient"
 		}).success(function(data, status, headers, config){
+			initWorkDocument(data, $scope, $http);
 			console.log("numberOfAutoSavedChange = "+$scope.numberOfAutoSavedChange);
 			$scope.numberOfAutoSavedChange = $scope.numberOfChange;
 			console.log("numberOfAutoSavedChange = "+$scope.numberOfAutoSavedChange);

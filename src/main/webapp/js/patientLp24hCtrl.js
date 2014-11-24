@@ -38,9 +38,13 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 
 
 copy = function(taskIndex, prescribeHistory){
+	console.log("-----copy-------- "+taskIndex);
+	console.log(prescribeHistory);
 	//var drug = prescribeHistory.prescribes.tasks[taskIndex];
 	//if(drug.selectMultiple){
 	if(prescribeHistory.prescribes.selectMultiple){
+		contextMenuCopy(prescribeHistory.prescribes, $http); 
+	}else if(taskIndex == -1){
 		contextMenuCopy(prescribeHistory.prescribes, $http); 
 	}else{
 		var drug = prescribeHistory.prescribes.tasks[taskIndex];
@@ -80,13 +84,14 @@ $scope.menuDayBlock = [
 
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
-		contextMenuCopy($itemScope.prescribeHistory.prescribes); 
+		contextMenuCopy($itemScope.prescribeHistory.prescribes, $http); 
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		$http({
 			method : 'GET',
 			url : config.urlPrefix + '/session/paste'
 		}).success(function(data, status, headers, config) {
+			
 			if($itemScope.prescribeHistory.prescribes.tasks.length == 0){
 				$itemScope.prescribeHistory.prescribes.tasks = data.tasks;
 				$scope.numberOfChange += $itemScope.prescribeHistory.prescribes.tasks.length;
@@ -96,6 +101,7 @@ $scope.menuTasksAll = [
 					.apply($itemScope.prescribeHistory.prescribes.tasks, data.tasks);
 				}
 			}
+			
 		}).error(function(data, status, headers, config) {
 		});
 	}]

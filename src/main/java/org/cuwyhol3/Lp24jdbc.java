@@ -143,8 +143,13 @@ public class Lp24jdbc {
 		jdbcTemplate.update("INSERT INTO drug1 (drug_name) VALUES (?)",drugName);
 		String sqlSelectDrug1 = "SELECT drug_id FROM drug1 WHERE drug_name = ? limit 1";
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sqlSelectDrug1, drugName);
-		Integer newDrugId = (Integer) drug1sList.get(0).get("DRUG_ID");
+		logger.debug(""+drug1sList);
+		Map<String, Object> nDr = drug1sList.get(0);
+		logger.debug(""+nDr);
+		Integer newDrugId = (Integer) nDr.get("DRUG_ID");
+		logger.debug(""+newDrugId);
 		newDrug.put("DRUG_ID", newDrugId);
+		logger.debug(""+newDrug);
 		return newDrug;
 	}
 
