@@ -154,6 +154,7 @@
 				>Призначене лікування</th>
 				<th data-ng-repeat="dayHour in dayHours"
 					data-ng-init="lpHour = getLp24hourStr(dayHour)"
+					data-ng-class="{selectpath:dayHeadSelect(prescribeHistoryIndex, $index)}"
 				>
 					|
 					<u data-ng-show="lpHour == prescribeStartHour ">

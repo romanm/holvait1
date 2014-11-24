@@ -370,6 +370,11 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 			startingDay: 1
 	};
 	//---------data-ng-class-----------------------------------
+	$scope.dayHeadSelect = function(prescribeHistoryIndex, dayHourIndex){
+		var dayInSelectPath = $scope.dayInSelectPath(prescribeHistoryIndex);
+		if(!dayInSelectPath) return false;
+		return $scope.editedPrescribeHistory.dayHourIndex == dayHourIndex;
+	}
 	$scope.allDaySelect = function(prescribeHistoryIndex){
 		return $scope.dayInSelectPath(prescribeHistoryIndex) && ($scope.workDoc.pageDeepPositionIndex == 2) && $scope.editedPrescribeHistory.selectDrugIndex == -1 ;
 	}

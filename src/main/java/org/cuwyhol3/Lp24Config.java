@@ -20,11 +20,11 @@ public class Lp24Config {
 	final static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
 
 	//develop tasclin/hol-sec
-//	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
+//	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
 
 	//test install freehost.ua/holweb
-//	static String url = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
 //	final static String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
+//	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holweb-prodaction-test/lp24protocol";
 	
 	//all linux
 	final static String innerDbFolderPfad = "src/main/webapp/db/";

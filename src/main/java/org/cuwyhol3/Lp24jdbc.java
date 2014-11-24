@@ -1,5 +1,11 @@
 package org.cuwyhol3;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,8 +16,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 @Component("lp24jdbc")
 public class Lp24jdbc {
+	
+//	@Autowired
+//	private Lp24ControllerImpl lp24Controller;
+
 	private static final Logger logger = LoggerFactory.getLogger(Lp24jdbc.class);
 	private Lp24Config lp24Config;
 
@@ -27,6 +42,64 @@ public class Lp24jdbc {
 //		dataSource.setPassword("");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		logger.debug("------CuwyCpoeHolDb2-------"+jdbcTemplate);
+		updateDbVersion();
+	}
+
+	private void updateDbVersion() {
+//		initDbVersionControl();
+		final Map<String, Object> dbVersionUpdate = readJsonDbFile2map();
+		final List<Map> sqlVersionUpdateList = (List) dbVersionUpdate.get("dbVersionUpdateList");
+		final List<String> sqls0 = (List<String>) ((Map) sqlVersionUpdateList.get(0)).get("sqls");
+		for (String sql : sqls0) 
+			jdbcTemplate.update(sql);
+		String sqlDbVersion = "select * from DBVERSION ORDER BY DBVERSION_ID DESC LIMIT 1";
+		List<Map<String, Object>> dbVersion = jdbcTemplate.queryForList(sqlDbVersion);
+		int thisDbVersionId = dbVersion.size() == 0 ? 0:(int) dbVersion.get(0).get("DBVERSION_ID");
+		logger.debug(""+thisDbVersionId);
+		for (Map map : sqlVersionUpdateList) {
+			final Integer dbVersionId = (Integer) map.get("dbVersionId");
+			if(dbVersionId > thisDbVersionId){
+				final List<String> sqls = (List<String>) map.get("sqls");
+				for (String sql : sqls) 
+					jdbcTemplate.update(sql);
+				jdbcTemplate.update("INSERT INTO DBVERSION (DBVERSION_ID) VALUES (?)",dbVersionId);
+			}
+		}
+	}
+
+	final String fileNameDbVersionUpdate = lp24Config.applicationFolderPfad + "src/main/resources/dbVersionUpdate.sql.json.js";
+	final String fileNameDbInit = lp24Config.applicationFolderPfad + "src/main/resources/dbVersionUpdateInit.json.sql";
+	private Map<String, Object> readJsonDbFile2map() {
+		logger.debug(fileNameDbVersionUpdate);
+		File file = new File(fileNameDbVersionUpdate);
+		logger.debug(" o - "+file);
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> readJsonDbFile2map = null;// = new HashMap<String, Object>();
+		try {
+			readJsonDbFile2map = mapper.readValue(file, Map.class);
+			logger.debug(" o - "+readJsonDbFile2map);
+		} catch (JsonParseException e1) {
+			e1.printStackTrace();
+		} catch (JsonMappingException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		logger.debug(" o - "+readJsonDbFile2map);
+		return readJsonDbFile2map;
+	}
+	void writeJsonDbVersionInitFile(Object java2jsonObject) {
+		File file = new File(fileNameDbInit);
+		logger.debug(fileNameDbInit+" - "+file);
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectWriter writerWithDefaultPrettyPrinter = mapper.writerWithDefaultPrettyPrinter();
+		try {
+//			logger.warn(writerWithDefaultPrettyPrinter.writeValueAsString(java2jsonObject));
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			writerWithDefaultPrettyPrinter.writeValue(fileOutputStream, java2jsonObject);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Map<String, Object> readPatient(Integer id) {
@@ -164,6 +237,22 @@ public class Lp24jdbc {
 		logger.debug("\n"+sql);
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
+	}
+
+	private void initDbVersionControl() {
+		Map dbVersionControlFile = new HashMap<String, Object>();
+		List dbVersionUpdateList = new ArrayList<Map>();
+		Map versionUpdate = new HashMap<String, Object>();
+		versionUpdate.put("dbVersionId", 0);
+		versionUpdate.put("dbVersionDate", new Date());
+		List sqlList = new ArrayList<List>();
+		sqlList.add("CREATE TABLE if not exists dbversion (dbversion_ID INT(10) NOT NULL, "
+				+ "dbversion_date timestamp default now(), primary key (dbversion_id)");
+		sqlList.add("CREATE SEQUENCE  if not exists  dbid");
+		versionUpdate.put("sqls", sqlList);
+		dbVersionUpdateList.add(versionUpdate);
+		dbVersionControlFile.put("dbVersionUpdateList", dbVersionUpdateList);
+		writeJsonDbVersionInitFile(dbVersionControlFile);
 	}
 
 }

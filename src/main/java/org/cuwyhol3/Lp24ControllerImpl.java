@@ -36,7 +36,7 @@ public class Lp24ControllerImpl {
 
 	@Autowired
 	private Lp24jdbc lp24jdbc;
-
+	
 	//------------------patient----------------------------
 	public Map<String, Object> readPatient(@PathVariable Integer patientId) {
 		String fileNameWithPathAdd = lp24Config.getPatientDbJsonName(patientId);
@@ -353,8 +353,12 @@ public class Lp24ControllerImpl {
 			e.printStackTrace();
 		}
 	}
+	void writeJsonDbVersionInitFile(Object java2jsonObject) {
+		final String fileName = lp24Config.applicationFolderPfad + "src/main/resources/dbVersionUpdate.json.sql";
+		writeToJsonDbFile(java2jsonObject, fileName);
+	}
 	private void writeToJsonDbFile(Object java2jsonObject, String fileName) {
-		File file = new File(lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName);
+		File file = new File(Lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName);
 		logger.warn(""+file);
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writerWithDefaultPrettyPrinter = mapper.writerWithDefaultPrettyPrinter();
