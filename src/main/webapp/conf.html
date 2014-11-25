@@ -36,6 +36,13 @@
 			data-ng-show="printForm == 'l8l'">використовується за
 			замовчуванням</small>
 	</h3>
+	<hr/>
+	<div>
+	Лист призначень починати з 
+	<span data-ng-click="setStartHour(8)" data-ng-class="{selected:dayStartHour == 8}">8</span>,
+	<span data-ng-click="setStartHour(10)" data-ng-class="{selected:dayStartHour == 10}">10</span>
+	години
+	</div>
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
@@ -46,6 +53,12 @@
 					console.log("----------confCtrl----------");
 					$scope.printForm = getCookie('printForm');
 					console.log($scope.printForm);
+					$scope.dayStartHour = getCookie('dayStartHour');
+					console.log($scope.dayStartHour);
+					$scope.setStartHour = function(dayStartHour){
+						setCookieDaysLong('dayStartHour',dayStartHour,365);
+						$scope.dayStartHour = dayStartHour;
+					}
 				} ]);
 	</script>
 </body>

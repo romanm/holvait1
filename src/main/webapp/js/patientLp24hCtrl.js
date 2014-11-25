@@ -2,6 +2,21 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 	var urlServer = '';
 	$scope.siteMap = config.siteMap.siteMaps[4];
 	$scope.startHour24lp = config.startHour24lp;
+	$scope.dayStartHour = getCookie('dayStartHour');
+	if($scope.dayStartHour){
+		$scope.startHour24lp = parseInt($scope.dayStartHour);
+	}
+
+	$scope.newPrescribes = function(){
+		newPrescribesCommon($scope);
+		$scope.savePatient();
+//		$scope.workDoc.prescribesHistory.splice(1, 0, prescribeHistory);
+		//moveMinus($scope.workDoc.prescribesHistory, 1);
+		//$scope.workDoc.selectPrescribesHistoryIndex = 1;
+		//console.log($scope.workDoc.selectPrescribesHistoryIndex);
+		//initEditedPrescribeHistory($scope);
+	}
+
 	initDeclarePrescribesEdit($scope, $http, $sce);
 
 	console.log("------patientLp24hCtrl-------------");
@@ -19,16 +34,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 
 	$scope.savePatient = function(){
 		saveWorkDoc(config.urlPrefix + "/save/patient", $scope, $http);
-	}
-
-	$scope.newPrescribes = function(){
-		newPrescribesCommon($scope);
-		$scope.savePatient();
-//		$scope.workDoc.prescribesHistory.splice(1, 0, prescribeHistory);
-		//moveMinus($scope.workDoc.prescribesHistory, 1);
-		//$scope.workDoc.selectPrescribesHistoryIndex = 1;
-		//console.log($scope.workDoc.selectPrescribesHistoryIndex);
-		//initEditedPrescribeHistory($scope);
 	}
 
 	$scope.phOpenUpdateDialog = function(prescribeHistoryIndex){

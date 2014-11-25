@@ -256,8 +256,10 @@
 					 ng-model="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT" type="text" class="form-control" /> </td>
 				</tr>
 				<tr>
+				<!-- 
 					<td></td>
-					<td colspan="7">
+				 -->
+					<td colspan="5">
 				<table>
 					<tr>
 						<td>
@@ -278,6 +280,26 @@
 						</td>
 					</tr>
 				</table>
+					</td>
+					<td colspan="4">
+					<table>
+						<tr>
+							<td>
+							<span data-ng-click="prescribeMalProDayMinus(prescribeHistory.prescribes.tasks[taskInDayIndex])" 
+						class="glyphicon glyphicon-arrow-left"></span>
+							</td>
+							<td>
+							{{getHoures2prescribe(prescribeHistory.prescribes.tasks[taskInDayIndex]).length}}
+							</td>
+							<td>
+							<span data-ng-click="prescribeMalProDayPlus(prescribeHistory.prescribes.tasks[taskInDayIndex])"
+						class="glyphicon glyphicon-arrow-right"></span>
+							</td>
+							<td>
+					рівномірно раз на день
+							</td>
+						</tr>
+					</table>
 					</td>
 				</tr>
 			</table>

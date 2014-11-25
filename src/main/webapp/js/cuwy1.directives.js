@@ -295,7 +295,9 @@ getLp24hour= function(dayHour, $scope){
 }
 
 newPrescribesCommon = function($scope){
-	var newDayTasks = angular.copy($scope.workDoc.prescribesHistory[0].prescribes.tasks);
+	var newDayTasks = [];
+	if($scope.workDoc.prescribesHistory)
+		newDayTasks = angular.copy($scope.workDoc.prescribesHistory[0].prescribes.tasks);
 	var today = new Date();
 	var prescribeHistory = {
 			date:today,
@@ -313,6 +315,7 @@ newPrescribesCommon = function($scope){
 
 initWorkDocument = function(data, $scope, $http){
 	console.log("initWorkDocument");
+	console.log(data);
 	$scope.workDoc = data;
 	$scope.p24hDoc = $scope.workDoc;
 	$scope.patient = $scope.workDoc;
@@ -458,6 +461,62 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 		return houres2prescribe;
 	}
 
+	$scope.prescribeMalProDayMinus = function(drugForEdit){
+		console.log(drugForEdit);
+		var malProDay = $scope.getHoures2prescribe(drugForEdit).length;
+		if(malProDay > 1)
+			malProDay--;
+		console.log(malProDay);
+		prescribeMalProDay(drugForEdit, malProDay);
+	}
+	$scope.prescribeMalProDayPlus = function(drugForEdit){
+		console.log(drugForEdit);
+		var malProDay = $scope.getHoures2prescribe(drugForEdit).length;
+		if(malProDay < 24)
+			malProDay++;
+		console.log(malProDay);
+		prescribeMalProDay(drugForEdit, malProDay);
+	}
+	
+	getNextHour = function(h, stepHour){
+		var nextHour = h + stepHour;
+		return nextHour > 23?nextHour-24:nextHour;
+	}
+	
+	prescribeMalProDay = function(drugForEdit, malProDay){
+		console.log(Math.abs(24/malProDay));
+		var stepHour = Math.round(24/malProDay);
+		console.log(stepHour+"/"+(24/malProDay));
+		console.log(drugForEdit.times.hours);
+		var nextHour = null;
+		for(var h = $scope.startHour24lp; h < 24; h++){
+			if(drugForEdit.times.hours[h]){
+				if(!nextHour){
+					nextHour = getNextHour(h, stepHour);
+					continue;
+				}
+			}
+			if(h == nextHour){
+				drugForEdit.times.hours[h] = "-";
+				nextHour = getNextHour(h, stepHour);
+				console.log(nextHour);
+				continue;
+			}else if(drugForEdit.times.hours[h]){
+				drugForEdit.times.hours[h] = null;
+			}
+		}
+		for(var h = 0; h < $scope.startHour24lp; h++){
+			if(h == nextHour){
+				drugForEdit.times.hours[h] = "-";
+				nextHour = getNextHour(h, stepHour);
+				console.log(nextHour);
+				continue;
+			}else if(drugForEdit.times.hours[h]){
+				drugForEdit.times.hours[h] = null;
+			}
+		}
+	}
+	
 	$scope.prescribeHoursLeft = function(drugForEdit){
 		var houres2prescribe = $scope.getHoures2prescribe(drugForEdit);
 		angular.forEach(houres2prescribe, function(hourValue, key){
@@ -471,6 +530,7 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 		movePlus(drugForEdit.times.hours, hour + 1);
 	}
 	$scope.prescribeHoursRight = function(drugForEdit){
+		console.log("-------------------");
 		var houres2prescribe = $scope.getHoures2prescribe(drugForEdit);
 		angular.forEach(houres2prescribe, function(hourValue, key){
 			$scope.prescribeHourRight(drugForEdit, hourValue);
@@ -604,6 +664,32 @@ contextMenuCopy = function(copyObject, $http){
 };
 //-------------context-menu-------------------------------------------END
 
+moveTo = function(arrayToSort, indexFrom, indexTo){
+	var el = arrayToSort.splice(indexFrom, 1);
+	arrayToSort.splice(indexTo, 0, el[0]);
+	changeSaveControl($scope, $http);
+}
+
+moveUp = function(arrayToSort, index){
+	moveTo(arrayToSort, index, index-1);
+}
+
+movePlus = function(arrayToSort, index){
+	if(index < arrayToSort.length){
+		moveUp(arrayToSort, index);
+	}else{
+		moveTo(arrayToSort, index-1,0);
+	}
+}
+
+moveMinus = function(arrayToSort, index){
+	if(index > 0){
+		moveUp(arrayToSort, index);
+	}else{
+		moveTo(arrayToSort, 0, arrayToSort.length-1);
+	}
+}
+
 }
 
 initDeclarePrescribesCommon = function($scope, $http, $sce){
@@ -624,7 +710,10 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 	}
 
 	$scope.taskDescription = function($index, prescribeHistory){
-		if(typeof prescribeHistory.prescribes === 'undefined' || $index >= prescribeHistory.prescribes.tasks.length) return ".";
+		if(typeof prescribeHistory === 'undefined' 
+		|| typeof prescribeHistory.prescribes === 'undefined' 
+		|| $index >= prescribeHistory.prescribes.tasks.length
+		) return ".";
 		var drug = prescribeHistory.prescribes.tasks[$index];
 		if(drug === null || drug.DRUG_NAME === "") return ".";
 		var taskDescription = drug.DRUG_NAME + " ";
@@ -728,30 +817,6 @@ changeHour = function(dayHourIndex, $scope, $http){
 	changeSaveControl($scope, $http);
 };
 
-moveTo = function(arrayToSort, indexFrom, indexTo){
-	var el = arrayToSort.splice(indexFrom, 1);
-	arrayToSort.splice(indexTo, 0, el[0]);
-	changeSaveControl($scope, $http);
-}
-
-moveUp = function(arrayToSort, index){
-	moveTo(arrayToSort, index, index-1);
-}
-
-movePlus = function(arrayToSort, index){
-	if(index < arrayToSort.length){
-		moveUp(arrayToSort, index);
-	}else{
-		moveTo(arrayToSort, index-1,0);
-	}
-}
-moveMinus = function(arrayToSort, index){
-	if(index > 0){
-		moveUp(arrayToSort, index);
-	}else{
-		moveTo(arrayToSort, 0, arrayToSort.length-1);
-	}
-}
 
 getPrescribeIndex = function(prescribeHistory, $scope){ return $scope.workDoc.prescribesHistory.indexOf(prescribeHistory); }
 
