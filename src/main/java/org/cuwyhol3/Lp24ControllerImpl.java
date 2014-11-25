@@ -135,14 +135,27 @@ public class Lp24ControllerImpl {
 				if(null != drug){
 					Map<String, Object> drugDocument;
 					Integer drugId = (Integer) drug.get("DRUG_ID");
+					String drugNameInDoc = (String) drug.get("DRUG_NAME");
 					if(null == drugId){
-						Object drugName = drug.get("DRUG_NAME");
-						if(null == drugName || "" == drugName)
+						if(null == drugNameInDoc || "" == drugNameInDoc)
 							continue;
-						drugDocument = lp24jdbc.newDrug(drug);
-						drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
+						drugDocument = newDrugToDbAndDoc(drug);
 					}else{
 						drugDocument = readDrug(drugId);
+						String drugName = (String) drugDocument.get("DRUG_NAME");
+						logger.debug(drugName+"=="+drugNameInDoc+"/"+drugName.equals(drugNameInDoc));
+						if(!drugName.equals(drugNameInDoc)){
+							final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName(drugNameInDoc);
+							drugName = (String) readDrugFromName.get("DRUG_NAME");
+							logger.debug(drugName+"=="+drugNameInDoc+"/"+drugName.equals(drugNameInDoc));
+							if(!drugName.equals(drugNameInDoc)){
+								drugDocument = newDrugToDbAndDoc(drug);
+							}else{
+								drugId = (Integer) readDrugFromName.get("DRUG_ID");
+								drugDocument = readDrug(drugId);
+							}
+							
+						}
 					}
 					List<Map> doses = addDose2DrugDocument(drug, drugDocument);
 					drugDocument.put("doses", doses);
@@ -151,6 +164,13 @@ public class Lp24ControllerImpl {
 			}
 		}
 		drug1sList();
+	}
+
+	private Map<String, Object> newDrugToDbAndDoc(Map drug) {
+		Map<String, Object> drugDocument;
+		drugDocument = lp24jdbc.newDrug(drug);
+		drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
+		return drugDocument;
 	}
 
 	private List getArray(Map map, String key) {
@@ -391,4 +411,7 @@ public class Lp24ControllerImpl {
 		return prescribe1sList;
 	}
 	
+	public Integer nextDbId() {
+		return lp24jdbc.nextDbId();
+	}
 }

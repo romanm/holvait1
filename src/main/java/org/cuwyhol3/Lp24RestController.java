@@ -155,6 +155,10 @@ public class Lp24RestController {
 		return lp24Controller.drug1sList();
 	}
 	//------------------drug----------------END------
+	@RequestMapping(value = "/nextDbId", method = RequestMethod.GET)
+	public @ResponseBody Integer nextDbId() {
+		return lp24Controller.nextDbId();
+	}
 	@RequestMapping(value = "/elexRea", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> elexRea() {
 		logger.debug("/elexRea");

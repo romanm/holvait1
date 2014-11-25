@@ -13,6 +13,7 @@ import org.h2.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.stereotype.Component;
 
@@ -118,6 +119,13 @@ public class Lp24jdbc {
 		return map;
 	}
 
+	public Map<String, Object> readDrugFromName(String name) {
+		String sql = "SELECT * FROM drug1 WHERE drug_name = ?";
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+name));
+		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, name);
+		Map<String, Object> map = prescribe1sList.get(0);
+		return map;
+	}
 	public Map<String, Object> readDrug(Integer id) {
 		String sql = "SELECT * FROM drug1 WHERE drug_id = ?";
 		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
@@ -238,6 +246,9 @@ public class Lp24jdbc {
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
 	}
+	public Integer nextDbId() {
+		return jdbcTemplate.queryForObject("select nextval('dbid')", Integer.class);
+	}
 
 	private void initDbVersionControl() {
 		Map dbVersionControlFile = new HashMap<String, Object>();
@@ -254,5 +265,7 @@ public class Lp24jdbc {
 		dbVersionControlFile.put("dbVersionUpdateList", dbVersionUpdateList);
 		writeJsonDbVersionInitFile(dbVersionControlFile);
 	}
+
+	
 
 }

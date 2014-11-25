@@ -69,6 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/session/paste"
 						//elex
 						,"/elexRea"
+						,"/nextDbId"
 						).permitAll()
 				.anyRequest().authenticated();
 		http
