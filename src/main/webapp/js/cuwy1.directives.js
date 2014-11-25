@@ -467,7 +467,7 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 		if(malProDay > 1)
 			malProDay--;
 		console.log(malProDay);
-		prescribeMalProDay(drugForEdit, malProDay);
+		prescribeMalProDay2(drugForEdit, malProDay);
 	}
 	$scope.prescribeMalProDayPlus = function(drugForEdit){
 		console.log(drugForEdit);
@@ -475,14 +475,49 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 		if(malProDay < 24)
 			malProDay++;
 		console.log(malProDay);
-		prescribeMalProDay(drugForEdit, malProDay);
+		prescribeMalProDay2(drugForEdit, malProDay);
 	}
 	
-	getNextHour = function(h, stepHour){
-		var nextHour = h + stepHour;
-		return nextHour > 23?nextHour-24:nextHour;
+	prescribeMalProDay2 = function(drugForEdit, malProDay){
+		var restHour = 24 % malProDay;
+		var stepHour = (24 - restHour) / malProDay;
+		var startHour = null;
+		for(var h = $scope.startHour24lp; h < 24; h++)
+			if(drugForEdit.times.hours[h]){
+				startHour = h;
+				break;
+			}
+		console.log(malProDay +"/"+ startHour+"/"+stepHour+"/"+restHour);
+		var restMalProDay = malProDay;
+		var lastHour = startHour;
+		var donation = {};
+		for(var h = startHour; h < 24; h++){
+			if(h == lastHour){
+				donation[h] = "-";
+				lastHour += stepHour;
+				restMalProDay--;
+			}
+		}
+		if(restMalProDay > 0)
+		for(var h = 0; h < startHour; h++){
+//		for(var h = 0; h < $scope.startHour24lp; h++){
+			if(h == lastHour - 24){
+				donation[h] = "-";
+				lastHour += stepHour;
+				restMalProDay--;
+				if(restMalProDay == 0)
+					break;
+			}
+		}
+		console.log(donation);
+		for(var h = 0; h < 24; h++)
+			if(donation[h]){
+				drugForEdit.times.hours[h] = "-";
+			}else
+			if(drugForEdit.times.hours[h]){
+				drugForEdit.times.hours[h] = null;
+			}
 	}
-	
 	prescribeMalProDay = function(drugForEdit, malProDay){
 		console.log(Math.abs(24/malProDay));
 		var stepHour = Math.round(24/malProDay);
@@ -516,7 +551,10 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 			}
 		}
 	}
-	
+	getNextHour = function(h, stepHour){
+		var nextHour = h + stepHour;
+		return nextHour > 23?nextHour-24:nextHour;
+	}
 	$scope.prescribeHoursLeft = function(drugForEdit){
 		var houres2prescribe = $scope.getHoures2prescribe(drugForEdit);
 		angular.forEach(houres2prescribe, function(hourValue, key){
