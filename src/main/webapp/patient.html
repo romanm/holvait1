@@ -30,7 +30,7 @@
 			<li><a href="#" data-ng-click="openF1()">підказка<small>(F1)</small></a></li>
 			<li><a data-ng-click="newPrescribes()" href="#">нове призначеня</a></li>
 			<li data-ng-class="{'disabled': numberOfChange == 0}"><a
-				data-ng-click="savePatient()" href="#"
+				data-ng-click="saveWorkDoc()" href="#"
 				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><sub>{{numberOfAutoSavedChange}}</sub><span
 					class="glyphicon glyphicon-floppy-disk"><sup>{{numberOfChange}}</sup></span><small>(F4)</small>
 			</a></li>
@@ -82,7 +82,7 @@
 					<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
 						data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)"
 						data-ng-dblclick="phOpenUpdateDialog(prescribeHistoryIndex)"
-						class="mouseover" 
+						class="mouseover"
 						data-ng-context-menu="menuDayBlock"
 						data-ng-class="{selectpath:dayInSelectPath(prescribeHistoryIndex),
 									selected:daySelected(prescribeHistoryIndex) }">
@@ -157,12 +157,8 @@
 					data-ng-class="{selectpath:dayHeadSelect(prescribeHistoryIndex, $index)}"
 				>
 					|
-					<u data-ng-show="lpHour == prescribeStartHour ">
-					{{lpHour}}
-					</u>
-					<span data-ng-show="lpHour != prescribeStartHour ">
-					{{lpHour}}
-					</span>
+					<u data-ng-show="lpHour == prescribeStartHour "> {{lpHour}} </u>
+					<span data-ng-show="lpHour != prescribeStartHour "> {{lpHour}} </span>
 				</th>
 							<th>|</th>
 						</tr>
@@ -295,39 +291,55 @@
 							<span data-ng-click="prescribeMalProDayPlus(prescribeHistory.prescribes.tasks[taskInDayIndex])"
 						class="glyphicon glyphicon-arrow-right"></span>
 							</td>
-							<td>
-					рівномірно раз на день
-							</td>
+							<td> рівномірно раз на день </td>
 						</tr>
 					</table>
 					</td>
 				</tr>
 			</table>
-				<div data-ng-show="taskInDay.dialogTab == 'drug'">
-					<div data-ng-repeat="drug in drug1sListFilter ">
-						<div class="mouseover" data-ng-class="{
-			selectpath:drug1sListFilter[selectDrugIndex] == drug,
-			selected:drug1sListFilter[selectDrugIndex] == drug }"
-			data-ng-click="drugToTask3(drug)">
-								{{drug.DRUG_NAME}} 
-						</div>
-					</div>
-				</div>
-				<div data-ng-show="taskInDay.dialogTab == 'dose'">
-					<span data-ng-repeat="dose in drugDocument.doses">
-						<span data-ng-click="addDoseToPrescribeDrug(dose)"
-						class="mouseover" data-ng-class="{
-				selectpath:drugDocument.doses[selectDoseIndex] == dose,
-				selected:drugDocument.doses[selectDoseIndex] == dose }"
-						>
-						<small
-							data-ng-show="dose.DOSECONCENTRATON_NUMBER">
-								{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
-						</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
-							{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}</span>
-							|
+
+			<div data-ng-show="taskInDay.dialogTab == 'drug'">
+			Медикаменти:
+					<span data-ng-repeat="drug in drug1sListFilter ">
+						<span class="mouseover" data-ng-class="{
+				selectpath:drug1sListFilter[selectDrugIndex] == drug,
+				selected:drug1sListFilter[selectDrugIndex] == drug }"
+				data-ng-click="drugToTask3(drug)"> {{drug.DRUG_NAME}} 
+						</span> |
+					</span>
+			</div>
+			<div data-ng-show="taskInDay.dialogTab == 'dose'">
+				<span data-ng-repeat="dose in drugDocument.doses">
+					<span data-ng-click="addDoseToPrescribeDrug(dose)"
+					class="mouseover" data-ng-class="{
+			selectpath:drugDocument.doses[selectDoseIndex] == dose,
+			selected:drugDocument.doses[selectDoseIndex] == dose }"
+					>
+					<small
+						data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+							{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+					</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
+						{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}</span>
+						|
+				</span>
+			</div>
+			<div data-ng-show="drugDocument.prescribesHistory">
+				<div
+					data-ng-repeat="ddPrescribeHistory in drugDocument.prescribesHistory"
+					data-ng-init="ddPrescribeHistoryIndex = $index;"
+					>
+					Група типових призначень {{ddPrescribeHistoryIndex + 1}} :
+					<span
+						data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
+						data-ng-init="drugIndex = $index">
+					<span data-ng-click="addTaskToPrescribeHistory(drug)">
+						<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
+						<span ng-bind-html="drugHourDescription(drug)"></span>
+					</span>
+					|
 					</span>
 				</div>
+			</div>
 			</div>
 				<span class="close navbar-right"> <small> Додаток: 
 				<a href="/drug.html?id={{prescribeHistory.prescribes.tasks[$index].DRUG_ID}}">

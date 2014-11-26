@@ -5,6 +5,16 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 	$scope.selectDrugIndex = null;
 	$scope.selectDoseIndex = null;
 
+	$scope.addTaskToPrescribeHistory = function(drug){
+		console.log(drug);
+		console.log($scope.editedPrescribeDrug);
+		$scope.editedPrescribeDrug.DRUG_ID= drug.DRUG_ID;
+		$scope.editedPrescribeDrug.DRUG_NAME= drug.DRUG_NAME;
+		$scope.editedPrescribeDrug.dose = drug.dose;
+		$scope.editedPrescribeDrug.times = drug.times;
+
+	}
+
 	$scope.addDoseToPrescribeDrug = function(doseToPrescribe){
 		$scope.editedPrescribeDrug.dose = doseToPrescribe;
 		$scope.numberOfChange++;

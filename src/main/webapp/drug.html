@@ -7,7 +7,7 @@
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
-<body key-cuwytrap="">
+<body data-key-cuwytrap="" >
 	<a id="focus_minus_2"
 		data-ng-class="{'selected': drugDocument.pageDeepPositionIndex == -2}"
 		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
@@ -29,7 +29,7 @@
 			<li><sub>.</sub></li>
 			<li><a href="#" data-ng-click="openF1()">підказка<small>(F1)</small></a></li>
 			<li data-ng-class="{'disabled': numberOfChange == 0}"><a
-				data-ng-click="savePatient()" href="#"
+				data-ng-click="saveWorkDoc()" href="#"
 				title="Запис (Ctrl_S, F4). {{numberOfChange}} незбережених змін"><span
 					class="glyphicon glyphicon-floppy-disk"></span>{{numberOfChange}}<small>(F4)</small>
 			</a></li>
@@ -100,6 +100,22 @@
 </div>
 
 <hr/>
+	<div class="row">
+		<div class="col-xs-12">
+			<div data-ng-repeat="ddPrescribeHistory in workDoc.prescribesHistory" data-ng-init="ddPrescribeHistoryIndex = $index;"
+				data-ng-context-menu="menuDrugPrescribesGroup"
+			>
+			Група типових призначень {{ddPrescribeHistoryIndex + 1}}
+			<div data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
+				data-ng-init="drugIndex = $index"
+			>
+				<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
+				<span ng-bind-html="drugHourDescription(drug)"></span>
+			</div>
+			</div>
+		</div>
+	</div>
+
 <a href="drugs.html">Ліки</a>
 
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>

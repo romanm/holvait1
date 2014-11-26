@@ -1,22 +1,26 @@
 //var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap']);
-cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
+cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $http, $sce) {
 	console.log("drugCtrl");
+	$scope.dayStartHour = getCookie('dayStartHour');
 	$scope.parameters = parameters;
 	$scope.numberOfChange = 0;
-
+	initDeclarePrescribesEdit($scope, $http, $sce);
+	
 	$scope.siteMap = config.siteMap.siteMaps[5];
 	$http({
 		method : 'GET',
 		url : config.urlPrefix + '/read/drug_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {
-		console.log(data);
 		$scope.drugDocument = data;
+		initWorkDocument(data, $scope);
 		if(null == $scope.drugDocument.doses)
 			$scope.drugDocument.doses = [];
 		if(null == $scope.drugDocument.localIdSequence)
 			$scope.drugDocument.localIdSequence = 1;
 	}).error(function(data, status, headers, config) {
 	});
+
+	$scope.newPrescribes = function(){newPrescribesCommon($scope);}
 
 	$scope.newDrugDocumentDose = {};
 	$scope.dose2newDose = function(dose){
@@ -41,6 +45,12 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
 			$scope.error = data;
 		});
 	}
+	
+
+	$scope.saveWorkDoc = function(){
+		saveWorkDoc(config.urlPrefix + "/save/drug", $scope, $http);
+	}
+
 
 	$scope.menuDoses = [
 		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
@@ -49,7 +59,23 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
 		}]
 	];
 
+	$scope.menuDrugPrescribesGroup = [
+		['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
+			$http({method : 'GET', url : config.urlPrefix + '/session/paste'
+			}).success(function(data, status, headers, config) {
+				if(data.DRUG_ID){
+					$itemScope.editedPrescribeHistory.prescribes.tasks.push(data);
+					changeSaveControl($scope, $http);
+				}else{
+					alert("Тільки медикамент підлягає вставці, інші елементи не обробляються.");
+				}
+			}).error(function(data, status, headers, config) {
+			});
+		}]
+	];
+
 	//---------------------keydown-------------------------------
+	/*
 	$scope.keys = [];
 	$scope.keys.push({code : KeyCodes.F1, action : function() { $scope.openF1(); } });
 	$scope.openF1 = function(){ window.open("help.html#protocols", "", "width=1000, height=500"); }
@@ -59,6 +85,7 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
 		var code = obj.event.keyCode;
 		var ctrlKey = obj.event.ctrlKey;
 		$scope.keys.forEach(function(o) {
+			console.log(o);
 			if (o.code !== code) return;
 			if(ctrlKey && !o.ctrlKey) return;
 			if(o.ctrlKey && !ctrlKey) return;
@@ -66,6 +93,7 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', function ($scope, $http) {
 			$scope.$apply();
 		});
 	});
+	 * */
 	//---------------------keydown---------------------END-------
 
 }]);

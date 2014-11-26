@@ -92,9 +92,7 @@ $scope.menuTasksAll = [
 		contextMenuCopy($itemScope.prescribeHistory.prescribes, $http); 
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
-		$http({
-			method : 'GET',
-			url : config.urlPrefix + '/session/paste'
+		$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
 		}).success(function(data, status, headers, config) {
 			
 			if($itemScope.prescribeHistory.prescribes.tasks.length == 0){
@@ -106,7 +104,6 @@ $scope.menuTasksAll = [
 					.apply($itemScope.prescribeHistory.prescribes.tasks, data.tasks);
 				}
 			}
-			
 		}).error(function(data, status, headers, config) {
 		});
 	}]

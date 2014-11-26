@@ -312,10 +312,10 @@ newPrescribesCommon = function($scope){
 		newDayTasks = angular.copy($scope.workDoc.prescribesHistory[0].prescribes.tasks);
 	var today = new Date();
 	var prescribeHistory = {
-			date:today,
-			prescribeHistoryDays: "1",
-			selectDrugIndex:0,
-			prescribes:{tasks:newDayTasks}
+		date:today,
+		prescribeHistoryDays: "1",
+		selectDrugIndex:0,
+		prescribes:{tasks:newDayTasks}
 //	prescribes:{tasks:[]}
 	}
 	prescribeHistory.tasksInDay = getTasksInDay($scope);
@@ -1192,13 +1192,39 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 		return isMinus;
 	}
 
-	$scope.taskDescription = function($index, prescribeHistory){
+	$scope.drugHourDescription = function(drug){
+		var hoursStr = "(";
+		var malProDay = 0;
+		for(var h = $scope.dayStartHour; h < 24; h++){
+			if(drug.times.hours[h]){
+				hoursStr += h+",";
+				malProDay++;
+			}
+		}
+		for(var h = 0; h < $scope.dayStartHour; h++){
+			if(drug.times.hours[h]){
+				hoursStr += h+",";
+				malProDay++;
+			}
+		}
+		hoursStr = hoursStr.substring(0, hoursStr.length-1) ;
+		hoursStr += " годин)";
+		var drugHourDescriptionStr = " " + malProDay +" раз в день " + hoursStr;
+		return drugHourDescriptionStr;
+	}
+
+	getTaskFromPrescribes = function($index, prescribeHistory){
 		if(typeof prescribeHistory === 'undefined' 
-		|| typeof prescribeHistory.prescribes === 'undefined' 
-		|| $index >= prescribeHistory.prescribes.tasks.length
+			|| typeof prescribeHistory.prescribes === 'undefined' 
+				|| $index >= prescribeHistory.prescribes.tasks.length
 		) return ".";
 		var drug = prescribeHistory.prescribes.tasks[$index];
 		if(drug === null || drug.DRUG_NAME === "") return ".";
+		return drug;
+	}
+	$scope.taskDescription = function($index, prescribeHistory){
+		var drug = getTaskFromPrescribes($index, prescribeHistory);
+		if("." === drug) return drug;
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
 			if(drug.dose.DOSECONCENTRATON_NUMBER){
@@ -1222,15 +1248,6 @@ initDeclarePrescribesPrint = function($scope, $http, $sce){
 
 }
 
-cangePatientDocToSave = function($scope){
-	var docToSave = angular.copy($scope.patient);
-	$(docToSave.prescribesHistory).each(function () {
-		this.tasksInDay = null;
-	});
-	docToSave.patientUpdateOpen = false;
-	return docToSave;
-}
-
 readDrug1sList = function($scope, $http){
 	$http({
 		method : 'GET',
@@ -1241,8 +1258,17 @@ readDrug1sList = function($scope, $http){
 	});
 }
 
+changeWorkDocToSave = function($scope){
+	var docToSave = angular.copy($scope.workDoc);
+	$(docToSave.prescribesHistory).each(function () {
+		this.tasksInDay = null;
+	});
+	docToSave.patientUpdateOpen = false;
+	return docToSave;
+}
+
 saveWorkDoc = function(url, $scope, $http){
-	var docToSave = cangePatientDocToSave($scope);
+	var docToSave = changeWorkDocToSave($scope);
 	$http({ method : 'POST', data : docToSave, url : url
 	}).success(function(data, status, headers, config){
 		initWorkDocument(data, $scope, $http);
@@ -1257,7 +1283,7 @@ saveWorkDoc = function(url, $scope, $http){
 changeSaveControl = function($scope, $http){
 	$scope.numberOfChange++;
 	if(($scope.numberOfChange - $scope.numberOfAutoSavedChange) >= $scope.autoSaveLimit){
-		var docToSave = cangePatientDocToSave($scope);
+		var docToSave = changeWorkDocToSave($scope);
 		$http({ method : 'POST', data : docToSave, url : config.urlPrefix + "/autosave/patient"
 		}).success(function(data, status, headers, config){
 			initWorkDocument(data, $scope, $http);
