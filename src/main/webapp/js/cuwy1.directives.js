@@ -1037,7 +1037,11 @@ moveDrugDown = function(tasks, selectDrugIndex){
 		movePlus(tasks, selectDrugIndex + 1);
 		changeSaveControl($scope, $http);
 		return true;
-	}else
+	}
+	if(drug.groupPosition > 0){
+		selectDrugIndex -= drug.groupPosition;
+		drug = tasks[selectDrugIndex];
+	}
 	if(drug.groupPosition == 0){
 		var drugInGroupIndex = 0;
 		while(drug && drug.groupPosition == drugInGroupIndex){
@@ -1058,7 +1062,11 @@ moveDrugUp = function(tasks, selectDrugIndex){
 		moveMinus(tasks, selectDrugIndex);
 		changeSaveControl($scope, $http);
 		return true;
-	}else
+	}
+	if(drug.groupPosition > 0){
+		selectDrugIndex -= drug.groupPosition;
+		drug = tasks[selectDrugIndex];
+	}
 	if(drug.groupPosition == 0){
 		moveMinus(tasks, selectDrugIndex);
 		var drugInGroupIndex = drug.groupPosition + 1;
