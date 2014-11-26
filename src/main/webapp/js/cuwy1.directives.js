@@ -614,6 +614,20 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 			$scope.error = data;
 		});
 	}
+
+copy = function(taskIndex, prescribeHistory){
+	console.log("-----copy-------- "+taskIndex);
+	console.log(prescribeHistory);
+	if(prescribeHistory.prescribes.selectMultiple){
+		contextMenuCopy(prescribeHistory.prescribes, $http); 
+	}else if(taskIndex == -1){
+		contextMenuCopy(prescribeHistory.prescribes, $http); 
+	}else{
+		var drug = prescribeHistory.prescribes.tasks[taskIndex];
+		contextMenuCopy(drug, $http);
+	}
+}
+
 //-------------context-menu-------------------------------------------
 $scope.menuTask = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
@@ -670,9 +684,9 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 	}else if(null == prescribeHistory.prescribes.tasks[position]){
 		prescribeHistory.prescribes.tasks[position] = drug;
 	}else{
+		prescribeHistory.prescribes.tasks.splice(position, 0, null);
 		prescribeHistory.prescribes.tasks[position] = drug;
 	}
-	changeSaveControl($scope, $http);
 }
 
 contextMenuPaste = function(taskInDay, prescribeHistory, $scope, $http){
@@ -689,6 +703,7 @@ contextMenuPaste = function(taskInDay, prescribeHistory, $scope, $http){
 			var drug = data;
 			drugToTask2(drug, taskInDay, prescribeHistory)
 		}
+		changeSaveControl($scope, $http);
 	}).error(function(data, status, headers, config) {
 	});
 };

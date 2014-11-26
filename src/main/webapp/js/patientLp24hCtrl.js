@@ -42,20 +42,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 	}
 
 
-copy = function(taskIndex, prescribeHistory){
-	console.log("-----copy-------- "+taskIndex);
-	console.log(prescribeHistory);
-	//var drug = prescribeHistory.prescribes.tasks[taskIndex];
-	//if(drug.selectMultiple){
-	if(prescribeHistory.prescribes.selectMultiple){
-		contextMenuCopy(prescribeHistory.prescribes, $http); 
-	}else if(taskIndex == -1){
-		contextMenuCopy(prescribeHistory.prescribes, $http); 
-	}else{
-		var drug = prescribeHistory.prescribes.tasks[taskIndex];
-		contextMenuCopy(drug, $http);
-	}
-}
 
 $scope.menuPatientUpdate = [
 ['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
