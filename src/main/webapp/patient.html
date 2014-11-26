@@ -179,6 +179,7 @@
 						ng-context-menu="menuTask"
 						title="{{taskInDay.isCollapsed}}"
 					>
+					<span data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
 					<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
 				</td>
 				<td data-ng-repeat="dayHour in dayHours"

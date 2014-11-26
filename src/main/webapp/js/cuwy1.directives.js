@@ -638,12 +638,15 @@ $scope.menuTask = [
 	}],
 	null,
 	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
-		moveMinus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
+		moveDrugUp($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
 	}],
 	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу <sub><kbd>Alt+↓</kbd></sub>', function ($itemScope) {
-		movePlus($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index + 1);
+		moveDrugDown($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
 	}],
 	null,
+	['<span class="glyphicon glyphicon-plus"></span> Додати до групи', function ($itemScope) {
+		addToGroup($itemScope);
+	}],
 	['<i class="fa fa-reply-all"></i> Скасувати вибір', function ($itemScope) {
 		escapeSelectMultiple($itemScope.$parent.prescribeHistory);
 	}]
@@ -703,7 +706,6 @@ contextMenuCopy = function(copyObject, $http){
 moveTo = function(arrayToSort, indexFrom, indexTo){
 	var el = arrayToSort.splice(indexFrom, 1);
 	arrayToSort.splice(indexTo, 0, el[0]);
-	changeSaveControl($scope, $http);
 }
 
 moveUp = function(arrayToSort, index){
@@ -1029,16 +1031,62 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowRight,
 	}
 });
 
+moveDrugDown = function(tasks, selectDrugIndex){
+	var drug = tasks[selectDrugIndex];
+	if(drug.groupPosition == null){
+		movePlus(tasks, selectDrugIndex + 1);
+		changeSaveControl($scope, $http);
+		return true;
+	}else
+	if(drug.groupPosition == 0){
+		var drugInGroupIndex = 0;
+		while(drug && drug.groupPosition == drugInGroupIndex){
+			drugInGroupIndex = drugInGroupIndex + 1;
+			drug = tasks[selectDrugIndex + drugInGroupIndex];
+		}
+		for(var gd = drugInGroupIndex; gd > 0; gd--){
+			movePlus(tasks, selectDrugIndex + gd);
+		}
+		changeSaveControl($scope, $http);
+		return true;
+	}
+}
+
+moveDrugUp = function(tasks, selectDrugIndex){
+	var drug = tasks[selectDrugIndex];
+	if(drug.groupPosition == null){
+		moveMinus(tasks, selectDrugIndex);
+		changeSaveControl($scope, $http);
+		return true;
+	}else
+	if(drug.groupPosition == 0){
+		moveMinus(tasks, selectDrugIndex);
+		var drugInGroupIndex = drug.groupPosition + 1;
+		var drugInGroup = tasks[selectDrugIndex + drugInGroupIndex];
+		while(drugInGroup && drugInGroup.groupPosition == drugInGroupIndex){
+			moveMinus(tasks, selectDrugIndex + drugInGroupIndex);
+			drugInGroupIndex = drugInGroupIndex + 1;
+			drugInGroup = tasks[selectDrugIndex + drugInGroupIndex];
+		}
+		changeSaveControl($scope, $http);
+		return true;
+	}
+}
+
 $scope.keys.push({ altKey : true, code : KeyCodes.ArrowDown,
 	action : function() {
-		movePlus($scope.editedPrescribeHistory.prescribes.tasks, $scope.editedPrescribeHistory.selectDrugIndex + 1);
-		$scope.editedPrescribeHistory.selectDrugIndex++;
+		var isMoved = moveDrugDown($scope.editedPrescribeHistory.prescribes.tasks, $scope.editedPrescribeHistory.selectDrugIndex);
+		if(isMoved){
+			$scope.editedPrescribeHistory.selectDrugIndex++;
+		}
 	}
 });
 $scope.keys.push({ altKey : true, code : KeyCodes.ArrowUp,
 	action : function() {
-		moveMinus($scope.editedPrescribeHistory.prescribes.tasks, $scope.editedPrescribeHistory.selectDrugIndex);
-		$scope.editedPrescribeHistory.selectDrugIndex--;
+		var isMoved = moveDrugUp($scope.editedPrescribeHistory.prescribes.tasks, $scope.editedPrescribeHistory.selectDrugIndex);
+		if(isMoved){
+			$scope.editedPrescribeHistory.selectDrugIndex--;
+		}
 	}
 });
 

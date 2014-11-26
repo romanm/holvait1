@@ -88,10 +88,10 @@ $scope.menuDayBlock = [
 ];
 
 $scope.menuTasksAll = [
-	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
+	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) {
 		contextMenuCopy($itemScope.prescribeHistory.prescribes, $http); 
 	}],
-	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
+	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) {
 		$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
 		}).success(function(data, status, headers, config) {
 			
@@ -115,6 +115,20 @@ deleteDay = function(prescribeHistory){
 	}else{
 		prescribeHistory.deleteDay = true;
 	}
+}
+
+addToGroup = function($itemScope){
+	var taskIndex = $itemScope.$index;
+	var prescribeHistory = $itemScope.$parent.prescribeHistory;
+	var drugGroup = prescribeHistory.prescribes.tasks[taskIndex-1];
+	if(!drugGroup.groupPosition){
+		drugGroup.groupPosition = 0;
+	}
+	console.log(drugGroup);
+	var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	drug.groupPosition = drugGroup.groupPosition+1;
+	console.log(drug);
+	changeSaveControl($scope, $http);
 }
 
 deleteSelected = function(taskIndex, prescribeHistory){
