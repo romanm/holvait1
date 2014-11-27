@@ -617,14 +617,18 @@ initDeclarePrescribesEdit = function($scope, $http, $sce){
 
 copy = function(taskIndex, prescribeHistory){
 	console.log("-----copy-------- "+taskIndex);
-	console.log(prescribeHistory);
 	if(prescribeHistory.prescribes.selectMultiple){
 		contextMenuCopy(prescribeHistory.prescribes, $http); 
 	}else if(taskIndex == -1){
 		contextMenuCopy(prescribeHistory.prescribes, $http); 
 	}else{
 		var drug = prescribeHistory.prescribes.tasks[taskIndex];
-		contextMenuCopy(drug, $http);
+		if(drug.groupPosition != null){
+			console.log("copy group");
+			setCookieCopyObject(taskIndex, prescribeHistory);
+		}else{
+			contextMenuCopy(drug, $http);
+		}
 	}
 }
 
@@ -963,6 +967,8 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.P0,
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.V,
 	action : function() {
 		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
+		pasteCookieCopyObject($scope.editedPrescribeHistory);
+		return
 		contextMenuPaste(taskInDay, $scope.editedPrescribeHistory, $scope, $http); 
 	}
 });
@@ -1412,6 +1418,39 @@ escapeSelectMultiple = function(prescribeHistory){
 
 
 //--------------patientLp24/prescribes24------------------------------END
+
+pasteCookieCopyObject = function(prescribeHistory){
+	var copyObject = getCookieCopyObject();
+	var taskInDay = prescribeHistory.tasksInDay[prescribeHistory.selectDrugIndex];
+	var position = taskInDay.i;
+	$(copyObject.tasks).each(function () {
+		insertDrugToTask(this, position++, prescribeHistory);
+	});
+}
+
+getCookieCopyObject = function(){
+	var copyObjectStr = getCookie("copyObject");
+	console.log(copyObjectStr);
+	return JSON.parse(copyObjectStr);
+}
+setCookieCopyObject = function(taskIndex, prescribeHistory){
+	var copyObj = {};
+	copyObj.tasks = [];
+	var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	if(drug.groupPosition != null){
+		if(drug.groupPosition > 0){
+			taskIndex -= drug.groupPosition;
+			drug = tasks[taskIndex];
+		}
+		var drugInGroupIndex = 0;
+		while(drug && drug.groupPosition == drugInGroupIndex){
+			copyObj.tasks.push(drug);
+			drugInGroupIndex = drugInGroupIndex + 1;
+			drug = prescribeHistory.prescribes.tasks[taskIndex + drugInGroupIndex];
+		}
+	}
+	document.cookie= "copyObject=" + JSON.stringify(copyObj);
+}
 
 setCookieDaysLong = function(c_name,value,exdays){
 	var exdate=new Date();
