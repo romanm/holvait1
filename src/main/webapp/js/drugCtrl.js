@@ -52,10 +52,15 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 	}
 
 
+	$scope.menuDrugName = [
+		['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
+			console.log("///");
+		}]
+	];
 	$scope.menuDoses = [
 		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
 			$itemScope.drugDocument.doses.splice($itemScope.$index, 1);
-			$scope.numberOfChange++;
+			changeSaveControl($scope, $http);
 		}]
 	];
 
@@ -71,6 +76,10 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 				}
 			}).error(function(data, status, headers, config) {
 			});
+		}],
+		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
+			$itemScope.editedPrescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
+			changeSaveControl($scope, $http);
 		}]
 	];
 

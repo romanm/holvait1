@@ -358,8 +358,8 @@ initWorkDocument = function(data, $scope, $http){
 	}
 }
 
-initDeclarePrescribesEdit = function($scope, $http, $sce){
-	initDeclarePrescribesCommon($scope, $http, $sce);
+initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
+	initDeclarePrescribesCommon($scope, $http, $sce, $filter);
 	$scope.minPageDeepPositionIndex = -2;
 	$scope.autoSaveLimit = 5;
 	$scope.tasksInDayNumber = 19;
@@ -1252,7 +1252,7 @@ $scope.$on('keydown', function(msg, obj){
 
 }
 
-initDeclarePrescribesCommon = function($scope, $http, $sce){
+initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	$scope.getLp24hourStr = function(dayHour){
 		var lp24hour = getLp24hour(dayHour, $scope);
 		return (lp24hour>9?'':'0')+lp24hour;
@@ -1299,6 +1299,39 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 		if(drug === null || drug.DRUG_NAME === "") return ".";
 		return drug;
 	}
+
+	$scope.malProDay = function(taskInDayIndex, prescribeHistory){
+		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
+		if(drug == null) return;
+		var donationMal = $filter('filter')(drug.times.hours, "-").length;
+		return (donationMal).toString();
+	}
+
+	$scope.dayInfusionSumme = function(prescribeHistory){
+		var diSum = 0;
+		angular.forEach(prescribeHistory.prescribes.tasks, function(drug, index){
+			if(drug){
+				var ml = drug.dose.DOSE_UNIT;
+				if("мл" === ml){
+					var donationMal = $filter('filter')(drug.times.hours, "-").length;
+					diSum += drug.dose.DOSE_NUMBER*donationMal;
+				}
+			}
+		} );
+		diSum = Math.round(diSum/100)*100;
+		return "≈" + (diSum).toString() + " мл";
+	}
+
+	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
+		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
+		if(drug == null) return;
+		var ml = drug.dose.DOSE_UNIT;
+		if("мл" === ml){
+			var donationMal = $filter('filter')(drug.times.hours, "-").length;
+			return (drug.dose.DOSE_NUMBER*donationMal).toString();
+		}
+
+	}
 	$scope.taskDescription = function($index, prescribeHistory){
 		var drug = getTaskFromPrescribes($index, prescribeHistory);
 		if("." === drug) return drug;
@@ -1317,9 +1350,9 @@ initDeclarePrescribesCommon = function($scope, $http, $sce){
 	};
 }
 
-initDeclarePrescribesPrint = function($scope, $http, $sce){
+initDeclarePrescribesPrint = function($scope, $http, $sce, $filter){
 	readPrescribes($scope, $http);
-	initDeclarePrescribesCommon($scope, $http, $sce);
+	initDeclarePrescribesCommon($scope, $http, $sce, $filter);
 	$scope.tasksInDay = getTasksInDay($scope);
 	$scope.dayHours = getDayHours();
 

@@ -4,7 +4,7 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', '$sce', functi
 	console.log("urlServer "+urlServer);
 	$scope.siteMap = config.siteMap.siteMaps[2];
 	$scope.startHour24lp = config.startHour24lp;
-	initDeclarePrescribesEdit($scope, $http, $sce);
+	initDeclarePrescribesEdit($scope, $http, $sce, $filter);
 
 	$http({ method : 'GET', url : config.urlPrefix + '/read' + urlServer + '/prescribe_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {

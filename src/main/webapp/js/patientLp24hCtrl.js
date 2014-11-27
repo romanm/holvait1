@@ -17,7 +17,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 		//initEditedPrescribeHistory($scope);
 	}
 
-	initDeclarePrescribesEdit($scope, $http, $sce);
+	initDeclarePrescribesEdit($scope, $http, $sce, $filter);
 
 	console.log("------patientLp24hCtrl-------------");
 	$http({ method : 'GET', url : config.urlPrefix + '/read/patient_'+$scope.parameters.id

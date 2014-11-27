@@ -160,7 +160,9 @@
 					<u data-ng-show="lpHour == prescribeStartHour "> {{lpHour}} </u>
 					<span data-ng-show="lpHour != prescribeStartHour "> {{lpHour}} </span>
 				</th>
-							<th>|</th>
+							<th>|
+								<span ng-bind-html="dayInfusionSumme(prescribeHistory)"></span>
+							</th>
 						</tr>
 					</thead>
 					<tbody data-ng-repeat="taskInDay in prescribeHistory.tasksInDay"
@@ -192,7 +194,10 @@
 					data-ng-show="isMinus(taskInDayIndex, dayHourIndex, prescribeHistory)"
 					class="glyphicon glyphicon-minus"></span>
 				</td>
-				<td>.</td>
+				<td>.
+					<sub ng-bind-html="malProDay(taskInDayIndex, prescribeHistory)"></sub>
+					<span ng-bind-html="infusionSumme(taskInDayIndex, prescribeHistory)"></span>
+				</td>
 			</tr>
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
