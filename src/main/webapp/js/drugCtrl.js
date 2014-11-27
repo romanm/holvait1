@@ -26,6 +26,7 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 	$scope.dose2newDose = function(dose){
 		angular.copy(dose, $scope.newDrugDocumentDose);
 	}
+
 	$scope.addNewDrugDocumentDose = function(){
 		$scope.newDrugDocumentDose.DOSE_ID = $scope.drugDocument.localIdSequence++;
 		$scope.drugDocument.doses.push($scope.newDrugDocumentDose);
@@ -45,16 +46,17 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 			$scope.error = data;
 		});
 	}
-	
 
 	$scope.saveWorkDoc = function(){
 		saveWorkDoc(config.urlPrefix + "/save/drug", $scope, $http);
 	}
 
-
 	$scope.menuDrugName = [
 		['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
-			console.log("///");
+			copyDrugDocument($scope.drugDocument, $http)
+		}],
+		['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
+			pasteToDrugDocName($itemScope, $scope, $http);
 		}]
 	];
 	$scope.menuDoses = [
@@ -66,8 +68,12 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 
 	$scope.menuDrugPrescribesGroup = [
 		['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
+			console.log($itemScope);
+			pasteCopyObject($itemScope.editedPrescribeHistory, $scope, $http);
+			return
 			$http({method : 'GET', url : config.urlPrefix + '/session/paste'
 			}).success(function(data, status, headers, config) {
+				console.log(data);
 				if(data.DRUG_ID){
 					$itemScope.editedPrescribeHistory.prescribes.tasks.push(data);
 					changeSaveControl($scope, $http);
@@ -84,25 +90,6 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $h
 	];
 
 	//---------------------keydown-------------------------------
-	/*
-	$scope.keys = [];
-	$scope.keys.push({code : KeyCodes.F1, action : function() { $scope.openF1(); } });
-	$scope.openF1 = function(){ window.open("help.html#protocols", "", "width=1000, height=500"); }
-
-	$scope.$on('keydown', function(msg, obj) {
-		console.log(obj);
-		var code = obj.event.keyCode;
-		var ctrlKey = obj.event.ctrlKey;
-		$scope.keys.forEach(function(o) {
-			console.log(o);
-			if (o.code !== code) return;
-			if(ctrlKey && !o.ctrlKey) return;
-			if(o.ctrlKey && !ctrlKey) return;
-			o.action();
-			$scope.$apply();
-		});
-	});
-	 * */
 	//---------------------keydown---------------------END-------
 
 }]);

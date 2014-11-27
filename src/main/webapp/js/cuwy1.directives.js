@@ -618,17 +618,9 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 copy = function(taskIndex, prescribeHistory){
 	console.log("-----copy-------- "+taskIndex);
 	if(prescribeHistory.prescribes.selectMultiple){
-		contextMenuCopy(prescribeHistory.prescribes, $http); 
-	}else if(taskIndex == -1){
-		contextMenuCopy(prescribeHistory.prescribes, $http); 
+		copyCopyObject(null, prescribeHistory, $http, $filter);
 	}else{
-		var drug = prescribeHistory.prescribes.tasks[taskIndex];
-		if(drug.groupPosition != null){
-			console.log("copy group");
-			setCookieCopyObject(taskIndex, prescribeHistory);
-		}else{
-			contextMenuCopy(drug, $http);
-		}
+		copyCopyObject(taskIndex, prescribeHistory, $http, $filter);
 	}
 }
 
@@ -643,8 +635,9 @@ $scope.menuTask = [
 		copy(taskIndex, $itemScope.$parent.prescribeHistory);
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
-		$itemScope.$parent.prescribeHistory.prescribes.tasks.splice($itemScope.$index, 0, null);
-		contextMenuPaste($itemScope.taskInDay, $itemScope.$parent.prescribeHistory, $scope, $http); 
+		var prescribeHistory = $itemScope.$parent.prescribeHistory;
+		prescribeHistory.selectDrugIndex = $itemScope.$index;
+		pasteCopyObject(prescribeHistory, $scope, $http);
 	}],
 	null,
 	['<span class="glyphicon glyphicon-plus"></span> Додати строчку <sub><kbd>Shift+⏎</kbd></sub>', function ($itemScope) {
@@ -687,26 +680,38 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 		prescribeHistory.prescribes.tasks.push(drug);
 	}else if(null == prescribeHistory.prescribes.tasks[position]){
 		prescribeHistory.prescribes.tasks[position] = drug;
+	}else if(null == drug){
+		prescribeHistory.prescribes.tasks.splice(position, 0, null);
 	}else{
 		prescribeHistory.prescribes.tasks.splice(position, 0, null);
 		prescribeHistory.prescribes.tasks[position] = drug;
 	}
 }
 
-contextMenuPaste = function(taskInDay, prescribeHistory, $scope, $http){
+pasteCopyObject = function(prescribeHistory, $scope, $http){
 	$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
 	}).success(function(data, status, headers, config) {
-		if(data.selectMultiple && data.tasks){
-			var position = taskInDay.i;
-			$(data.tasks).each(function () {
-				if(this.selectMultiple){
-					insertDrugToTask(this, position++, prescribeHistory);
-				}
-			});
-		}else{
-			var drug = data;
-			drugToTask2(drug, taskInDay, prescribeHistory)
+		var copyObject = data;
+		var selectPosition = prescribeHistory.selectDrugIndex;
+		if(selectPosition == -1) selectPosition = 0;
+		var taskInDay = prescribeHistory.tasksInDay[selectPosition];
+		var position = taskInDay.i;
+		$(copyObject.tasks).each(function () {
+			var drug = this.DRUG_NAME?this:null;
+			insertDrugToTask(drug, position++, prescribeHistory);
+		});
+		changeSaveControl($scope, $http);
+	}).error(function(data, status, headers, config) {
+	});
+};
+
+pasteToDrugDocName = function($itemScope, $scope, $http){
+	$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
+	}).success(function(copyObject, status, headers, config) {
+		if(!$scope.drugDocument.replacementDrugs){
+			$scope.drugDocument.replacementDrugs = [];
 		}
+		$scope.drugDocument.replacementDrugs.push(copyObject.drugDocument);
 		changeSaveControl($scope, $http);
 	}).error(function(data, status, headers, config) {
 	});
@@ -966,10 +971,7 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.P0,
 
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.V,
 	action : function() {
-		var taskInDay = $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex];
-		pasteCookieCopyObject($scope.editedPrescribeHistory);
-		return
-		contextMenuPaste(taskInDay, $scope.editedPrescribeHistory, $scope, $http); 
+		pasteCopyObject($scope.editedPrescribeHistory, $scope, $http);
 	}
 });
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.C,
@@ -1302,7 +1304,7 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 
 	$scope.malProDay = function(taskInDayIndex, prescribeHistory){
 		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
-		if(drug == null) return;
+		if(drug == null || drug.times == null) return;
 		var donationMal = $filter('filter')(drug.times.hours, "-").length;
 		return (donationMal).toString();
 	}
@@ -1311,10 +1313,12 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		var diSum = 0;
 		angular.forEach(prescribeHistory.prescribes.tasks, function(drug, index){
 			if(drug){
-				var ml = drug.dose.DOSE_UNIT;
-				if("мл" === ml){
-					var donationMal = $filter('filter')(drug.times.hours, "-").length;
-					diSum += drug.dose.DOSE_NUMBER*donationMal;
+				if(drug.dose){
+					var ml = drug.dose.DOSE_UNIT;
+					if("мл" === ml){
+						var donationMal = $filter('filter')(drug.times.hours, "-").length;
+						diSum += drug.dose.DOSE_NUMBER*donationMal;
+					}
 				}
 			}
 		} );
@@ -1324,7 +1328,7 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 
 	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
 		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
-		if(drug == null) return;
+		if(drug == null || drug.times == null) return;
 		var ml = drug.dose.DOSE_UNIT;
 		if("мл" === ml){
 			var donationMal = $filter('filter')(drug.times.hours, "-").length;
@@ -1452,37 +1456,43 @@ escapeSelectMultiple = function(prescribeHistory){
 
 //--------------patientLp24/prescribes24------------------------------END
 
-pasteCookieCopyObject = function(prescribeHistory){
-	var copyObject = getCookieCopyObject();
-	var taskInDay = prescribeHistory.tasksInDay[prescribeHistory.selectDrugIndex];
-	var position = taskInDay.i;
-	$(copyObject.tasks).each(function () {
-		insertDrugToTask(this, position++, prescribeHistory);
-	});
-}
-
 getCookieCopyObject = function(){
 	var copyObjectStr = getCookie("copyObject");
-	console.log(copyObjectStr);
 	return JSON.parse(copyObjectStr);
 }
-setCookieCopyObject = function(taskIndex, prescribeHistory){
+
+copyDrugDocument = function(drugDocument, $http, $filter){
+	var copyObj = {};
+	copyObj.drugDocument = drugDocument;
+	contextMenuCopy(copyObj, $http);
+}
+copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 	var copyObj = {};
 	copyObj.tasks = [];
-	var drug = prescribeHistory.prescribes.tasks[taskIndex];
-	if(drug.groupPosition != null){
-		if(drug.groupPosition > 0){
-			taskIndex -= drug.groupPosition;
-			drug = tasks[taskIndex];
-		}
-		var drugInGroupIndex = 0;
-		while(drug && drug.groupPosition == drugInGroupIndex){
+	if(taskIndex == null){
+		var tasksToCopy = $filter('filter')
+			(prescribeHistory.prescribes.tasks, {selectMultiple:true});
+		copyObj.tasks = tasksToCopy;
+	}else if(taskIndex == -1){
+		copyObj.tasks = prescribeHistory.prescribes.tasks;
+	}else{
+		var drug = prescribeHistory.prescribes.tasks[taskIndex];
+		if(drug.groupPosition != null){
+			if(drug.groupPosition > 0){
+				taskIndex -= drug.groupPosition;
+				drug = tasks[taskIndex];
+			}
+			var drugInGroupIndex = 0;
+			while(drug && drug.groupPosition == drugInGroupIndex){
+				copyObj.tasks.push(drug);
+				drugInGroupIndex = drugInGroupIndex + 1;
+				drug = prescribeHistory.prescribes.tasks[taskIndex + drugInGroupIndex];
+			}
+		}else{
 			copyObj.tasks.push(drug);
-			drugInGroupIndex = drugInGroupIndex + 1;
-			drug = prescribeHistory.prescribes.tasks[taskIndex + drugInGroupIndex];
 		}
 	}
-	document.cookie= "copyObject=" + JSON.stringify(copyObj);
+	contextMenuCopy(copyObj, $http);
 }
 
 setCookieDaysLong = function(c_name,value,exdays){

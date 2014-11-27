@@ -100,8 +100,9 @@
 </div>
 
 <hr/>
+<div class="container">
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-xs-6">
 			<div data-ng-repeat="ddPrescribeHistory in workDoc.prescribesHistory" data-ng-init="ddPrescribeHistoryIndex = $index;"
 				data-ng-context-menu="menuDrugPrescribesGroup"
 			>
@@ -109,13 +110,33 @@
 			<div data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
 				data-ng-init="drugIndex = $index"
 			>
+				<span data-ng-show="drug.groupPosition > 0">+</span>
 				<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
 				<span ng-bind-html="drugHourDescription(drug)"></span>
 			</div>
 			</div>
 		</div>
+		<div class="col-xs-6">
+			<div data-ng-repeat="replacementDrug in workDoc.replacementDrugs"
+				data-ng-init="replacementDrugIndex = $index;">
+				<h3>{{replacementDrug.DRUG_NAME}}</h3>
+				<div
+					data-ng-repeat="rdPrescribeHistory in replacementDrug.prescribesHistory"
+					data-ng-init="rdPrescribeHistoryIndex = $index;">
+					Група типових призначень {{rdPrescribeHistoryIndex + 1}}
+					<div data-ng-repeat="rDrug in rdPrescribeHistory.prescribes.tasks"
+						data-ng-init="rDrugIndex = $index">
+						<span data-ng-show="rDrug.groupPosition > 0">+</span> <span
+							ng-bind-html="taskDescription(rDrugIndex, rdPrescribeHistory)"></span>,
+						<span ng-bind-html="drugHourDescription(rDrug)"></span>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+</div>
 
+<hr/>
 <a href="drugs.html">Ліки</a>
 
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>

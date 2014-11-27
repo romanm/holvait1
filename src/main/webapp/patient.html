@@ -338,11 +338,36 @@
 					<span
 						data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
 						data-ng-init="drugIndex = $index">
-					<span data-ng-click="addTaskToPrescribeHistory(drug)">
+					<span 
+						class="mouseover"
+					data-ng-click="addTaskToPrescribeHistory(drug)">
 						<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
 						<span ng-bind-html="drugHourDescription(drug)"></span>
 					</span>
 					|
+					</span>
+				</div>
+				<div
+					data-ng-repeat="replacementDrug in drugDocument.replacementDrugs"
+					data-ng-init="replacementDrugIndex = $index;">
+					<span class="h4"> {{replacementDrug.DRUG_NAME}} </span>
+					<span
+						data-ng-repeat="rdPrescribeHistory in replacementDrug.prescribesHistory"
+						data-ng-init="rdPrescribeHistoryIndex = $index;">
+						Група типових призначень {{rdPrescribeHistoryIndex + 1}}
+						|<span
+							data-ng-repeat="rDrug in rdPrescribeHistory.prescribes.tasks"
+							data-ng-init="rDrugIndex = $index">
+							<span data-ng-show="!(rDrug.groupPosition > 0)">|</span>
+							<span data-ng-click="addTaskToPrescribeHistory(rDrug)"
+							class="mouseover"
+							>
+								<span data-ng-show="rDrug.groupPosition > 0">+</span>
+								<span
+									ng-bind-html="taskDescription(rDrugIndex, rdPrescribeHistory)"></span>,
+								<span ng-bind-html="drugHourDescription(rDrug)"></span>
+							</span>
+						</span>|
 					</span>
 				</div>
 			</div>

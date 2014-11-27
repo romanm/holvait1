@@ -75,9 +75,12 @@ $scope.menuDayBlock = [
 
 $scope.menuTasksAll = [
 	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) {
-		contextMenuCopy($itemScope.prescribeHistory.prescribes, $http); 
+		copy(-1, $itemScope.prescribeHistory);
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) {
+		pasteCopyObject($itemScope.prescribeHistory, $scope, $http);
+		console.log("----------------");
+		return
 		$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
 		}).success(function(data, status, headers, config) {
 			
