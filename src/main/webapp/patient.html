@@ -341,8 +341,7 @@
 					<span 
 						class="mouseover"
 					data-ng-click="addTaskToPrescribeHistory(drug)">
-						<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
-						<span ng-bind-html="drugHourDescription(drug)"></span>
+						<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>
 					</span>
 					|
 					</span>
@@ -363,9 +362,7 @@
 							class="mouseover"
 							>
 								<span data-ng-show="rDrug.groupPosition > 0">+</span>
-								<span
-									ng-bind-html="taskDescription(rDrugIndex, rdPrescribeHistory)"></span>,
-								<span ng-bind-html="drugHourDescription(rDrug)"></span>
+								<span ng-bind-html="taskAndHourDescription(rDrugIndex, rdPrescribeHistory)"></span>
 							</span>
 						</span>|
 					</span>

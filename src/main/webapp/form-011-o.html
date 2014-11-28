@@ -36,6 +36,7 @@ table {
 	border-collapse: collapse;
 }
 
+.groupDrug td { border-width: 0px 1px;}
 td, th {
 	border: solid;
 	border-width: 1px 1px;
@@ -109,10 +110,12 @@ td, th {
 		<th>08</th>
 	</tr>
 	<tr data-ng-repeat="taskInDay in tasksInDay"
+		data-ng-class="{'groupDrug': prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition >= 0}"
 		data-ng-init="taskInDayIndex = $index"
 	>
 		<td></td>
 		<td colspan="3">
+			<span data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
 			<span ng-bind-html="taskDescription($index, prescribeHistory)"></span>
 		</td>
 		<td data-ng-repeat="dayHour in dayHours">

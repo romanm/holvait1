@@ -102,6 +102,7 @@ var KeyCodes = {
 	V : 86,
 	S : 83,
 	P0 : 48,//Ctrl_P
+	Backspace : 8,
 	Delete : 46,
 	PageUp : 33,
 	PageDown : 34,
@@ -1172,21 +1173,23 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.Enter,
 	}
 });
 
-$scope.keys.push({ code : KeyCodes.Delete,
-	action : function() {
-		if($scope.workDoc.pageDeepPositionIndex == 1){
-			deleteDay($scope.editedPrescribeHistory);
-		}else
-		if($scope.workDoc.pageDeepPositionIndex == 2){
-			if($scope.editedPrescribeHistory.selectDrugIndex == -1){
-				deleteAllDrugs();
-			}else{
-				deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
-			}
+$scope.keys.push({ code : KeyCodes.Backspace, action : function() {deleteBackspace();}});
+$scope.keys.push({ code : KeyCodes.Delete, action : function() {deleteBackspace();}});
+deleteBackspace = function(){
+	if($scope.workDoc.pageDeepPositionIndex == 1){
+		deleteDay($scope.editedPrescribeHistory);
+		changeSaveControl($scope, $http);
+	}else
+	if($scope.workDoc.pageDeepPositionIndex == 2){
+		if($scope.editedPrescribeHistory.selectDrugIndex == -1){
+			deleteAllDrugs();
+		}else{
+			deleteSelected($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
 		}
+		changeSaveControl($scope, $http);
 	}
-});
 
+}
 $scope.keys.push({ code : KeyCodes.F2,
 	action : function() {
 		console.log("F2");
@@ -1271,27 +1274,6 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		return isMinus;
 	}
 
-	$scope.drugHourDescription = function(drug){
-		var hoursStr = "(";
-		var malProDay = 0;
-		for(var h = $scope.dayStartHour; h < 24; h++){
-			if(drug.times.hours[h]){
-				hoursStr += h+",";
-				malProDay++;
-			}
-		}
-		for(var h = 0; h < $scope.dayStartHour; h++){
-			if(drug.times.hours[h]){
-				hoursStr += h+",";
-				malProDay++;
-			}
-		}
-		hoursStr = hoursStr.substring(0, hoursStr.length-1) ;
-		hoursStr += " годин)";
-		var drugHourDescriptionStr = " " + malProDay +" раз в день " + hoursStr;
-		return drugHourDescriptionStr;
-	}
-
 	getTaskFromPrescribes = function($index, prescribeHistory){
 		if(typeof prescribeHistory === 'undefined' 
 			|| typeof prescribeHistory.prescribes === 'undefined' 
@@ -1336,9 +1318,22 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		}
 
 	}
+	$scope.taskAndHourDescription = function($index, prescribeHistory){
+		var drug = getTaskFromPrescribes($index, prescribeHistory);
+		if("." === drug) return drug;
+		var td = drugDescription(drug);
+		angular.forEach($filter('filter')(drug.times.hours, "-"), function(){
+			td += " <i class='fa fa-minus'></i>";
+		});
+		td = "<span title ='" +$scope.drugHourDescription(drug) +"' >" + td +"</span>";
+		return $sce.trustAsHtml( td );
+	}
 	$scope.taskDescription = function($index, prescribeHistory){
 		var drug = getTaskFromPrescribes($index, prescribeHistory);
 		if("." === drug) return drug;
+		return drugDescription(drug);
+	};
+	drugDescription = function(drug){
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
 			if(drug.dose.DOSECONCENTRATON_NUMBER){
@@ -1351,7 +1346,29 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 			}
 		}
 		return taskDescription;
-	};
+	}
+	$scope.drugHourDescription = function(drug){
+		var hoursStr = "(";
+		var malProDay = 0;
+		for(var h = $scope.dayStartHour; h < 24; h++){
+			if(drug.times.hours[h]){
+				hoursStr += h+",";
+				malProDay++;
+			}
+		}
+		for(var h = 0; h < $scope.dayStartHour; h++){
+			if(drug.times.hours[h]){
+				hoursStr += h+",";
+				malProDay++;
+			}
+		}
+		hoursStr = hoursStr.substring(0, hoursStr.length-1) ;
+		hoursStr += " год.)";
+		var drugHourDescriptionStr = malProDay +" в день " + hoursStr;
+		return drugHourDescriptionStr;
+	}
+
+	
 }
 
 initDeclarePrescribesPrint = function($scope, $http, $sce, $filter){

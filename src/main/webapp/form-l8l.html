@@ -15,6 +15,7 @@ table {
 	*/
 }
 
+.groupDrug td { border-width: 0px 1px;}
 td, th {
 	border: solid;
 	border-width: 1px 1px;
@@ -38,15 +39,15 @@ td, th {
 				<td colspan="27">
 					<table width="100%" class="captiontable">
 						<colgroup>
-							<col style="width: 12%"/>
+							<col style="width: 13%"/>
 							<col style="width: 5%"/>
-							<col style="width: 8%"/>
+							<col style="width: 7%"/>
 							<col style="width: 47%"/>
-							<col style="width: 16%"/>
-							<col style="width: 12%"/>
+							<col style="width: 18%"/>
+							<col style="width: 10%"/>
 						</colgroup>
 						<tr>
-							<td>Група крові</td><td></td>
+							<td class="right">Група крові</td><td></td>
 							<td>Хворий</td><td class="bold"> {{patient.PATIENT_NAME}} </td>
 							<td>Історія хвороби</td><td class="bold">{{patient.PATIENT_HISTORYID}}</td>
 						</tr>
@@ -54,8 +55,7 @@ td, th {
 							<td class="right">Rh</td><td></td>
 							<td>Діагноз</td><td></td>
 							<td class="right">Дата</td>
-							<td>{{prescribeHistory.date | date:'dd-MM-yyyy'}}
-								</td>
+							<td>{{prescribeHistory.date | date:'dd-MM-yyyy'}}</td>
 								<!-- 
 							<td>{{prescribeHistory.date | date:'" dd " '}}
 								{{getMMMMUa(prescribeHistory.date)}} {{prescribeHistory.date |
@@ -99,10 +99,14 @@ td, th {
 		</thead>
 		<tbody>
 			<tr data-ng-repeat="taskInDay in tasksInDay"
+				data-ng-class="{'groupDrug': prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition >= 0}"
 				data-ng-init="taskInDayIndex = $index">
-				<td><span ng-bind-html="taskDescription($index, prescribeHistory)"></span></td>
-				<td data-ng-repeat="dayHour in dayHours"><i
-					data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
+				<td
+				>
+				<span data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
+				<span ng-bind-html="taskDescription($index, prescribeHistory)"></span></td>
+				<td data-ng-repeat="dayHour in dayHours">
+					<i data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
 				</td>
 				<td></td>
 				<td></td>
@@ -122,7 +126,8 @@ td, th {
 	<script src="/js/cuwy1.config.js"></script>
 	<script type="text/javascript">
 	
-	angular.module('f8lApp', ['ngSanitize']).controller('f8lCtrl', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
+	angular.module('f8lApp', ['ngSanitize']).controller('f8lCtrl', ['$scope', '$http', '$sce', 
+			function($scope, $http, $sce) {
 		console.log("----------f8lCtrl----------");
 		setCookieDaysLong('printForm','l8l',365);
 		$scope.tasksInDayNumber = 20;

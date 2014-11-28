@@ -1,10 +1,10 @@
 //var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap']);
-cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$sce', function ($scope, $http, $sce) {
+cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$filter', '$sce', function ($scope, $http, $filter, $sce) {
 	console.log("drugCtrl");
 	$scope.dayStartHour = getCookie('dayStartHour');
 	$scope.parameters = parameters;
 	$scope.numberOfChange = 0;
-	initDeclarePrescribesEdit($scope, $http, $sce);
+	initDeclarePrescribesEdit($scope, $http, $sce, $filter);
 	
 	$scope.siteMap = config.siteMap.siteMaps[5];
 	$http({

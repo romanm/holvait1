@@ -4,6 +4,7 @@
 	<meta charset="utf-8" />
 	<title>{{siteMap.title}}</title>
 	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
 	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
 </head>
 
@@ -111,7 +112,7 @@
 				data-ng-init="drugIndex = $index"
 			>
 				<span data-ng-show="drug.groupPosition > 0">+</span>
-				<span ng-bind-html="taskDescription(drugIndex, ddPrescribeHistory)"></span>,
+				<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>,
 				<span ng-bind-html="drugHourDescription(drug)"></span>
 			</div>
 			</div>
@@ -125,9 +126,9 @@
 					data-ng-init="rdPrescribeHistoryIndex = $index;">
 					Група типових призначень {{rdPrescribeHistoryIndex + 1}}
 					<div data-ng-repeat="rDrug in rdPrescribeHistory.prescribes.tasks"
-						data-ng-init="rDrugIndex = $index">
-						<span data-ng-show="rDrug.groupPosition > 0">+</span> <span
-							ng-bind-html="taskDescription(rDrugIndex, rdPrescribeHistory)"></span>,
+							data-ng-init="rDrugIndex = $index">
+						<span data-ng-show="rDrug.groupPosition > 0">+</span>
+						<span ng-bind-html="taskAndHourDescription(rDrugIndex, rdPrescribeHistory)"></span>,
 						<span ng-bind-html="drugHourDescription(rDrug)"></span>
 					</div>
 				</div>
