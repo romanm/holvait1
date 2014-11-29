@@ -361,6 +361,13 @@ initWorkDocument = function(data, $scope, $http){
 
 initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	initDeclarePrescribesCommon($scope, $http, $sce, $filter);
+	$scope.hourMoveWay = 0;
+	$scope.hoursMoveWays = ["|⇄|",".⇄|","|⇄."];
+//	$scope.hoursMoveWays = ["|⇄|",".⇄|","|⇄|","|⇄."];
+//	$scope.hoursMoveWays = ["|↔|"," ↔|","|↔|","|↔ "];
+//	$scope.hoursMoveWays = ["↔","⇥","↦"];
+//	$scope.hoursMoveWays = ["↔","⇥↤","↦⇤"];
+	//$scope.hoursMoveWays = ["<sub>←</sub><sup>→</sup>","<sub>⇥</sub><sup>↤</sup>","<sub>↦</sub><sup>⇤</sup>"];
 	$scope.minPageDeepPositionIndex = -2;
 	$scope.autoSaveLimit = 5;
 	$scope.tasksInDayNumber = 19;
@@ -1172,7 +1179,9 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.Enter,
 		}
 	}
 });
-
+$scope.keys.push({ ctrlKey : true, code : KeyCodes.Way, action : function() {
+	$scope.changeHourMoveWay();
+}});
 $scope.keys.push({ code : KeyCodes.Backspace, action : function() {deleteBackspace();}});
 $scope.keys.push({ code : KeyCodes.Delete, action : function() {deleteBackspace();}});
 deleteBackspace = function(){
@@ -1308,6 +1317,13 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		return "≈" + (diSum).toString() + " мл";
 	}
 
+	$scope.changeHourMoveWay = function(){
+		$scope.hourMoveWay++;
+		if($scope.hourMoveWay > 2) $scope.hourMoveWay = 0;
+	}
+	$scope.showHourMoveWay = function(){
+		return $sce.trustAsHtml($scope.hoursMoveWays[$scope.hourMoveWay]);
+	}
 	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
 		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
 		if(drug == null || drug.times == null) return;

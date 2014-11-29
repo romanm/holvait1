@@ -20,6 +20,9 @@ public class Lp24RestController {
 	private static final Logger logger = LoggerFactory.getLogger(Lp24RestController.class);
 	
 	@Autowired
+	private ScheduledTasks scheduledTasks;
+
+	@Autowired
 	private Lp24ControllerImpl lp24Controller;
 
 	//------------------patient----------------------
@@ -159,9 +162,11 @@ public class Lp24RestController {
 	public @ResponseBody Integer nextDbId() {
 		return lp24Controller.nextDbId();
 	}
+
 	@RequestMapping(value = "/elexRea", method = RequestMethod.GET)
 	public @ResponseBody List<Map<String, Object>> elexRea() {
 		logger.debug("/elexRea");
 		return lp24Controller.elexRea();
 	}
+
 }

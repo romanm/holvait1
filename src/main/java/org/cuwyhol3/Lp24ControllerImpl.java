@@ -11,6 +11,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class Lp24ControllerImpl {
 	
 	//------------------patient----------------------------
 	public Map<String, Object> readPatient(@PathVariable Integer patientId) {
-		String fileNameWithPathAdd = lp24Config.getPatientDbJsonName(patientId);
+		String fileNameWithPathAdd = Lp24Config.getPatientDbJsonName(patientId);
 		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
 		if(null == readJsonDbFile2map){
 			readJsonDbFile2map = lp24jdbc.readPatient(patientId);
@@ -101,6 +103,9 @@ public class Lp24ControllerImpl {
 	}
 	private void savePatienToFile(Map<String, Object> patientToSave, Integer patientId) {
 		updateDrugs(patientToSave);
+		final Date savedDate = new Date();
+		patientToSave.put("savedDate", savedDate);
+		lp24jdbc.newSavedPatient(patientId, savedDate);
 		writeToJsonDbFile(patientToSave, Lp24Config.getPatientDbJsonName(patientId));
 		updatePatient(patientToSave);
 	}
@@ -129,9 +134,32 @@ public class Lp24ControllerImpl {
 		return patient1sList;
 	}
 	//------------------patient----------------------------END
+
+	public boolean updateDrugToBlock1(Map<String, Object> readDrug, Map drug) {
+		for (Map prescribeHistory : getInitListOfMaps(readDrug, "prescribesHistory")) {
+			final Map prescribes = getInitMap(prescribeHistory, "prescribes");
+			List<Map> tasks = getListOfMaps(prescribes, "tasks");
+			if(null == tasks){
+				tasks = new ArrayList<Map>();
+				tasks.add(drug);
+				prescribes.put("tasks", tasks);
+				return true;
+			}else
+			for (Map map : tasks) {
+				logger.debug(""+map);
+				logger.debug(""+(null == map));
+				logger.debug(""+map.get("DRUG_ID"));
+				if(null == map.get("DRUG_ID")){
+					logger.debug("leer");
+				}
+			}
+		}
+		return false;
+	}
+
 	private void updateDrugs(Map<String, Object> prescribes) {
-		for (Object prescribeHistory : getArray(prescribes,"prescribesHistory")) {
-			for (Map drug : getMapsArray(getMap((Map)prescribeHistory, "prescribes"), "tasks")) {
+		for (Map prescribeHistory : getList(prescribes,"prescribesHistory")) {
+			for (Map drug : getListOfMaps(getMap(prescribeHistory, "prescribes"), "tasks")) {
 				if(null != drug){
 					Map<String, Object> drugDocument;
 					Integer drugId = (Integer) drug.get("DRUG_ID");
@@ -154,7 +182,6 @@ public class Lp24ControllerImpl {
 								drugId = (Integer) readDrugFromName.get("DRUG_ID");
 								drugDocument = readDrug(drugId);
 							}
-							
 						}
 					}
 					List<Map> doses = addDose2DrugDocument(drug, drugDocument);
@@ -173,21 +200,38 @@ public class Lp24ControllerImpl {
 		return drugDocument;
 	}
 
-	private List getArray(Map map, String key) {
-		return (List)map.get(key);
+	private List<Map> getInitListOfMaps(Map<String, Object> map, String key) {
+		List<Map> list = getList(map, key);
+		if(null == list){
+			list = new ArrayList<Map>();
+			list.add(new HashMap<String, Object>());
+			map.put(key, list);
+		}
+		return list;
 	}
-	private List<Map> getMapsArray(Map map, String key) {
+	private List<Map> getList(Map map, String key) {
 		return (List<Map>)map.get(key);
 	}
-	private Map getMap(Map<String, Object> prescribes, String key) {
-		return (Map)prescribes.get(key);
+	private List<Map> getListOfMaps(Map map, String key) {
+		return (List<Map>)map.get(key);
+	}
+	private Map getInitMap(Map map,final String key) {
+		Map mapInMap = getMap(map, key);
+		if(null == mapInMap){
+			mapInMap = new HashMap<String, Object>();
+			map.put(key, mapInMap);
+		}
+		return mapInMap;
+	}
+	private Map getMap(Map<String, Object> map, String key) {
+		return (Map)map.get(key);
 	}
 	private List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
 		Set<Map> hashSet = new HashSet<Map>();
-		List<Map> ddDoses = getMapsArray(drugDocument, "doses");
+		List<Map> ddDoses = getListOfMaps(drugDocument, "doses");
 		if(null != ddDoses)
 			hashSet.addAll(ddDoses);
-		List<Map> dDoses = getMapsArray(drug, "doses");
+		List<Map> dDoses = getListOfMaps(drug, "doses");
 		Map dose = getMap(drug, "dose");
 		if(null != dose)
 			hashSet.add(dose);
@@ -335,16 +379,14 @@ public class Lp24ControllerImpl {
 	}
 	//------------------drug----------------------------END
 
-	private Map<String, Object> readJsonDbFile2map(String fileName) {
+	Map<String, Object> readJsonDbFile2map(String fileName) {
 		String pathToFile = lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName;
-		logger.debug(pathToFile);
 		File file = new File(pathToFile);
 		logger.debug(" o - "+file);
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> readJsonDbFile2map = null;// = new HashMap<String, Object>();
 		try {
 			readJsonDbFile2map = mapper.readValue(file, Map.class);
-			logger.debug(" o - "+readJsonDbFile2map);
 		} catch (JsonParseException e1) {
 			e1.printStackTrace();
 		} catch (JsonMappingException e1) {
@@ -377,7 +419,7 @@ public class Lp24ControllerImpl {
 		final String fileName = lp24Config.applicationFolderPfad + "src/main/resources/dbVersionUpdate.json.sql";
 		writeToJsonDbFile(java2jsonObject, fileName);
 	}
-	private void writeToJsonDbFile(Object java2jsonObject, String fileName) {
+	void writeToJsonDbFile(Object java2jsonObject, String fileName) {
 		File file = new File(Lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName);
 		logger.warn(""+file);
 		ObjectMapper mapper = new ObjectMapper();
@@ -414,4 +456,5 @@ public class Lp24ControllerImpl {
 	public Integer nextDbId() {
 		return lp24jdbc.nextDbId();
 	}
+	
 }

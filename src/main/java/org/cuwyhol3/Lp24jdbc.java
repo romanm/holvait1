@@ -13,7 +13,6 @@ import org.h2.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.stereotype.Component;
 
@@ -103,6 +102,14 @@ public class Lp24jdbc {
 		}
 	}
 
+	public Map<String, Object> readSavedPatient() {
+		String sql = "SELECT * FROM patient1 where PATIENT_CHECKED = false ORDER BY patient_savedts ASC LIMIT 1";
+		List<Map<String, Object>> patient1sList = jdbcTemplate.queryForList(sql);
+		if(patient1sList.isEmpty())
+			return null;
+		Map<String, Object> map = patient1sList.get(0);
+		return map;
+	}
 	public Map<String, Object> readPatient(Integer id) {
 		String sql = "SELECT * FROM patient1 WHERE patient_id = ?";
 		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
@@ -193,7 +200,14 @@ public class Lp24jdbc {
 		List<Map<String, Object>> patient1sList = jdbcTemplate.queryForList(sql);
 		return patient1sList;
 	}
-
+	public void updateSavedPatientIsChecked(int patientId) {
+		jdbcTemplate.update("UPDATE patient1 SET patient_checked = true WHERE patient_id = ?"
+				,patientId);
+	}
+	public void newSavedPatient(Integer patientId, Date savedDate) {
+		jdbcTemplate.update("UPDATE patient1 SET patient_checked = false, patient_savedts = ? WHERE patient_id = ?"
+				,savedDate,patientId);
+	}
 	public Map<String, Object> newPatient(Map<String, Object> newPatient) {
 		Object patientName = newPatient.get("PATIENT_NAME");
 		jdbcTemplate.update("INSERT INTO patient1 (patient_name) VALUES (?)",patientName);
@@ -267,5 +281,6 @@ public class Lp24jdbc {
 	}
 
 	
+
 
 }
