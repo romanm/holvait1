@@ -5,14 +5,35 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 	$scope.selectDrugIndex = null;
 	$scope.selectDoseIndex = null;
 
-	$scope.addTaskToPrescribeHistory = function(drug){
-		console.log(drug);
-		console.log($scope.editedPrescribeDrug);
+	$scope.addTaskToPrescribeHistory = function(drugPrescribeHistory, selectDrugIndex){
+		var drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
+		if(drug.groupPosition >=0){
+			if(drug.groupPosition > 0){
+				selectDrugIndex -= drug.groupPosition;
+				drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
+			}
+			attToFirstDrug(drug);
+			var drugInGroupIndex = 0;
+			while(drug && drug.groupPosition == drugInGroupIndex){
+				drugInGroupIndex = drugInGroupIndex + 1;
+				drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex + drugInGroupIndex];
+				if(drug){
+					insertDrugToTask(drug, $scope.editedPrescribeHistory.selectDrugIndex + drugInGroupIndex, $scope.editedPrescribeHistory);
+				}
+			}
+			changeSaveControl($scope, $http);
+		}else{
+			attToFirstDrug(drug);
+			changeSaveControl($scope, $http);
+		}
+
+	}
+
+	attToFirstDrug = function(drug){
 		$scope.editedPrescribeDrug.DRUG_ID= drug.DRUG_ID;
 		$scope.editedPrescribeDrug.DRUG_NAME= drug.DRUG_NAME;
 		$scope.editedPrescribeDrug.dose = drug.dose;
 		$scope.editedPrescribeDrug.times = drug.times;
-
 	}
 
 	$scope.addDoseToPrescribeDrug = function(doseToPrescribe){

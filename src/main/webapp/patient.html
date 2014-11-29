@@ -326,9 +326,8 @@
 			selectpath:drugDocument.doses[selectDoseIndex] == dose,
 			selected:drugDocument.doses[selectDoseIndex] == dose }"
 					>
-					<small
-						data-ng-show="dose.DOSECONCENTRATON_NUMBER">
-							{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
+					<small data-ng-show="dose.DOSECONCENTRATON_NUMBER">
+						{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
 					</small> {{dose.DOSE_NUMBER}} {{dose.DOSE_UNIT}}
 						{{dose.DOSE_ROUTE_OF_ADMINISTRATION}}</span>
 						|
@@ -343,9 +342,8 @@
 					<span
 						data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
 						data-ng-init="drugIndex = $index">
-					<span 
-						class="mouseover"
-					data-ng-click="addTaskToPrescribeHistory(drug)">
+					<span class="mouseover"
+							data-ng-click="addTaskToPrescribeHistory(ddPrescribeHistory, drugIndex)">
 						<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>
 					</span>
 					|
@@ -363,7 +361,7 @@
 							data-ng-repeat="rDrug in rdPrescribeHistory.prescribes.tasks"
 							data-ng-init="rDrugIndex = $index">
 							<span data-ng-show="!(rDrug.groupPosition > 0)">|</span>
-							<span data-ng-click="addTaskToPrescribeHistory(rDrug)"
+							<span data-ng-click="addTaskToPrescribeHistory(rdPrescribeHistory, rDrugIndex)"
 							class="mouseover"
 							>
 								<span data-ng-show="rDrug.groupPosition > 0">+</span>
