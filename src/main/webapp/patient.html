@@ -221,13 +221,13 @@
 					<th title="Одиниці виміру">
 						<span 
 						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг', 'г']"
-						data-ng-click="newDrugDocumentDose.DOSE_UNIT = doseUnit"
+						data-ng-click="editedPrescribeDrug.dose.DOSE_UNIT = doseUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
 					</th>
 					<th title="Шлях введення">
 						<span 
-						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п.о.']"
-						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
+						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п/ш', 'п.о.']"
+						data-ng-click="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
 						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
 					</th>
 					<th></th>
@@ -235,7 +235,7 @@
 					<th title="Одиниці виміру концентрації">
 						<span 
 						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
-						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
+						data-ng-click="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
 					</th>
 				</tr>

@@ -1014,7 +1014,7 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowLeft,
 			}else{
 				var moved = false;
 				var selectedHour = hour;
-				for (var hour = dayStartHour; hour < selectedHour; hour++) {
+				for (var hour = $scope.dayStartHour; hour < selectedHour; hour++) {
 					if($scope.editedPrescribeDrug.times.hours[hour]){
 						if(hour == 8) break; // no move to other day
 						hourYesHourNo(hour - 1, hour);
@@ -1039,9 +1039,9 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.ArrowRight,
 				var moved = false;
 				var selectedHour = hour;
 				var isBreak = false;
-				for (var hour = dayStartHour - 1; hour > selectedHour || (selectedHour >= dayStartHour && hour >= 0); hour--) 
+				for (var hour = $scope.dayStartHour - 1; hour > selectedHour || (selectedHour >= $scope.dayStartHour && hour >= 0); hour--) 
 					if($scope.editedPrescribeDrug.times.hours[hour]){
-						if(hour == (dayStartHour - 1)){
+						if(hour == ($scope.dayStartHour - 1)){
 							isBreak = true;
 							break; // no move to other day
 						}
