@@ -24,7 +24,7 @@ public class ScheduledTasks {
 	@Autowired
 	private Lp24ControllerImpl lp24Controller;
 
-	@Scheduled(fixedRate = 27000)
+	@Scheduled(fixedRate = 97000)
 	public void checkSavedPatient() {
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(""+readSavedPatient+" "+dateFormat.format(new Date()));
@@ -47,7 +47,7 @@ public class ScheduledTasks {
 		lp24jdbc.updateSavedPatientIsChecked(patientId);
 	}
 
-	@Scheduled(fixedRate = 97000)
+	@Scheduled(fixedRate = 87000)
 	public void reportCurrentTime() {
 		System.out.println("The time is now " + dateFormat.format(new Date()) + lp24jdbc);
 	}

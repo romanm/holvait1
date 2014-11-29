@@ -1352,7 +1352,7 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	drugDescription = function(drug){
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
-			if(drug.dose.DOSECONCENTRATON_NUMBER){
+			if(drug.dose.DOSECONCENTRATON_NUMBER && !(drug.DRUG_NAME.indexOf("%") > 0)){
 				taskDescription +=
 					$sce.trustAsHtml( "<small>" + drug.dose.DOSECONCENTRATON_NUMBER+drug.dose.DOSECONCENTRATON_UNIT + "</small> ");
 			}
