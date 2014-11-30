@@ -31,6 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/js/**", 
 						"/js-vendor/**" 
 						,"/tmp/dp*" 
+						,"/tmp/p-m-m-1_files/*" 
 						,"/home.html"
 						,"/elexRean.html"
 						,"/elexReanPrecis.html"

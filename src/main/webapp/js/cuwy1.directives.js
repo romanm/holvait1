@@ -592,9 +592,16 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		var oldCollapsed = taskInDay.isCollapsed;
 		$(prescribeHistory.tasksInDay).each(function () {
 			this.isCollapsed = false;
-		} );
+		});
 		taskInDay.isCollapsed = !oldCollapsed;
-		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+		initEditedPrescribeDrugForEdit(prescribeHistory, $scope.editedPrescribeHistory.selectDrugIndex, $scope);
+
+		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
+			readDrugDocument($scope.editedPrescribeDrug, $scope, $http);
+		}
+	}
+	initEditedPrescribeDrugForEdit = function(prescribeHistory, editedPrescribeDrugIndex, $scope){
+		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[editedPrescribeDrugIndex];
 		if(null == $scope.editedPrescribeDrug){
 			$scope.editedPrescribeDrug = 
 			{DRUG_NAME:"",
@@ -605,13 +612,9 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 					,DOSE_ID:""
 					,DOSE_ROUTE_OF_ADMINISTRATION:""}
 			};
-			insertDrugToTask($scope.editedPrescribeDrug, $scope.editedPrescribeHistory.selectDrugIndex, prescribeHistory);
-		}
-		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
-			readDrugDocument($scope.editedPrescribeDrug, $scope, $http);
+			insertDrugToTask($scope.editedPrescribeDrug, editedPrescribeDrugIndex, prescribeHistory);
 		}
 	}
-
 	$scope.saveNewDrug = function(seekDrug, taskInDay, prescribeHistory){
 		$http({ method : 'POST', data : $scope.editedPrescribeDrug, url : config.urlPrefix + '/saveNewDrug'
 		}).success(function(data, status, headers, config){
@@ -644,7 +647,10 @@ $scope.menuTask = [
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		var prescribeHistory = $itemScope.$parent.prescribeHistory;
+		console.log(prescribeHistory);
+		console.log(prescribeHistory.selectDrugIndex);
 		prescribeHistory.selectDrugIndex = $itemScope.$index;
+		console.log(prescribeHistory.selectDrugIndex);
 		pasteCopyObject(prescribeHistory, $scope, $http);
 	}],
 	null,
@@ -698,16 +704,19 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 
 pasteCopyObject = function(prescribeHistory, $scope, $http){
 	$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
-	}).success(function(data, status, headers, config) {
-		var copyObject = data;
+	}).success(function(copyObject, status, headers, config) {
+		console.log(copyObject);
 		var selectPosition = prescribeHistory.selectDrugIndex;
 		if(selectPosition == -1) selectPosition = 0;
+		console.log(prescribeHistory);
 		var taskInDay = prescribeHistory.tasksInDay[selectPosition];
+		console.log(taskInDay);
 		var position = taskInDay.i;
 		$(copyObject.tasks).each(function () {
 			var drug = this.DRUG_NAME?this:null;
 			insertDrugToTask(drug, position++, prescribeHistory);
 		});
+		console.log(prescribeHistory);
 		changeSaveControl($scope, $http);
 	}).error(function(data, status, headers, config) {
 	});
@@ -1164,8 +1173,13 @@ $scope.keys.push({ shiftKey : true, code : KeyCodes.Enter,
 			$scope.newPrescribes();
 		}else
 		if($scope.workDoc.pageDeepPositionIndex == 2){
-			$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex+1, 0, null);
-			changeSaveControl($scope, $http);
+			var drug = $scope.editedPrescribeHistory.prescribes.tasks[$scope.editedPrescribeHistory.selectDrugIndex];
+			console.log(drug);
+			if(drug && drug.groupPosition >=0){
+			}else{
+				$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex+1, 0, null);
+				changeSaveControl($scope, $http);
+			}
 		}
 	}
 });
@@ -1240,6 +1254,7 @@ $scope.$on('keydown', function(msg, obj){
 	console.log(obj.event);
 	var code = obj.event.keyCode;
 	if(isEditDialogOpen()){
+		console.log("---");
 		if(code == $scope.keys[0].code){
 			$scope.keys[0].action(); //make save (F4)
 		}else
@@ -1263,6 +1278,57 @@ $scope.$on('keydown', function(msg, obj){
 });
 
 //---------------------keydown-------------------------------END
+//---------------------work with block-------------------------------
+
+	$scope.addTaskToPrescribeHistoryEnd = function(drugPrescribeHistory, selectDrugIndex){
+		var insertPosition = $scope.editedPrescribeHistory.prescribes.tasks.length;
+		if(insertPosition > 0){
+			while(insertPosition > 0 && ($scope.editedPrescribeHistory.prescribes.tasks[insertPosition] == null
+					|| $scope.editedPrescribeHistory.prescribes.tasks[insertPosition].DRUG_NAME == "")){
+				insertPosition--;
+			}
+			insertPosition++;
+		}
+		console.log(insertPosition);
+		initEditedPrescribeDrugForEdit($scope.editedPrescribeHistory, insertPosition, $scope);
+		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, insertPosition);
+	}
+	$scope.addTaskToPrescribeHistory = function(drugPrescribeHistory, selectDrugIndex){
+		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, $scope.editedPrescribeHistory.selectDrugIndex);
+	}
+
+	addTaskToPrescribeHistoryInPosition = function(drugPrescribeHistory, selectDrugIndex, insertPosition){
+		var drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
+		console.log(drug);
+		if(drug.groupPosition >=0){
+			if(drug.groupPosition > 0){
+				selectDrugIndex -= drug.groupPosition;
+				drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
+			}
+			attToFirstDrug(drug);
+			var drugInGroupIndex = 0;
+			while(drug && drug.groupPosition == drugInGroupIndex){
+				drugInGroupIndex = drugInGroupIndex + 1;
+				drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex + drugInGroupIndex];
+				if(drug){
+					insertDrugToTask(drug, insertPosition + drugInGroupIndex, $scope.editedPrescribeHistory);
+				}
+			}
+			changeSaveControl($scope, $http);
+		}else{
+			attToFirstDrug(drug);
+			changeSaveControl($scope, $http);
+		}
+	}
+
+	attToFirstDrug = function(drug){
+		$scope.editedPrescribeDrug.DRUG_ID= drug.DRUG_ID;
+		$scope.editedPrescribeDrug.DRUG_NAME= drug.DRUG_NAME;
+		$scope.editedPrescribeDrug.dose = drug.dose;
+		$scope.editedPrescribeDrug.times = drug.times;
+	}
+
+//---------------------work with block-------------------------------END
 
 }
 

@@ -24,7 +24,7 @@ public class ScheduledTasks {
 	@Autowired
 	private Lp24ControllerImpl lp24Controller;
 
-	@Scheduled(fixedRate = 97000)
+	@Scheduled(fixedRate = 117000)
 	public void checkSavedPatient() {
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(""+readSavedPatient+" "+dateFormat.format(new Date()));
@@ -38,6 +38,8 @@ public class ScheduledTasks {
 				if(null == drugInPatientDocument)
 					continue;
 				final Integer drugId = (Integer) drugInPatientDocument.get("DRUG_ID");
+				if(null == drugId)
+					continue;
 				final Map<String, Object> readDrugDocument = lp24Controller.readDrug(drugId);
 				if(lp24Controller.updateDrugToBlock1(readDrugDocument, drugInPatientDocument)){
 					lp24Controller.writeToJsonDbFile(readDrugDocument, Lp24Config.getDrugDbJsonName(drugId));
@@ -47,7 +49,7 @@ public class ScheduledTasks {
 		lp24jdbc.updateSavedPatientIsChecked(patientId);
 	}
 
-	@Scheduled(fixedRate = 87000)
+	@Scheduled(fixedRate = 287000)
 	public void reportCurrentTime() {
 		System.out.println("The time is now " + dateFormat.format(new Date()) + lp24jdbc);
 	}

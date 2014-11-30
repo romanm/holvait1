@@ -8,8 +8,14 @@
 </head>
 
 <body key-cuwytrap="">
-<a href="home.html"><span class="glyphicon glyphicon-home"></span></a>
-/ <span class="h1">{{siteMap.name}}</span>
+	<a id="focus_minus_1"
+		data-ng-class="{'selected': pageDeepPositionIndex == -1}"
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
+/	<a id="focus_0"
+		data-ng-class="{'selected': pageDeepPositionIndex == 0}"
+		href="protocols.html"> <span class="h1">{{siteMap.name}}</span>
+	</a>
+
 <span class="navbar-right">
 	<ul class="nav nav-pills">
 		<li><a href="patients.html">пацієнти</a></li>
@@ -169,8 +175,10 @@
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/db/protocolOrder1sList.json.js"></script>
 	<script src="/db/prescribeOrder1sList.json.js"></script>
+	<!--  
 	<script src="http://sah.curepathway.com/db/prescribeOrder1sListOpen.json.js"></script>
 	<script src="http://sah.curepathway.com/db/protocolOrder1sListOpen.json.js"></script>
+	-->
 	<script src="/js/protocolsCtrl.js"></script>
 
 </body>

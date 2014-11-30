@@ -28,8 +28,8 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', '$sce', functi
 		}
 		return true;
 	}
-	
-copy = function(taskIndex, prescribeHistory){
+
+copyTODEL = function(taskIndex, prescribeHistory){
 	var drug = prescribeHistory.prescribes.tasks[taskIndex];
 	if(drug.selectMultiple){
 		$itemScope.$parent.prescribeHistory.prescribes.selectMultiple = true;
@@ -120,35 +120,6 @@ saveDrugDocument = function(){
 //---------------------drug document---------------------END-------
 
 //---------------------keydown-------------------------------
-
-$scope.$on('keydownOldToDel', function(msg, obj){
-	//console.log(obj);
-	var code = obj.event.keyCode;
-	if(!$scope.editedPrescribeHistory.selectDrugIndex){
-		$scope.editedPrescribeHistory.selectDrugIndex = 0;
-	}
-	if($scope.editedPrescribeHistory.tasksInDay 
-	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex]
-	&& $scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed
-	){
-		if(code == $scope.keys[0].code){
-			//make save (F4)
-			 $scope.keys[0].action();
-		}
-		return;
-	}
-	var ctrlKey = obj.event.ctrlKey;
-	var altKey = obj.event.altKey;
-	var shiftKey = obj.event.shiftKey;
-	$scope.keys.forEach(function(o) {
-		if(o.code !== code) return;
-		if((ctrlKey && !o.ctrlKey) || (o.ctrlKey && !ctrlKey)) return;
-		if((altKey && !o.altKey) || (o.altKey && !altKey)) return;
-		if((shiftKey && !o.shiftKey) || (o.shiftKey && !shiftKey)) return;
-		o.action();
-		$scope.$apply();
-	});
-});
 
 //---------------------keydown---------------------END-------
 }]);

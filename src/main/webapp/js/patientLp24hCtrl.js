@@ -31,6 +31,12 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 		}
 	}).error(function(data, status, headers, config) {
 	});
+	$http({ method : 'GET', url : config.urlPrefix + '/read' + urlServer + '/prescribe_14'
+	}).success(function(prescribesGroup, status, headers, config) {
+		$scope.prescribesGroup = prescribesGroup;
+		console.log($scope.prescribesGroup);
+	}).error(function(data, status, headers, config) {
+	});
 
 	$scope.saveWorkDoc = function(){
 		saveWorkDoc(config.urlPrefix + "/save/patient", $scope, $http);
@@ -227,4 +233,12 @@ $scope.dateOptions = { formatYear: 'yy', startingDay: 1 };
 $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
 $scope.format = $scope.formats[0];
 //---------------datepicker-------------------------END
+
+//---------------prescribes group-------------------------
+$scope.openPrescribesGroupIndex = -1;
+$scope.openGroup = function(pgPrescribesHistoryIndex){
+	$scope.openPrescribesGroupIndex = pgPrescribesHistoryIndex;
+	console.log(pgPrescribesHistoryIndex);
+}
+//---------------prescribes group-------------------------END
 }]);

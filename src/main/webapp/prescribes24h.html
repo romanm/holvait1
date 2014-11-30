@@ -11,7 +11,7 @@
 <body data-key-cuwytrap="" >
 	<a id="focus_minus_2"
 		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -2}"
-		href="home.html"><span class="glyphicon glyphicon-home"></span></a> 
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
 /	<a id="focus_minus_1"
 		data-ng-class="{'selected': p24hDoc.pageDeepPositionIndex == -1}"
 		href="protocols.html">Список КП:призначень</a> 
@@ -131,26 +131,17 @@
 									<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
 									<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
 								</td>
-								<td 
+								<td
 									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
 									data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
 														selected:taskSelected(taskInDayIndex, prescribeHistory) }"
-									ng-context-menu="menuTask"
-									title="{{taskInDay.isCollapsed}}"
-								>
-								{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME == null
-								? ".":prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}
-								<small data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER">
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_NUMBER
-									}}{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSECONCENTRATON_UNIT}}
-								</small>
-								<span>
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_NUMBER}}
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_UNIT}}
-									{{prescribeHistory.prescribes.tasks[taskInDayIndex].dose.DOSE_ROUTE_OF_ADMINISTRATION}}
-								</span>
-							</td>
-							<td data-ng-repeat="dayHour in dayHours"
+									ng-context-menu="menuTask" title="{{taskInDay.isCollapsed}}">
+									<span
+									data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
+									<span
+									ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
+								</td>
+								<td data-ng-repeat="dayHour in dayHours"
 							ng-init="dayHourIndex = $index"
 							data-ng-class="{	selectpath:dayHourInSelectPath(dayHourIndex, taskInDayIndex, prescribeHistory),
 										selected:dayHourSelected(dayHourIndex, taskInDayIndex, prescribeHistory) }"

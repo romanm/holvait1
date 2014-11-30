@@ -221,10 +221,9 @@ public class Lp24jdbc {
 		String patientName = (String) patientToUpdate.get("PATIENT_NAME");
 		Boolean patientArchive = (Boolean) patientToUpdate.get("PATIENT_ARCHIVE");
 		Integer patientId = (Integer) patientToUpdate.get("PATIENT_ID");
-		int update = this.jdbcTemplate.update(
-				"update patient1 set patient_name = ?, patient_archive = ? where patient_id = ?",
-				patientName, patientArchive, patientId);
-		return update;
+		final String sql = "update patient1 set patient_name = ?, patient_archive = ? where patient_id = ?";
+		logger.debug(sql.replaceFirst("\\?", patientName).replaceFirst("\\?", patientArchive.toString()).replaceFirst("\\?", patientId.toString()));
+		return this.jdbcTemplate.update(sql, patientName, patientArchive, patientId);
 	}
 	public int removePatient(Map<String, Object> removePatient) {
 		Integer patientId = (Integer) removePatient.get("PATIENT_ID");

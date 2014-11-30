@@ -78,7 +78,43 @@
 	<div class="container">
 	<div class="row">
 		<div class="col-xs-12">
-			<div data-ng-repeat="prescribeHistory in patient.prescribesHistory" data-ng-init="prescribeHistoryIndex = $index;" >
+			<div class="navbar-right">
+			|
+				<span data-ng-repeat="pgPrescribesHistory in prescribesGroup.prescribesHistory" 
+					data-ng-init="pgPrescribesHistoryIndex = $index;" >
+					<a data-ng-click="openGroup(pgPrescribesHistoryIndex)" >
+						{{pgPrescribesHistory.prescribeHistoryDaysNote}}
+					</a>
+					|
+				</span>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="navbar-right">
+				<div data-ng-show="prescribesGroup.prescribesHistory[openPrescribesGroupIndex]">
+					<span data-ng-repeat="pgDrug in prescribesGroup.prescribesHistory[openPrescribesGroupIndex].prescribes.tasks"
+							data-ng-init="pgDrugIndex = $index"> 
+					<span class="mouseover"
+							data-ng-click="addTaskToPrescribeHistoryEnd(prescribesGroup.prescribesHistory[openPrescribesGroupIndex], pgDrugIndex)">
+						<span data-ng-show="!(prescribesGroup.prescribesHistory[openPrescribesGroupIndex].prescribes.tasks[pgDrugIndex].groupPosition > 0)">|</span>
+						<span data-ng-show="prescribesGroup.prescribesHistory[openPrescribesGroupIndex].prescribes.tasks[pgDrugIndex].groupPosition > 0">+</span>
+						<span ng-bind-html="taskAndHourDescription(pgDrugIndex, prescribesGroup.prescribesHistory[openPrescribesGroupIndex])"></span>
+					</span>
+					</span>
+				</div>
+				<!-- 
+				-
+				<a href="#">інотропна</a>| <a href="#">інфузії</a>| <a href="#">антибіотики</a>|
+				Харчування <a href="#">ентерально</a>| <a href="#">парентерально</a>
+				 -->
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+				<div data-ng-repeat="prescribeHistory in patient.prescribesHistory" data-ng-init="prescribeHistoryIndex = $index;" >
 					<span title="{{prescribeHistory.date | date:'HH:mm:ss'}}"
 						data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)"
 						data-ng-dblclick="phOpenUpdateDialog(prescribeHistoryIndex)"
@@ -207,25 +243,34 @@
 			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
-				<div >
+				<div>
 			<table class="dose">
 				<tr>
 					<td>{{prescribeHistory.prescribes.tasks[taskInDayIndex].DRUG_NAME}}</td>
-					<td colspan="3">доза</td>
-					<td></td>
+					<td class="doseDialog">доза</td>
+					<th colspan="3" style="text-align:center;">
+					<small><sub> Години </sub> </small> 
+					<span data-ng-click="prescribeHoursLeft(prescribeHistory.prescribes.tasks[taskInDayIndex])" 
+						class="glyphicon glyphicon-arrow-left"></span>
+					<a href="#" data-ng-click="changeHourMoveWay()">
+										<span ng-bind-html="showHourMoveWay()"></span>
+								</a>
+					<span data-ng-click="prescribeHoursRight(prescribeHistory.prescribes.tasks[taskInDayIndex])"
+						class="glyphicon glyphicon-arrow-right"></span>
+					</th>
 					<td colspan="2">концентрація</td>
 				</tr>
 				<tr>
 					<th>Медикамент:_______</th>
-					<th title="Кількість">--</th>
-					<th title="Одиниці виміру">
-						<span 
+					<th title="Кількість"  class="doseDialog">--</th>
+					<th title="Одиниці виміру"  class="doseDialog">
+						<span  class="mouseover"
 						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг', 'г']"
 						data-ng-click="editedPrescribeDrug.dose.DOSE_UNIT = doseUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
 					</th>
-					<th title="Шлях введення">
-						<span 
+					<th title="Шлях введення"  nowrap  class="doseDialog">
+						<span  class="mouseover"
 						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п/ш', 'п.о.']"
 						data-ng-click="editedPrescribeDrug.dose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
 						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
@@ -233,7 +278,7 @@
 					<th></th>
 					<th title="Концентрація">--</th>
 					<th title="Одиниці виміру концентрації">
-						<span 
+						<span  class="mouseover"
 						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
 						data-ng-click="editedPrescribeDrug.dose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
@@ -342,11 +387,12 @@
 					<span
 						data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
 						data-ng-init="drugIndex = $index">
+					<span data-ng-show="!(drug.groupPosition > 0)">|</span>
 					<span class="mouseover"
 							data-ng-click="addTaskToPrescribeHistory(ddPrescribeHistory, drugIndex)">
+						<span data-ng-show="drug.groupPosition > 0">+</span>
 						<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>
 					</span>
-					|
 					</span>
 				</div>
 				<div
@@ -392,6 +438,7 @@
 <a href="protocols.html">Клінічні протоколи</a>
 
 	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/jquery-ui.min.js"></script>
 	<script src="/js-vendor/bootstrap.min.js"></script>
 	<script src="/js-vendor/bootstrap-datepicker.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
@@ -405,6 +452,6 @@
 	<script src="/db/drug1sList.json.js"></script>
 	<script src="/js/patientLp24hCtrl.js"></script>
 	<script src="/js/taskInDayCtrl.js"></script>
-
+	
 </body>
 </html>
