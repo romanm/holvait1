@@ -987,12 +987,12 @@ $scope.keys.push({ ctrlKey : true, code : KeyCodes.P0,
 });
 
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.V,
-	action : function() {
+	action : function() { //Ctrl_V
 		pasteCopyObject($scope.editedPrescribeHistory, $scope, $http);
 	}
 });
 $scope.keys.push({ ctrlKey : true, code : KeyCodes.C,
-	action : function() {
+	action : function() { //Ctrl_C
 		copy($scope.editedPrescribeHistory.selectDrugIndex, $scope.editedPrescribeHistory);
 	}
 });
@@ -1306,6 +1306,7 @@ $scope.$on('keydown', function(msg, obj){
 				drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
 			}
 			attToFirstDrug(drug);
+			$scope.editedPrescribeDrug.groupPosition = 0;
 			var drugInGroupIndex = 0;
 			while(drug && drug.groupPosition == drugInGroupIndex){
 				drugInGroupIndex = drugInGroupIndex + 1;
@@ -1568,6 +1569,7 @@ copyDrugDocument = function(drugDocument, $http, $filter){
 copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 	var copyObj = {};
 	copyObj.tasks = [];
+	console.log(taskIndex);
 	if(taskIndex == null){
 		var tasksToCopy = $filter('filter')
 			(prescribeHistory.prescribes.tasks, {selectMultiple:true});
@@ -1576,6 +1578,7 @@ copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 		copyObj.tasks = prescribeHistory.prescribes.tasks;
 	}else{
 		var drug = prescribeHistory.prescribes.tasks[taskIndex];
+		console.log(drug);
 		if(drug.groupPosition != null){
 			if(drug.groupPosition > 0){
 				taskIndex -= drug.groupPosition;
