@@ -112,38 +112,6 @@ deleteDay = function(prescribeHistory){
 	}
 }
 
-addToGroup = function($itemScope){
-	var taskIndex = $itemScope.$index;
-	var prescribeHistory = $itemScope.$parent.prescribeHistory;
-	var drugGroup = prescribeHistory.prescribes.tasks[taskIndex-1];
-	if(!drugGroup.groupPosition){
-		drugGroup.groupPosition = 0;
-	}
-	console.log(drugGroup);
-	var drug = prescribeHistory.prescribes.tasks[taskIndex];
-	drug.groupPosition = drugGroup.groupPosition+1;
-	console.log(drug);
-	changeSaveControl($scope, $http);
-}
-
-deleteSelected = function(taskIndex, prescribeHistory){
-	var isMultipleSelect = false;
-	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
-		if(prescribeHistory.prescribes.tasks[i] 
-		&& prescribeHistory.prescribes.tasks[i].selectMultiple
-		){
-			prescribeHistory.prescribes.tasks.splice(i, 1);
-			isMultipleSelect = true;
-			changeSaveControl($scope, $http);
-		}
-	}
-	if(!isMultipleSelect){
-		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
-		changeSaveControl($scope, $http);
-	}
-};
-
-
 $scope.selectMultiple = function(taskInDayIndex, prescribeHistory){
 	console.log("selectMultiple");
 	if(null == prescribeHistory.prescribes.tasks[taskInDayIndex]){

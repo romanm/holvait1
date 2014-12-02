@@ -68,23 +68,6 @@ $scope.menuTasksAll = [
 	}]
 ];
 
-deleteSelected = function(taskIndex, prescribeHistory){
-	var isMultipleSelect = false;
-	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
-		if(prescribeHistory.prescribes.tasks[i] 
-		&& prescribeHistory.prescribes.tasks[i].selectMultiple
-		){
-			prescribeHistory.prescribes.tasks.splice(i, 1);
-			isMultipleSelect = true;
-			changeSaveControl($scope, $http);
-		}
-	}
-	if(!isMultipleSelect){
-		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
-		changeSaveControl($scope, $http);
-	}
-};
-
 $scope.selectMultiple = function(taskInDayIndex, prescribeHistory){
 	console.log("selectMultiple");
 	if(null == prescribeHistory.prescribes.tasks[taskInDayIndex]){

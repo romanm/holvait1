@@ -45,6 +45,9 @@ table.tablehover > tbody > tr > td:hover{
 	border: 1px dotted green; 
 	*/
 }
+table.tablehover > tbody > tr > td.nohover:hover{
+	border: 0px dashed navy; 
+}
 .record-highlight-parent { border: 1px dotted green; }
 .hover:hover{
 	background-color: LightCyan;

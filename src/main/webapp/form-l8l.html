@@ -98,16 +98,34 @@ td, th {
 			</tr>
 		</thead>
 		<tbody>
-			<tr data-ng-repeat="taskInDay in tasksInDay"
+			<tr data-ng-repeat-start="taskInDay in tasksInDay"
 				data-ng-class="{'groupDrug': prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition >= 0}"
 				data-ng-init="taskInDayIndex = $index">
-				<td
-				>
-				<span data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
-				<span ng-bind-html="taskDescription($index, prescribeHistory)"></span></td>
+				<td><span
+					data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
+					<span ng-bind-html="taskDescription($index, prescribeHistory)"></span>
+					<span
+					data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs">
+						+<span ng-bind-html="drugDescription(drugInline)"></span>
+				</span></td>
 				<td data-ng-repeat="dayHour in dayHours">
 					<i data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
 				</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr data-ng-repeat-end="" class="groupDrug"
+				data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : true}"
+				ng-init="drugInlineIndex = $index">
+				<td class="nohover"><span> +<span
+						ng-bind-html="drugDescription(drugInline)"></span>
+				</span></td>
+				<td data-ng-repeat="dayHour in dayHours"
+					ng-init="dayHourIndex = $index"><i
+					data-ng-show="isMinusDrugInDrug(dayHourIndex, drugInline )"
+					class="fa fa-minus"></i> <span
+					data-ng-show="isMinusDrugInDrug(dayHourIndex, drugInline )"
+					class="glyphicon glyphicon-minus"></span></td>
 				<td></td>
 				<td></td>
 			</tr>

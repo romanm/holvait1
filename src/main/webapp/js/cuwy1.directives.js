@@ -397,7 +397,7 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		return $scope.editedPrescribeHistory.dayHourIndex == dayHourIndex;
 	}
 	$scope.allDaySelect = function(prescribeHistoryIndex){
-		return $scope.dayInSelectPath(prescribeHistoryIndex) && ($scope.workDoc.pageDeepPositionIndex == 2) && $scope.editedPrescribeHistory.selectDrugIndex == -1 ;
+		return $scope.dayInSelectPath(prescribeHistoryIndex) && ($scope.workDoc.pageDeepPositionIndex == 2) && $scope.editedPrescribeHistory.selectDrugIndex == -1;
 	}
 	$scope.dayInSelectPath = function(prescribeHistoryIndex){
 		return prescribeHistoryIndex == $scope.p24hDoc.selectPrescribesHistoryIndex;
@@ -407,6 +407,10 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	}
 	$scope.taskInSelectPath = function(taskInDayIndex, prescribeHistory){
 		return taskInDayIndex == prescribeHistory.selectDrugIndex;
+	}
+	$scope.drugInDrugSelected = function(taskInDayIndex, drugInDrug, prescribeHistory){
+		var dayInSelectPath = $scope.dayInSelectPath(getPrescribeIndex(prescribeHistory, $scope));
+		return dayInSelectPath && $scope.editedPrescribeDrug == drugInDrug && $scope.taskInSelectPath(taskInDayIndex, prescribeHistory) && ($scope.patient.pageDeepPositionIndex == 2);
 	}
 	$scope.taskSelected = function(taskInDayIndex, prescribeHistory){
 		var dayInSelectPath = $scope.dayInSelectPath(getPrescribeIndex(prescribeHistory, $scope));
@@ -439,6 +443,19 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		if(prescribeHistory.isCollapsed)
 			return;
 		setEditedPrescribeHistory(prescribeHistoryIndex, $scope);
+		changeSaveControl($scope, $http);
+	}
+
+	$scope.useHourDrugInDrug = function(dayHourIndex, drugInline){
+		console.log(dayHourIndex);
+		console.log(drugInline);
+		console.log(drugInline.times.hours[dayHourIndex]);
+		var hour =  getLp24hour(dayHourIndex, $scope);
+		if(!drugInline.times.hours[hour]){
+			drugInline.times.hours[hour] = "-";
+		}else{
+			drugInline.times.hours[hour] = null;
+		}
 		changeSaveControl($scope, $http);
 	}
 
@@ -581,6 +598,20 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		});
 	}
 
+	$scope.openPrescribeDrugInDrugDialog = function(taskInDay, drugInDrug, prescribeHistory){
+		collapseModal(taskInDay, prescribeHistory);
+		$scope.editedPrescribeDrug = drugInDrug;
+		readDrugDocument(drugInDrug, $scope, $http);
+	}
+
+	collapseModal = function(taskInDay, prescribeHistory){
+		var oldCollapsed = taskInDay.isCollapsed;
+		$(prescribeHistory.tasksInDay).each(function () {
+			this.isCollapsed = false;
+		});
+		taskInDay.isCollapsed = !oldCollapsed;
+	}
+
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
 		if($scope.patient.selectPrescribesHistoryIndex == -1){
 			$scope.patient.selectPrescribesHistoryIndex = getPrescribeIndex(prescribeHistory, $scope);
@@ -589,17 +620,14 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		if(!changeEditedSelection(taskInDayIndex, prescribeHistory, $scope)) return;
 
 		//$scope.patient.pageDeepPositionIndex = 3;
-		var oldCollapsed = taskInDay.isCollapsed;
-		$(prescribeHistory.tasksInDay).each(function () {
-			this.isCollapsed = false;
-		});
-		taskInDay.isCollapsed = !oldCollapsed;
+		collapseModal(taskInDay, prescribeHistory);
 		initEditedPrescribeDrugForEdit(prescribeHistory, $scope.editedPrescribeHistory.selectDrugIndex, $scope);
 
 		if($scope.editedPrescribeDrug && $scope.editedPrescribeDrug.DRUG_ID){
 			readDrugDocument($scope.editedPrescribeDrug, $scope, $http);
 		}
 	}
+
 	initEditedPrescribeDrugForEdit = function(prescribeHistory, editedPrescribeDrugIndex, $scope){
 		$scope.editedPrescribeDrug =  prescribeHistory.prescribes.tasks[editedPrescribeDrugIndex];
 		if(null == $scope.editedPrescribeDrug){
@@ -615,6 +643,7 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 			insertDrugToTask($scope.editedPrescribeDrug, editedPrescribeDrugIndex, prescribeHistory);
 		}
 	}
+
 	$scope.saveNewDrug = function(seekDrug, taskInDay, prescribeHistory){
 		$http({ method : 'POST', data : $scope.editedPrescribeDrug, url : config.urlPrefix + '/saveNewDrug'
 		}).success(function(data, status, headers, config){
@@ -636,6 +665,31 @@ copy = function(taskIndex, prescribeHistory){
 }
 
 //-------------context-menu-------------------------------------------
+$scope.menuDrugInDrug = [
+	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
+		$scope.openPrescribeDrugDialog($itemScope.taskInDay, $itemScope.taskInDayIndex, $itemScope.$parent.prescribeHistory);
+	}],
+	null,
+	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
+		var taskIndex = $itemScope.$index;
+		copy(taskIndex, $itemScope.$parent.prescribeHistory);
+	}],
+	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
+		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
+	}],
+	null,
+	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
+		moveDrugUp($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
+	}],
+	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу <sub><kbd>Alt+↓</kbd></sub>', function ($itemScope) {
+		moveDrugDown($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
+	}],
+	null,
+	['<span class="glyphicon glyphicon-minus"></span> В стовбчик / стрічку ', function ($itemScope) {
+		inSelfLine($itemScope);
+	}]
+];
+
 $scope.menuTask = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція <sub><kbd>⏎</kbd></sub>', function ($itemScope) {
 		$scope.openPrescribeDrugDialog($itemScope.taskInDay, $itemScope.taskInDayIndex, $itemScope.$parent.prescribeHistory);
@@ -672,10 +726,57 @@ $scope.menuTask = [
 	['<span class="glyphicon glyphicon-plus"></span> Додати до групи', function ($itemScope) {
 		addToGroup($itemScope);
 	}],
+	['<span class="glyphicon glyphicon-plus"></span> Додати до групи в лінію', function ($itemScope) {
+		addToGroupInline($itemScope);
+	}],
 	['<i class="fa fa-reply-all"></i> Скасувати вибір', function ($itemScope) {
 		escapeSelectMultiple($itemScope.$parent.prescribeHistory);
 	}]
 ];
+
+inSelfLine = function($itemScope){
+	console.log("в стовбчик");
+	console.log($itemScope);
+	console.log($itemScope.$index);
+	$itemScope.drugInline.inSelfLine = !$itemScope.drugInline.inSelfLine;
+	console.log($itemScope.drugInline);
+	console.log($itemScope.drugInline[$itemScope.$index]);
+}
+addToGroupInline = function($itemScope){
+	console.log("---------------");
+	var taskIndex = $itemScope.$index;
+	var prescribeHistory = $itemScope.$parent.prescribeHistory;
+	var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	console.log(drug);
+	var drugGroup = prescribeHistory.prescribes.tasks[taskIndex-1];
+	if(drug.groupPosition > 0){
+		drugGroup  = prescribeHistory.prescribes.tasks[taskIndex - drug.groupPosition];
+	}
+	console.log(drugGroup);
+	if(!drugGroup.inlineDrugs){
+		drugGroup.inlineDrugs = [];
+	}
+	if(!drug.inSelfLine){
+		drug.inSelfLine = false;
+	}
+	drugGroup.inlineDrugs.push(drug);
+	prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
+	changeSaveControl($scope, $http);
+}
+
+addToGroup = function($itemScope){
+	var taskIndex = $itemScope.$index;
+	var prescribeHistory = $itemScope.$parent.prescribeHistory;
+	var drugGroup = prescribeHistory.prescribes.tasks[taskIndex-1];
+	if(!drugGroup.groupPosition){
+		drugGroup.groupPosition = 0;
+	}
+	console.log(drugGroup);
+	var drug = prescribeHistory.prescribes.tasks[taskIndex];
+	drug.groupPosition = drugGroup.groupPosition+1;
+	console.log(drug);
+	changeSaveControl($scope, $http);
+}
 
 drugToTask2 = function(drug, taskInDay, prescribeHistory){
 	var position = taskInDay.i;
@@ -1211,8 +1312,24 @@ deleteBackspace = function(){
 		}
 		changeSaveControl($scope, $http);
 	}
+};
+deleteSelected = function(taskIndex, prescribeHistory){
+	var isMultipleSelect = false;
+	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
+		if(prescribeHistory.prescribes.tasks[i] 
+		&& prescribeHistory.prescribes.tasks[i].selectMultiple
+		){
+			prescribeHistory.prescribes.tasks.splice(i, 1);
+			isMultipleSelect = true;
+			changeSaveControl($scope, $http);
+		}
+	}
+	if(!isMultipleSelect){
+		prescribeHistory.prescribes.tasks.splice(taskIndex, 1);
+		changeSaveControl($scope, $http);
+	}
+};
 
-}
 $scope.keys.push({ code : KeyCodes.F2,
 	action : function() {
 		console.log("F2");
@@ -1339,6 +1456,12 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		return (lp24hour>9?'':'0')+lp24hour;
 	}
 
+	$scope.isMinusDrugInDrug = function(dayHourIndex, drugInline){
+		var lp24hour = getLp24hour(dayHourIndex, $scope);
+		var isMinus = ('-' == drugInline.times.hours[lp24hour]);
+		return isMinus;
+	}
+
 	$scope.isMinus = function(taskInDayIndex, dayHourIndex, prescribeHistory){
 		if(typeof prescribeHistory === 'undefined' 
 		|| !prescribeHistory.prescribes || !prescribeHistory.prescribes.tasks[taskInDayIndex]
@@ -1404,7 +1527,7 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	$scope.taskAndHourDescription = function($index, prescribeHistory){
 		var drug = getTaskFromPrescribes($index, prescribeHistory);
 		if("." === drug) return drug;
-		var td = drugDescription(drug);
+		var td = $scope.drugDescription(drug);
 		angular.forEach($filter('filter')(drug.times.hours, "-"), function(){
 			td += " <i class='fa fa-minus'></i>";
 		});
@@ -1414,9 +1537,9 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	$scope.taskDescription = function($index, prescribeHistory){
 		var drug = getTaskFromPrescribes($index, prescribeHistory);
 		if("." === drug) return drug;
-		return drugDescription(drug);
+		return $scope.drugDescription(drug);
 	};
-	drugDescription = function(drug){
+	$scope.drugDescription = function(drug){
 		var taskDescription = drug.DRUG_NAME + " ";
 		if(typeof drug.dose !== 'undefined'){
 			if(drug.dose.DOSECONCENTRATON_NUMBER && !(drug.DRUG_NAME.indexOf("%") > 0)){
@@ -1579,17 +1702,17 @@ copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 	}else{
 		var drug = prescribeHistory.prescribes.tasks[taskIndex];
 		console.log(drug);
-		if(drug.groupPosition != null){
-			if(drug.groupPosition > 0){
-				taskIndex -= drug.groupPosition;
-				drug = tasks[taskIndex];
-			}
+		if(drug.groupPosition == 0){
 			var drugInGroupIndex = 0;
 			while(drug && drug.groupPosition == drugInGroupIndex){
 				copyObj.tasks.push(drug);
 				drugInGroupIndex = drugInGroupIndex + 1;
 				drug = prescribeHistory.prescribes.tasks[taskIndex + drugInGroupIndex];
 			}
+		}else if(drug.groupPosition > 0){
+			var drugToCopy = angular.copy(drug);
+			drugToCopy.groupPosition = null;
+			copyObj.tasks.push(drugToCopy);
 		}else{
 			copyObj.tasks.push(drug);
 		}

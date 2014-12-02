@@ -131,15 +131,36 @@
 									<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
 									<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
 								</td>
-								<td
-									data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
-									data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
-														selected:taskSelected(taskInDayIndex, prescribeHistory) }"
-									ng-context-menu="menuTask" title="{{taskInDay.isCollapsed}}">
+								<td class="nohover" data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs">
 									<span
-									data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
-									<span
-									ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
+										data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
+										data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
+												selected:taskSelected(taskInDayIndex, prescribeHistory) }"
+										ng-context-menu="menuTask"
+										class="mouseover"
+										>
+										<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
+									</span> 
+									<span data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : false}"
+										ng-init="drugInlineIndex = $index"
+										data-ng-click="openPrescribeDrugInDrugDialog(taskInDay, drugInline, prescribeHistory)"
+										data-ng-class="{selected:drugInDrugSelected(taskInDayIndex, drugInline, prescribeHistory) }"
+										ng-context-menu="menuTask"
+										class="mouseover"
+									>
+										+<span ng-bind-html="drugDescription(drugInline)"></span>
+									</span>
+								</td>
+								<td data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs"
+										data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
+										data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
+															selected:taskSelected(taskInDayIndex, prescribeHistory) }"
+										ng-context-menu="menuTask"
+										title="{{taskInDay.isCollapsed}}"
+									>
+									<span data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
+									<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
+									
 								</td>
 								<td data-ng-repeat="dayHour in dayHours"
 							ng-init="dayHourIndex = $index"
@@ -153,7 +174,27 @@
 							</td>
 							<td>.</td>
 						</tr>
-			<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
+						<tr
+							data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : true}"
+							ng-init="drugInlineIndex = $index">
+							<td></td>
+							<td class="nohover"><span
+								data-ng-click="openPrescribeDrugInDrugDialog(taskInDay, drugInline, prescribeHistory)"
+								data-ng-class="{selected:drugInDrugSelected(taskInDayIndex, drugInline, prescribeHistory) }"
+								ng-context-menu="menuDrugInDrug" class="mouseover"> +<span
+									ng-bind-html="drugDescription(drugInline)"></span>
+							</span></td>
+							<td data-ng-repeat="dayHour in dayHours"
+								ng-init="dayHourIndex = $index"
+								data-ng-class="{	selectpath:dayHourInSelectPath(dayHourIndex, taskInDayIndex, prescribeHistory),
+									selected:dayHourSelected(dayHourIndex, taskInDayIndex, prescribeHistory) }"
+								data-ng-click="useHourDrugInDrug(dayHourIndex, drugInline)">.
+								<span
+								data-ng-show="isMinusDrugInDrug(dayHourIndex, drugInline )"
+								class="glyphicon glyphicon-minus"></span>
+							</td>
+						</tr>
+							<tr data-ng-if="taskInDay.isCollapsed" data-ng-controller="taskInDayCtrl" >
 				<td />
 				<td class="well" colspan="25">
 				<div >
