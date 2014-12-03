@@ -42,6 +42,14 @@ copyTODEL = function(taskIndex, prescribeHistory){
 $scope.menuDayBlock = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		$itemScope.prescribeHistory.updateDialogOpen = !$itemScope.prescribeHistory.updateDialogOpen;
+	}],
+	null,
+	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
+		console.log($itemScope);
+		moveDrugUp($itemScope.workDoc.prescribesHistory, $itemScope.$index);
+	}],
+	['<span class="glyphicon glyphicon-arrow-down"></span> Донизу <sub><kbd>Alt+↓</kbd></sub>', function ($itemScope) {
+		moveDrugDown($itemScope.workDoc.prescribesHistory, $itemScope.$index);
 	}]
 ];
 

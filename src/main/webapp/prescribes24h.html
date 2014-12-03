@@ -145,10 +145,11 @@
 										ng-init="drugInlineIndex = $index"
 										data-ng-click="openPrescribeDrugInDrugDialog(taskInDay, drugInline, prescribeHistory)"
 										data-ng-class="{selected:drugInDrugSelected(taskInDayIndex, drugInline, prescribeHistory) }"
-										ng-context-menu="menuTask"
+										ng-context-menu="menuDrugInDrug"
 										class="mouseover"
-									>
-										+<span ng-bind-html="drugDescription(drugInline)"></span>
+									>{{prescribeHistory.prescribes.tasks[taskInDayIndex].splitSymbol}}
+										<span data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].splitSymbol">+ </span>
+										<span ng-bind-html="drugDescription(drugInline)"></span>
 									</span>
 								</td>
 								<td data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs"

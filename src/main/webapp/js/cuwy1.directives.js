@@ -675,7 +675,7 @@ $scope.menuDrugInDrug = [
 		copy(taskIndex, $itemScope.$parent.prescribeHistory);
 	}],
 	['<span class="glyphicon glyphicon-remove"></span> Видалити <sub><kbd>Del</kbd></sub>', function ($itemScope) {
-		deleteSelected($itemScope.$index, $itemScope.$parent.prescribeHistory);
+		deleteDrugInDrug($itemScope);
 	}],
 	null,
 	['<span class="glyphicon glyphicon-arrow-up"></span> Догори <sub><kbd>Alt+↑</kbd></sub>', function ($itemScope) {
@@ -687,6 +687,9 @@ $scope.menuDrugInDrug = [
 	null,
 	['<span class="glyphicon glyphicon-minus"></span> В стовбчик / стрічку ', function ($itemScope) {
 		inSelfLine($itemScope);
+	}],
+	['<span class="glyphicon glyphicon-minus"></span> Розділитиль ', function ($itemScope) {
+		splitSymbol($itemScope);
 	}]
 ];
 
@@ -723,9 +726,11 @@ $scope.menuTask = [
 		moveDrugDown($itemScope.$parent.prescribeHistory.prescribes.tasks, $itemScope.$index);
 	}],
 	null,
+	/*
 	['<span class="glyphicon glyphicon-plus"></span> Додати до групи', function ($itemScope) {
 		addToGroup($itemScope);
 	}],
+	 * */
 	['<span class="glyphicon glyphicon-plus"></span> Додати до групи в лінію', function ($itemScope) {
 		addToGroupInline($itemScope);
 	}],
@@ -734,13 +739,24 @@ $scope.menuTask = [
 	}]
 ];
 
-inSelfLine = function($itemScope){
-	console.log("в стовбчик");
+splitSymbol = function($itemScope){
 	console.log($itemScope);
-	console.log($itemScope.$index);
+	console.log($itemScope.$parent);
+	var drugGroup = $itemScope.prescribeHistory.prescribes.tasks[$itemScope.taskInDayIndex];
+	console.log(drugGroup);
+	if(!drugGroup.splitSymbol){
+		drugGroup.splitSymbol = ";"
+	}else
+	if("+" == drugGroup.splitSymbol){
+		drugGroup.splitSymbol = ";";
+	}else
+	if(";" == drugGroup.splitSymbol){
+		drugGroup.splitSymbol = "+";
+	}
+}
+
+inSelfLine = function($itemScope){
 	$itemScope.drugInline.inSelfLine = !$itemScope.drugInline.inSelfLine;
-	console.log($itemScope.drugInline);
-	console.log($itemScope.drugInline[$itemScope.$index]);
 }
 addToGroupInline = function($itemScope){
 	console.log("---------------");
@@ -1312,7 +1328,12 @@ deleteBackspace = function(){
 		}
 		changeSaveControl($scope, $http);
 	}
-};
+}; 
+deleteDrugInDrug = function($itemScope){
+	var delDrugPosition = $itemScope.prescribeHistory.prescribes.tasks[$itemScope.taskInDayIndex].inlineDrugs.indexOf($itemScope.drugInline);
+	$itemScope.prescribeHistory.prescribes.tasks[$itemScope.taskInDayIndex].inlineDrugs.splice(delDrugPosition, 1);
+	changeSaveControl($scope, $http);
+}; 
 deleteSelected = function(taskIndex, prescribeHistory){
 	var isMultipleSelect = false;
 	for(var i=prescribeHistory.prescribes.tasks.length-1;i>=0;i--){
