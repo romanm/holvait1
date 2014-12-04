@@ -1,12 +1,16 @@
 package org.cuwyhol3;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -250,23 +255,85 @@ public class Lp24ControllerImpl {
 		}
 		return readJsonDbFile2map;
 	}
-	public List<Map<String, Object>> saveNewPrescribe(
-			Map<String, Object> newPrescribe) {
-		newPrescribe = lp24jdbc.newPrescribe(newPrescribe);
+	public List<Map<String, Object>> saveNewPrescribe(Map<String, Object> newPrescribe) {
+		lp24jdbc.newPrescribe(newPrescribe);
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
-	public List<Map<String, Object>> updatePrescribe(
-			Map<String, Object> prescribeToUpdate) {
+	private void setExchangeInstall(Integer prescribeId, final Map exchange) {
+		Map<String, Object> cuwyConfig = getCuwyConfig();
+		final String aliasId = (String) ((Map) cuwyConfig.get("installConfig")).get("aliasId");
+		final Map exchangeInstall = new HashMap<String, Object>();
+		exchange.put(aliasId, exchangeInstall);
+		exchangeInstall.put("id", prescribeId);
+	}
+	Map<String, Object> saveNewPrescribeFromLocalServer(Map<String, Object> prescribeToExchange) {
+		logger.debug("prescribeId = "+prescribeToExchange.get("PRESCRIBE_ID"));
+		Map<String, Object> newPrescribe = lp24jdbc.newPrescribe(prescribeToExchange);
+		Integer prescribeId = (Integer) newPrescribe.get("PRESCRIBE_ID");
+		logger.debug("prescribeId = "+prescribeId);
+		Map exchange = (Map) prescribeToExchange.get("exchange");
+		setExchangeInstall(prescribeId, exchange);
+		prescribeToExchange.put("PRESCRIBE_ID", prescribeId);
+		logger.debug("prescribeToExchange = "+prescribeToExchange);
+		final String prescribeDbJsonName = lp24Config.getPrescribeDbJsonName(prescribeId);
+		logger.debug("prescribeDbJsonName = "+prescribeDbJsonName);
+		writeToJsonDbFile(prescribeToExchange, prescribeDbJsonName);
+		return prescribeToExchange;
+	}
+
+	public List<Map<String, Object>> updatePrescribe(Map<String, Object> prescribeToUpdate) {
+		logger.debug(" o "+prescribeToUpdate);
 		int updateProtocol = lp24jdbc.updatePrescribeOrder(prescribeToUpdate);
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
+		logger.debug(" o "+prescribeId);
 		Map<String, Object> readPrescribes = readPrescribes(prescribeId);
-		String prescribeName = (String) prescribeToUpdate.get("PRESCRIBE_NAME");
-		readPrescribes.put("PRESCRIBE_NAME", prescribeName);
+		logger.debug(" o "+readPrescribes);
+		Boolean prescribeRecommend = (Boolean) prescribeToUpdate.get("PRESCRIBE_RECOMMEND");
+		readPrescribes.put("PRESCRIBE_RECOMMEND", prescribeRecommend);
+		readPrescribes.put("PRESCRIBE_NAME", prescribeToUpdate.get("PRESCRIBE_NAME"));
 		writeToJsonDbFile(readPrescribes, lp24Config.getPrescribeDbJsonName(prescribeId));
+		if(prescribeRecommend){
+			logger.debug("save to server");
+			if(!readPrescribes.containsKey("exchange")){
+				final Map exchange = new HashMap<String, Object>();
+				readPrescribes.put("exchange", exchange);
+				setExchangeInstall(prescribeId, exchange);
+				logger.debug("save to server saveNewPrescribesInServer 1");
+				final Map<String, Object> saveNewPrescribesInServer = saveNewPrescribesInServer("sah", readPrescribes);
+				logger.debug("saveNewPrescribesInServer = "+saveNewPrescribesInServer);
+				saveNewPrescribesInServer.put("PRESCRIBE_ID", prescribeId);
+				logger.debug("saveNewPrescribesInServer = "+saveNewPrescribesInServer);
+				writeToJsonDbFile(saveNewPrescribesInServer, lp24Config.getPrescribeDbJsonName(prescribeId));
+			}
+		}
 		prescribe1sListOpen();
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
+	}
+
+	private Map<String, Object> cuwyConfig = null;
+	private Map<String, Object> getCuwyConfig() {
+		if(null != cuwyConfig)
+			return cuwyConfig;
+		String pathToFile = Lp24Config.applicationFolderPfad + Lp24Config.innerDbFolderPfad + "cuwy1.config.js";
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			BufferedReader 
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(pathToFile)));
+			br.readLine();
+			cuwyConfig = mapper.readValue(br, Map.class);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (JsonParseException e1) {
+			e1.printStackTrace();
+		} catch (JsonMappingException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		logger.debug(" o - "+cuwyConfig);
+		return cuwyConfig;
 	}
 
 	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
@@ -308,26 +375,59 @@ public class Lp24ControllerImpl {
 		return readPrescribe(url);
 	}
 
-	public Map<String, Object> savePrescribesInServer(String shortServerName,
-			Map<String, Object> prescribes) {
+	public Map<String, Object> saveNewPrescribesInServer(String shortServerName, Map<String, Object> prescribes) {
+		ObjectMapper mapper = new ObjectMapper();
+		String url = "http://"+ shortServerName+ ".curepathway.com/saveNewPrescribeFromLocalServer";
+		logger.debug(url);
+		Map readValue = null;
+		HttpURLConnection con = postToUrl(prescribes, mapper, url);
+		logger.debug(""+con);
+		if(null != con){
+			try {
+				InputStream requestBody = con.getInputStream();
+				logger.debug(""+requestBody);
+				readValue = mapper.readValue(requestBody, Map.class);
+				logger.debug(""+readValue);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return readValue;
+	}
+	public Map<String, Object> savePrescribesInServer(String shortServerName, Map<String, Object> prescribes) {
 		ObjectMapper mapper = new ObjectMapper();
 		String url = "http://"+ shortServerName+ ".curepathway.com/save/prescribes";
-		URL obj = null;
+		HttpURLConnection con = postToUrl(prescribes, mapper, url);
 		try {
-			obj = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("POST");
-			con.setDoOutput(true);
-			con.setRequestProperty("Content-Type", "application/json"); 
-			con.setRequestProperty("charset", "utf-8");
-
-			mapper.writeValue(con.getOutputStream(), prescribes);
-
 			InputStream requestBody = con.getInputStream();
 			Map readValue = mapper.readValue(requestBody, Map.class);
 			logger.debug("\n"+readValue);
 
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	private HttpURLConnection postToUrl(Map<String, Object> mapObject,
+			ObjectMapper mapper, String url) {
+		try {
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("POST");
+			con.setDoOutput(true);
+			con.setRequestProperty("Content-Type", "application/json"); 
+			con.setRequestProperty("charset", "utf-8");
+			mapper.writeValue(con.getOutputStream(), mapObject);
+			return con;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (ProtocolException e1) {
+			e1.printStackTrace();
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -380,7 +480,7 @@ public class Lp24ControllerImpl {
 	//------------------drug----------------------------END
 
 	Map<String, Object> readJsonDbFile2map(String fileName) {
-		String pathToFile = lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName;
+		String pathToFile = Lp24Config.applicationFolderPfad + Lp24Config.innerDbFolderPfad + fileName;
 		File file = new File(pathToFile);
 		logger.debug(" o - "+file);
 		ObjectMapper mapper = new ObjectMapper();

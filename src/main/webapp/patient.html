@@ -219,6 +219,17 @@
 						<u data-ng-show="prescribeHistory.prescribes.tasks.length == taskInDayIndex + 1">{{taskInDayIndex + 1}}</u> 
 						<span data-ng-show="prescribeHistory.prescribes.tasks.length != taskInDayIndex + 1">{{taskInDayIndex + 1 }}</span>
 					</td>
+					<td class="nohover" data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs.length == 0">
+					<span
+							data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
+							data-ng-class="{	selectpath:taskInSelectPath(taskInDayIndex, prescribeHistory),
+									selected:taskSelected(taskInDayIndex, prescribeHistory) }"
+							ng-context-menu="menuTask"
+							class="mouseover"
+							>
+							<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
+						</span>
+					</td>
 					<td class="nohover" data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs">
 						<span
 							data-ng-click="openPrescribeDrugDialog(taskInDay, taskInDayIndex, prescribeHistory);"
@@ -228,15 +239,16 @@
 							class="mouseover"
 							>
 							<span ng-bind-html="taskDescription(taskInDayIndex, prescribeHistory)"></span>
-						</span> 
-						<span data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : false}"
+						</span>
+						<span
+							data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : false}"
 							ng-init="drugInlineIndex = $index"
 							data-ng-click="openPrescribeDrugInDrugDialog(taskInDay, drugInline, prescribeHistory)"
 							data-ng-class="{selected:drugInDrugSelected(taskInDayIndex, drugInline, prescribeHistory) }"
-							ng-context-menu="menuDrugInDrug"
-							class="mouseover"
-						>
-							+<span ng-bind-html="drugDescription(drugInline)"></span>
+							ng-context-menu="menuDrugInDrug" class="mouseover">{{prescribeHistory.prescribes.tasks[taskInDayIndex].splitSymbol}}
+							<span
+							data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].splitSymbol">+
+							</span> <span ng-bind-html="drugDescription(drugInline)"></span>
 						</span>
 					</td>
 					<td data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs"
@@ -492,10 +504,10 @@
 	<script src="/js-vendor/ui-bootstrap-tpls-0.11.2.js"></script>
 	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
 	<script src='/js-vendor/textAngular.min.js'></script>
-	<script src="/js/cuwy1.config.js"></script>
-	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/db/cuwy1.config.js"></script>
 	<script src="/db/patient1sList.json.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/js/patientLp24hCtrl.js"></script>
 	<script src="/js/taskInDayCtrl.js"></script>
 	

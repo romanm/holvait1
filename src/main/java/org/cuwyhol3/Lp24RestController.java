@@ -81,16 +81,24 @@ public class Lp24RestController {
 		logger.debug("/saveNewPrescribe");
 		return lp24Controller.saveNewPrescribe(newPrescribe);
 	}
-	@RequestMapping(value = "/save/prescribes", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> savePrescribes(
-			@RequestBody Map<String, Object> prescribes){
-		return lp24Controller.savePrescribes(prescribes);
+	@RequestMapping(value = "/saveNewPrescribeFromLocalServer", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> saveNewPrescribeFromLocalServer(
+			@RequestBody Map<String, Object> newPrescribe) {
+		logger.debug("/saveNewPrescribeFromLocalServer");
+		return lp24Controller.saveNewPrescribeFromLocalServer(newPrescribe);
 	}
 	@RequestMapping(value = "/updatePrescribe", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updatePrescribe(
 			@RequestBody Map<String, Object> prescribeToUpdate) {
 		logger.debug("/updatePrescribe prarameters = "+prescribeToUpdate);
-		return lp24Controller.updatePrescribe(prescribeToUpdate);
+		final List<Map<String, Object>> updatePrescribe = lp24Controller.updatePrescribe(prescribeToUpdate);
+		logger.debug("/updatePrescribe resault = "+updatePrescribe);
+		return updatePrescribe;
+	}
+	@RequestMapping(value = "/save/prescribes", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> savePrescribes(
+			@RequestBody Map<String, Object> prescribes){
+		return lp24Controller.savePrescribes(prescribes);
 	}
 	//reload prescribe list from DB and build new db/prescribeOrder1sList.json.js
 	@RequestMapping(value = "/prescribe1sList", method = RequestMethod.GET)

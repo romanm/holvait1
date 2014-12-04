@@ -753,6 +753,7 @@ splitSymbol = function($itemScope){
 	if(";" == drugGroup.splitSymbol){
 		drugGroup.splitSymbol = "+";
 	}
+	changeSaveControl($scope, $http);
 }
 
 inSelfLine = function($itemScope){

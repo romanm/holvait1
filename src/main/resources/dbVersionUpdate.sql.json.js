@@ -14,7 +14,7 @@
 	},{
 		"dbVersionId" : 3,
 		"sqls" : [
-			"alter table PATIENT1 add column if not exists patient_savedts timestamp  not null"
+			"alter table PATIENT1 add column if not exists patient_savedts timestamp default now() not null"
 			,"alter table PATIENT1 add column if not exists patient_checked boolean default true"
 		]
 	}

@@ -206,7 +206,6 @@ $scope.format = $scope.formats[0];
 $scope.openPrescribesGroupIndex = -1;
 $scope.openGroup = function(pgPrescribesHistoryIndex){
 	$scope.openPrescribesGroupIndex = pgPrescribesHistoryIndex;
-	console.log(pgPrescribesHistoryIndex);
 }
 //---------------prescribes group-------------------------END
 }]);
