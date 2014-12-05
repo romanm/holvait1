@@ -60,8 +60,20 @@ public class Lp24jdbc {
 			final Integer dbVersionId = (Integer) map.get("dbVersionId");
 			if(dbVersionId > thisDbVersionId){
 				final List<String> sqls = (List<String>) map.get("sqls");
-				for (String sql : sqls) 
-					jdbcTemplate.update(sql);
+				for (String sql : sqls) {
+					if(sql.indexOf("sql_update")>0){
+						System.out.println(sql);
+						List<Map<String, Object>> sqlUpdateList = jdbcTemplate.queryForList(sql);
+						for (Map<String, Object> sqlToUpdateMap : sqlUpdateList) {
+							String sqlToUpdate = (String) sqlToUpdateMap.get("sql_update");
+							System.out.println(sqlToUpdate);
+							jdbcTemplate.update(sqlToUpdate);
+							
+						}
+					}else{
+						jdbcTemplate.update(sql);
+					}
+				}
 				jdbcTemplate.update("INSERT INTO DBVERSION (DBVERSION_ID) VALUES (?)",dbVersionId);
 			}
 		}

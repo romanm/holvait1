@@ -41,6 +41,7 @@ public class ScheduledTasks {
 				if(null == drugId)
 					continue;
 				final Map<String, Object> readDrugDocument = lp24Controller.readDrug(drugId);
+				logger.debug(""+readDrugDocument);
 				if(lp24Controller.updateDrugToBlock1(readDrugDocument, drugInPatientDocument)){
 					lp24Controller.writeToJsonDbFile(readDrugDocument, Lp24Config.getDrugDbJsonName(drugId));
 				}

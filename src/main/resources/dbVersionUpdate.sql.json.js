@@ -17,6 +17,11 @@
 			"alter table PATIENT1 add column if not exists patient_savedts timestamp default now() not null"
 			,"alter table PATIENT1 add column if not exists patient_checked boolean default true"
 		]
+	},{
+		"dbVersionId" : 4,
+		"sqls" : [
+			"select ' alter table PATIENT1 drop CONSTRAINT '||constraint_name as sql_update from information_schema.constraints where table_name ='PATIENT1' and column_list = 'PATIENT_NAME'"
+		]
 	}
 	]
 }
