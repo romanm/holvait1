@@ -1348,7 +1348,7 @@ deleteSelected = function(taskIndex, prescribeHistory){
 
 $scope.keys.push({ code : KeyCodes.F2,
 	action : function() {
-		console.log("F2");
+		console.log("F2 "+$scope.patient.pageDeepPositionIndex);
 		if($scope.patient.pageDeepPositionIndex == 1){
 			if($scope.patient.selectPrescribesHistoryIndex == -1){
 				$scope.updatePatient();
@@ -1356,6 +1356,9 @@ $scope.keys.push({ code : KeyCodes.F2,
 				$scope.phOpenUpdateDialog($scope.workDoc.selectPrescribesHistoryIndex);
 			}
 			changeSaveControl($scope, $http);
+		}else
+		if($scope.workDoc.pageDeepPositionIndex == 2){
+			openEditedPrescribeDrugDialog();
 		}
 	}
 });
