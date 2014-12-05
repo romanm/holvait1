@@ -449,6 +449,10 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	$scope.useHourDrugInDrug = function(dayHourIndex, drugInline){
 		console.log(dayHourIndex);
 		console.log(drugInline);
+		if(!drugInline.times){
+			drugInline.times = {};
+			drugInline.times.hours = getDayHoursEmpty();
+		}
 		console.log(drugInline.times.hours[dayHourIndex]);
 		var hour =  getLp24hour(dayHourIndex, $scope);
 		if(!drugInline.times.hours[hour]){
@@ -1480,6 +1484,8 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 
 	$scope.isMinusDrugInDrug = function(dayHourIndex, drugInline){
 		var lp24hour = getLp24hour(dayHourIndex, $scope);
+		if(!drugInline.times)
+			return false;
 		var isMinus = ('-' == drugInline.times.hours[lp24hour]);
 		return isMinus;
 	}
@@ -1514,19 +1520,32 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 
 	$scope.dayInfusionSumme = function(prescribeHistory){
 		var diSum = 0;
+		var diPoSum = 0;
+		var diVvSum = 0;
+		console.log("---");
 		angular.forEach(prescribeHistory.prescribes.tasks, function(drug, index){
 			if(drug){
 				if(drug.dose){
-					var ml = drug.dose.DOSE_UNIT;
-					if("мл" === ml){
+					if("мл" === drug.dose.DOSE_UNIT){
 						var donationMal = $filter('filter')(drug.times.hours, "-").length;
 						diSum += drug.dose.DOSE_NUMBER*donationMal;
+						if("п.о." === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+							diPoSum += drug.dose.DOSE_NUMBER*donationMal;
+						}else
+						if("в/в" === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+							diVvSum += drug.dose.DOSE_NUMBER*donationMal;
+						}
 					}
 				}
 			}
 		} );
 		diSum = Math.round(diSum/100)*100;
-		return "≈" + (diSum).toString() + " мл";
+		diPoSum = Math.round(diPoSum/100)*100;
+		diVvSum = Math.round(diVvSum/100)*100;
+		var diPoSumHtml = " <sub>"+diPoSum.toString()+"</sub>";
+		var diVvSumHtml = " <sup>"+diVvSum.toString()+"</sup>";
+		var html = "≈" + (diSum).toString() + " мл "+diVvSumHtml+"/"+diPoSumHtml;
+		return $sce.trustAsHtml(html);
 	}
 
 	$scope.changeHourMoveWay = function(){
