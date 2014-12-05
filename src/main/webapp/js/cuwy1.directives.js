@@ -447,13 +447,10 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	}
 
 	$scope.useHourDrugInDrug = function(dayHourIndex, drugInline){
-		console.log(dayHourIndex);
-		console.log(drugInline);
 		if(!drugInline.times){
 			drugInline.times = {};
 			drugInline.times.hours = getDayHoursEmpty();
 		}
-		console.log(drugInline.times.hours[dayHourIndex]);
 		var hour =  getLp24hour(dayHourIndex, $scope);
 		if(!drugInline.times.hours[hour]){
 			drugInline.times.hours[hour] = "-";
@@ -608,14 +605,6 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		readDrugDocument(drugInDrug, $scope, $http);
 	}
 
-	collapseModal = function(taskInDay, prescribeHistory){
-		var oldCollapsed = taskInDay.isCollapsed;
-		$(prescribeHistory.tasksInDay).each(function () {
-			this.isCollapsed = false;
-		});
-		taskInDay.isCollapsed = !oldCollapsed;
-	}
-
 	$scope.openPrescribeDrugDialog = function(taskInDay, taskInDayIndex, prescribeHistory){
 		if($scope.patient.selectPrescribesHistoryIndex == -1){
 			$scope.patient.selectPrescribesHistoryIndex = getPrescribeIndex(prescribeHistory, $scope);
@@ -646,8 +635,23 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 			};
 			insertDrugToTask($scope.editedPrescribeDrug, editedPrescribeDrugIndex, prescribeHistory);
 		}
+		$scope.editedPrescribeDrug.oldDoses = getDosesInStr($scope.editedPrescribeDrug.dose);
 	}
-
+	getDosesInStr = function(d){
+		return d.DOSECONCENTRATON_UNIT +d.DOSECONCENTRATON_NUMBER +d.DOSE_UNIT +d.DOSE_NUMBER 
+		+d.DOSE_ROUTE_OF_ADMINISTRATION;
+	}
+	collapseModal = function(taskInDay, prescribeHistory){
+		var oldCollapsed = taskInDay.isCollapsed;
+		for (var dp = 0; dp < prescribeHistory.tasksInDay.length; dp++)
+			if(prescribeHistory.tasksInDay[dp].isCollapsed){
+				var drug = prescribeHistory.prescribes.tasks[dp];
+				if(drug && drug.oldDoses != getDosesInStr(drug))
+						changeSaveControl($scope, $http);
+				prescribeHistory.tasksInDay[dp].isCollapsed = false;
+			}
+		taskInDay.isCollapsed = !oldCollapsed;
+	}
 	$scope.saveNewDrug = function(seekDrug, taskInDay, prescribeHistory){
 		$http({ method : 'POST', data : $scope.editedPrescribeDrug, url : config.urlPrefix + '/saveNewDrug'
 		}).success(function(data, status, headers, config){
@@ -708,10 +712,7 @@ $scope.menuTask = [
 	}],
 	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 		var prescribeHistory = $itemScope.$parent.prescribeHistory;
-		console.log(prescribeHistory);
-		console.log(prescribeHistory.selectDrugIndex);
 		prescribeHistory.selectDrugIndex = $itemScope.$index;
-		console.log(prescribeHistory.selectDrugIndex);
 		pasteCopyObject(prescribeHistory, $scope, $http);
 	}],
 	null,
@@ -744,10 +745,7 @@ $scope.menuTask = [
 ];
 
 splitSymbol = function($itemScope){
-	console.log($itemScope);
-	console.log($itemScope.$parent);
 	var drugGroup = $itemScope.prescribeHistory.prescribes.tasks[$itemScope.taskInDayIndex];
-	console.log(drugGroup);
 	if(!drugGroup.splitSymbol){
 		drugGroup.splitSymbol = ";"
 	}else
@@ -764,16 +762,13 @@ inSelfLine = function($itemScope){
 	$itemScope.drugInline.inSelfLine = !$itemScope.drugInline.inSelfLine;
 }
 addToGroupInline = function($itemScope){
-	console.log("---------------");
 	var taskIndex = $itemScope.$index;
 	var prescribeHistory = $itemScope.$parent.prescribeHistory;
 	var drug = prescribeHistory.prescribes.tasks[taskIndex];
-	console.log(drug);
 	var drugGroup = prescribeHistory.prescribes.tasks[taskIndex-1];
 	if(drug.groupPosition > 0){
 		drugGroup  = prescribeHistory.prescribes.tasks[taskIndex - drug.groupPosition];
 	}
-	console.log(drugGroup);
 	if(!drugGroup.inlineDrugs){
 		drugGroup.inlineDrugs = [];
 	}
@@ -792,10 +787,8 @@ addToGroup = function($itemScope){
 	if(!drugGroup.groupPosition){
 		drugGroup.groupPosition = 0;
 	}
-	console.log(drugGroup);
 	var drug = prescribeHistory.prescribes.tasks[taskIndex];
 	drug.groupPosition = drugGroup.groupPosition+1;
-	console.log(drug);
 	changeSaveControl($scope, $http);
 }
 
@@ -827,18 +820,14 @@ insertDrugToTask = function(drug, position, prescribeHistory){
 pasteCopyObject = function(prescribeHistory, $scope, $http){
 	$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
 	}).success(function(copyObject, status, headers, config) {
-		console.log(copyObject);
 		var selectPosition = prescribeHistory.selectDrugIndex;
 		if(selectPosition == -1) selectPosition = 0;
-		console.log(prescribeHistory);
 		var taskInDay = prescribeHistory.tasksInDay[selectPosition];
-		console.log(taskInDay);
 		var position = taskInDay.i;
 		$(copyObject.tasks).each(function () {
 			var drug = this.DRUG_NAME?this:null;
 			insertDrugToTask(drug, position++, prescribeHistory);
 		});
-		console.log(prescribeHistory);
 		changeSaveControl($scope, $http);
 	}).error(function(data, status, headers, config) {
 	});
@@ -857,7 +846,6 @@ pasteToDrugDocName = function($itemScope, $scope, $http){
 };
 
 contextMenuCopy = function(copyObject, $http){
-	console.log(copyObject);
 	$http({ method : 'POST', data : copyObject, url : config.urlPrefix + "/session/copy"
 	}).success(function(data, status, headers, config){
 	}).error(function(data, status, headers, config) {
@@ -1397,7 +1385,6 @@ $scope.$on('keydown', function(msg, obj){
 	console.log(obj.event);
 	var code = obj.event.keyCode;
 	if(isEditDialogOpen()){
-		console.log("---");
 		if(code == $scope.keys[0].code){
 			$scope.keys[0].action(); //make save (F4)
 		}else
@@ -1432,7 +1419,6 @@ $scope.$on('keydown', function(msg, obj){
 			}
 			insertPosition++;
 		}
-		console.log(insertPosition);
 		initEditedPrescribeDrugForEdit($scope.editedPrescribeHistory, insertPosition, $scope);
 		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, insertPosition);
 	}
@@ -1442,7 +1428,6 @@ $scope.$on('keydown', function(msg, obj){
 
 	addTaskToPrescribeHistoryInPosition = function(drugPrescribeHistory, selectDrugIndex, insertPosition){
 		var drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
-		console.log(drug);
 		if(drug.groupPosition >=0){
 			if(drug.groupPosition > 0){
 				selectDrugIndex -= drug.groupPosition;
@@ -1517,34 +1502,62 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		var donationMal = $filter('filter')(drug.times.hours, "-").length;
 		return (donationMal).toString();
 	}
-
-	$scope.dayInfusionSumme = function(prescribeHistory){
-		var diSum = 0;
-		var diPoSum = 0;
-		var diVvSum = 0;
-		console.log("---");
-		angular.forEach(prescribeHistory.prescribes.tasks, function(drug, index){
-			if(drug){
-				if(drug.dose){
-					if("мл" === drug.dose.DOSE_UNIT){
-						var donationMal = $filter('filter')(drug.times.hours, "-").length;
-						diSum += drug.dose.DOSE_NUMBER*donationMal;
-						if("п.о." === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
-							diPoSum += drug.dose.DOSE_NUMBER*donationMal;
-						}else
-						if("в/в" === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
-							diVvSum += drug.dose.DOSE_NUMBER*donationMal;
-						}
-					}
+	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
+		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
+		if(drug == null || drug.times == null) return;
+		var dayMlSum = {
+			diSum : 0,
+			diPoSum : 0,
+			diVvSum : 0
+		}
+		var ml = drug.dose.DOSE_UNIT;
+		if("мл" === ml){
+			var donationMal = $filter('filter')(drug.times.hours, "-").length;
+			dayMlSum.diSum = drug.dose.DOSE_NUMBER*donationMal;
+		}
+		angular.forEach(drug.inlineDrugs, function(inlineDrug, idIndex){
+			calcMl(inlineDrug, dayMlSum, $filter);
+		})
+		if(0 === dayMlSum.diSum || dayMlSum.diSum < 10)
+			return;
+		return (dayMlSum.diSum).toString();
+	}
+	calcMl = function(drug, dayMlSum, $filter){
+		if(drug.dose){
+			if("мл" === drug.dose.DOSE_UNIT){
+				var donationMal = $filter('filter')(drug.times.hours, "-").length;
+				dayMlSum.diSum += drug.dose.DOSE_NUMBER*donationMal;
+				if("п.о." === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+					dayMlSum.diPoSum += drug.dose.DOSE_NUMBER*donationMal;
+				}else
+				if("в/в" === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+					dayMlSum.diVvSum += drug.dose.DOSE_NUMBER*donationMal;
 				}
 			}
+		}
+	};
+	$scope.dayInfusionSumme = function(prescribeHistory){
+		if(prescribeHistory.isCollapsed)
+			return;
+		var dayMlSum = {
+			diSum : 0,
+			diPoSum : 0,
+			diVvSum : 0
+		}
+		angular.forEach(prescribeHistory.prescribes.tasks, function(drug, index){
+			if(drug){
+				calcMl(drug, dayMlSum, $filter);
+				angular.forEach(drug.inlineDrugs, function(inlineDrug, idIndex){
+					calcMl(inlineDrug, dayMlSum, $filter);
+				})
+			}
 		} );
-		diSum = Math.round(diSum/100)*100;
-		diPoSum = Math.round(diPoSum/100)*100;
-		diVvSum = Math.round(diVvSum/100)*100;
-		var diPoSumHtml = " <sub>"+diPoSum.toString()+"</sub>";
-		var diVvSumHtml = " <sup>"+diVvSum.toString()+"</sup>";
-		var html = "≈" + (diSum).toString() + " мл "+diVvSumHtml+"/"+diPoSumHtml;
+		dayMlSum.diSum = Math.round(dayMlSum.diSum/100)*100;
+		dayMlSum.diPoSum = Math.round(dayMlSum.diPoSum/100)*100;
+		dayMlSum.diVvSum = Math.round(dayMlSum.diVvSum/100)*100;
+		var diPoSumHtml = " <sub>"+dayMlSum.diPoSum.toString()+"</sub>";
+		var diVvSumHtml = " <sup>"+dayMlSum.diVvSum.toString()+"</sup>";
+		var html = "≈" + (dayMlSum.diSum).toString() + " мл "+diVvSumHtml+"/"+diPoSumHtml;
 		return $sce.trustAsHtml(html);
 	}
 
@@ -1554,16 +1567,6 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	}
 	$scope.showHourMoveWay = function(){
 		return $sce.trustAsHtml($scope.hoursMoveWays[$scope.hourMoveWay]);
-	}
-	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
-		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
-		if(drug == null || drug.times == null) return;
-		var ml = drug.dose.DOSE_UNIT;
-		if("мл" === ml){
-			var donationMal = $filter('filter')(drug.times.hours, "-").length;
-			return (drug.dose.DOSE_NUMBER*donationMal).toString();
-		}
-
 	}
 	$scope.taskAndHourDescription = function($index, prescribeHistory){
 		var drug = getTaskFromPrescribes($index, prescribeHistory);
@@ -1733,7 +1736,6 @@ copyDrugDocument = function(drugDocument, $http, $filter){
 copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 	var copyObj = {};
 	copyObj.tasks = [];
-	console.log(taskIndex);
 	if(taskIndex == null){
 		var tasksToCopy = $filter('filter')
 			(prescribeHistory.prescribes.tasks, {selectMultiple:true});
@@ -1742,7 +1744,6 @@ copyCopyObject = function(taskIndex, prescribeHistory, $http, $filter){
 		copyObj.tasks = prescribeHistory.prescribes.tasks;
 	}else{
 		var drug = prescribeHistory.prescribes.tasks[taskIndex];
-		console.log(drug);
 		if(drug.groupPosition == 0){
 			var drugInGroupIndex = 0;
 			while(drug && drug.groupPosition == drugInGroupIndex){
