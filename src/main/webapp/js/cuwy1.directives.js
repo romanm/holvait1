@@ -439,9 +439,11 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 			prescribeHistory.updateDialogOpen = false;
 			return;
 		}
-		prescribeHistory.isCollapsed = !prescribeHistory.isCollapsed
-		if(prescribeHistory.isCollapsed)
-			return;
+		prescribeHistory.isCollapsed = !prescribeHistory.isCollapsed;
+		if(prescribeHistory.isCollapsed){
+			prescribeHistoryIndex--;
+			if(prescribeHistoryIndex < 0) prescribeHistoryIndex = 0;
+		}
 		setEditedPrescribeHistory(prescribeHistoryIndex, $scope);
 		changeSaveControl($scope, $http);
 	}
@@ -1412,6 +1414,7 @@ $scope.$on('keydown', function(msg, obj){
 
 	$scope.addTaskToPrescribeHistoryEnd = function(drugPrescribeHistory, selectDrugIndex){
 		var insertPosition = $scope.editedPrescribeHistory.prescribes.tasks.length;
+		console.log(insertPosition);
 		if(insertPosition > 0){
 			while(insertPosition > 0 && ($scope.editedPrescribeHistory.prescribes.tasks[insertPosition] == null
 					|| $scope.editedPrescribeHistory.prescribes.tasks[insertPosition].DRUG_NAME == "")){
@@ -1419,6 +1422,7 @@ $scope.$on('keydown', function(msg, obj){
 			}
 			insertPosition++;
 		}
+		console.log(insertPosition);
 		initEditedPrescribeDrugForEdit($scope.editedPrescribeHistory, insertPosition, $scope);
 		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, insertPosition);
 	}
@@ -1427,7 +1431,9 @@ $scope.$on('keydown', function(msg, obj){
 	}
 
 	addTaskToPrescribeHistoryInPosition = function(drugPrescribeHistory, selectDrugIndex, insertPosition){
+		console.log(drugPrescribeHistory);
 		var drug = drugPrescribeHistory.prescribes.tasks[selectDrugIndex];
+		console.log(drug);
 		if(drug.groupPosition >=0){
 			if(drug.groupPosition > 0){
 				selectDrugIndex -= drug.groupPosition;

@@ -79,7 +79,9 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="navbar-right">
-			|
+				<a data-ng-click="openPrescribesGroupIndex = -1"> <span
+					class="glyphicon glyphicon-remove"></span>
+				</a> |
 				<span data-ng-repeat="pgPrescribesHistory in prescribesGroup.prescribesHistory" 
 					data-ng-init="pgPrescribesHistoryIndex = $index;" >
 					<a data-ng-click="openGroup(pgPrescribesHistoryIndex)" >
@@ -101,7 +103,6 @@
 							data-ng-click="addTaskToPrescribeHistoryEnd(prescribesGroup.prescribesHistory[openPrescribesGroupIndex], pgDrugIndex)">
 						<span data-ng-show="prescribesGroup.prescribesHistory[openPrescribesGroupIndex].prescribes.tasks[pgDrugIndex].groupPosition > 0">+</span>
 						<span ng-bind-html="taskAndHourDescription(pgDrugIndex, prescribesGroup.prescribesHistory[openPrescribesGroupIndex])"></span>
-						
 						<span data-ng-repeat="drugInline in pgDrug.inlineDrugs">
 							+<span ng-bind-html="drugDescription(drugInline)"></span>
 						</span>

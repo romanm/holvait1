@@ -47,8 +47,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 		prescribeHistory.updateDialogOpen = !prescribeHistory.updateDialogOpen;
 	}
 
-
-
 $scope.menuPatientUpdate = [
 ['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 	console.debug('Edit');
