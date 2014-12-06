@@ -140,23 +140,29 @@ public class Lp24ControllerImpl {
 	}
 	//------------------patient----------------------------END
 
-	public boolean updateDrugToBlock1(Map<String, Object> readDrug, Map drug) {
+	public boolean updateDrugToBlock1(Map<String, Object> readDrug, Map drugFromDocument) {
 		for (Map prescribeHistory : getInitListOfMaps(readDrug, "prescribesHistory")) {
 			final Map prescribes = getInitMap(prescribeHistory, "prescribes");
 			List<Map> tasks = getListOfMaps(prescribes, "tasks");
 			if(null == tasks){
 				tasks = new ArrayList<Map>();
-				tasks.add(drug);
+				tasks.add(drugFromDocument);
 				prescribes.put("tasks", tasks);
 				return true;
-			}else
-			for (Map map : tasks) {
-				logger.debug(""+map);
-				logger.debug(""+(null == map));
-				logger.debug(""+map.get("DRUG_ID"));
-				if(null == map.get("DRUG_ID")){
-					logger.debug("leer");
+			}else{
+				boolean doseNumberExist = false;
+				final Integer doseNumberNew = getInt(getMap(drugFromDocument, "dose"), "DOSE_NUMBER");
+				for (Map drugFromDrug : tasks) {
+					doseNumberExist = doseNumberExist || doseNumberNew.equals(getInt(getMap(drugFromDrug, "dose"), "DOSE_NUMBER"));
+					if(null == drugFromDrug.get("DRUG_ID")){
+						logger.debug("leer");
+					}
 				}
+				if(!doseNumberExist){
+					tasks.add(drugFromDocument);
+					return true;
+				}
+				logger.debug(doseNumberExist+"/"+tasks);
 			}
 		}
 		return false;
@@ -231,6 +237,10 @@ public class Lp24ControllerImpl {
 	private Map getMap(Map<String, Object> map, String key) {
 		return (Map)map.get(key);
 	}
+	private Integer getInt(Map<String, Object> map, String key) {
+		final Object object = map.get(key);
+		return Integer.parseInt((String) object);
+	}
 	private List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
 		Set<Map> hashSet = new HashSet<Map>();
 		List<Map> ddDoses = getListOfMaps(drugDocument, "doses");
@@ -260,51 +270,45 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
+	private String getInstallAliasId() {
+		return (String) ((Map) getCuwyConfig().get("installConfig")).get("aliasId");
+	}
 	private void setExchangeInstall(Integer prescribeId, final Map exchange) {
-		Map<String, Object> cuwyConfig = getCuwyConfig();
-		final String aliasId = (String) ((Map) cuwyConfig.get("installConfig")).get("aliasId");
 		final Map exchangeInstall = new HashMap<String, Object>();
-		exchange.put(aliasId, exchangeInstall);
 		exchangeInstall.put("id", prescribeId);
+		final String aliasId = getInstallAliasId();
+		exchange.put(aliasId, exchangeInstall);
 	}
 	Map<String, Object> saveNewPrescribeFromLocalServer(Map<String, Object> prescribeToExchange) {
-		logger.debug("prescribeId = "+prescribeToExchange.get("PRESCRIBE_ID"));
-		Map<String, Object> newPrescribe = lp24jdbc.newPrescribe(prescribeToExchange);
-		Integer prescribeId = (Integer) newPrescribe.get("PRESCRIBE_ID");
-		logger.debug("prescribeId = "+prescribeId);
 		Map exchange = (Map) prescribeToExchange.get("exchange");
-		setExchangeInstall(prescribeId, exchange);
+		Integer prescribeId = (Integer) ((Map) exchange.get(getInstallAliasId())).get("id");
+		if(null == prescribeId){
+			prescribeId = (Integer) lp24jdbc.newPrescribe(prescribeToExchange).get("PRESCRIBE_ID");
+			setExchangeInstall(prescribeId, exchange);
+		}
 		prescribeToExchange.put("PRESCRIBE_ID", prescribeId);
-		logger.debug("prescribeToExchange = "+prescribeToExchange);
-		final String prescribeDbJsonName = lp24Config.getPrescribeDbJsonName(prescribeId);
-		logger.debug("prescribeDbJsonName = "+prescribeDbJsonName);
-		writeToJsonDbFile(prescribeToExchange, prescribeDbJsonName);
+		writeToJsonDbFile(prescribeToExchange, lp24Config.getPrescribeDbJsonName(prescribeId));
 		return prescribeToExchange;
 	}
 
 	public List<Map<String, Object>> updatePrescribe(Map<String, Object> prescribeToUpdate) {
-		logger.debug(" o "+prescribeToUpdate);
 		int updateProtocol = lp24jdbc.updatePrescribeOrder(prescribeToUpdate);
 		Integer prescribeId = (Integer) prescribeToUpdate.get("PRESCRIBE_ID");
-		logger.debug(" o "+prescribeId);
 		Map<String, Object> readPrescribes = readPrescribes(prescribeId);
-		logger.debug(" o "+readPrescribes);
 		Boolean prescribeRecommend = (Boolean) prescribeToUpdate.get("PRESCRIBE_RECOMMEND");
 		readPrescribes.put("PRESCRIBE_RECOMMEND", prescribeRecommend);
 		readPrescribes.put("PRESCRIBE_NAME", prescribeToUpdate.get("PRESCRIBE_NAME"));
 		writeToJsonDbFile(readPrescribes, lp24Config.getPrescribeDbJsonName(prescribeId));
 		if(prescribeRecommend){
-			logger.debug("save to server");
 			if(!readPrescribes.containsKey("exchange")){
 				final Map exchange = new HashMap<String, Object>();
 				readPrescribes.put("exchange", exchange);
 				setExchangeInstall(prescribeId, exchange);
-				logger.debug("save to server saveNewPrescribesInServer 1");
 				final Map<String, Object> saveNewPrescribesInServer = saveNewPrescribesInServer("sah", readPrescribes);
-				logger.debug("saveNewPrescribesInServer = "+saveNewPrescribesInServer);
 				saveNewPrescribesInServer.put("PRESCRIBE_ID", prescribeId);
-				logger.debug("saveNewPrescribesInServer = "+saveNewPrescribesInServer);
 				writeToJsonDbFile(saveNewPrescribesInServer, lp24Config.getPrescribeDbJsonName(prescribeId));
+			}else{
+				saveNewPrescribesInServer("sah", readPrescribes);
 			}
 		}
 		prescribe1sListOpen();

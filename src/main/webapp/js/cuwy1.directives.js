@@ -1511,6 +1511,7 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		var donationMal = $filter('filter')(drug.times.hours, "-").length;
 		return (donationMal).toString();
 	}
+
 	$scope.infusionSumme = function(taskInDayIndex, prescribeHistory){
 		var drug = prescribeHistory.prescribes.tasks[taskInDayIndex];
 		if(drug == null || drug.times == null) return;
@@ -1534,13 +1535,15 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 	calcMl = function(drug, dayMlSum, $filter){
 		if(drug.dose){
 			if("мл" === drug.dose.DOSE_UNIT){
-				var donationMal = $filter('filter')(drug.times.hours, "-").length;
-				dayMlSum.diSum += drug.dose.DOSE_NUMBER*donationMal;
-				if("п.о." === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
-					dayMlSum.diPoSum += drug.dose.DOSE_NUMBER*donationMal;
-				}else
-				if("в/в" === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
-					dayMlSum.diVvSum += drug.dose.DOSE_NUMBER*donationMal;
+				if(drug.times){
+					var donationMal = $filter('filter')(drug.times.hours, "-").length;
+					dayMlSum.diSum += drug.dose.DOSE_NUMBER*donationMal;
+					if("п.о." === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+						dayMlSum.diPoSum += drug.dose.DOSE_NUMBER*donationMal;
+					}else
+					if("в/в" === drug.dose.DOSE_ROUTE_OF_ADMINISTRATION){
+						dayMlSum.diVvSum += drug.dose.DOSE_NUMBER*donationMal;
+					}
 				}
 			}
 		}
@@ -1627,7 +1630,6 @@ initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
 		return drugHourDescriptionStr;
 	}
 
-	
 }
 
 initDeclarePrescribesPrint = function($scope, $http, $sce, $filter){
@@ -1719,6 +1721,9 @@ setEditedPrescribeDrug = function(taskInDayIndex, $scope){
 }
 
 closeEditedPrescribeDrugDialog = function($scope){
+	if($scope.editedPrescribeHistory.selectDrugIndex = -1){
+		$scope.editedPrescribeHistory.selectDrugIndex = 0;
+	}
 	$scope.editedPrescribeHistory.tasksInDay[$scope.editedPrescribeHistory.selectDrugIndex].isCollapsed = false;
 }
 

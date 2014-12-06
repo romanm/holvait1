@@ -17,6 +17,7 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 			$scope.drugDocument.doses = [];
 		if(null == $scope.drugDocument.localIdSequence)
 			$scope.drugDocument.localIdSequence = 1;
+		console.log($scope.editedPrescribeHistory);
 	}).error(function(data, status, headers, config) {
 	});
 
@@ -66,6 +67,17 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 		}]
 	];
 
+	$scope.menuDrugInPrescribesGroup = [
+		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
+			console.log($itemScope.editedPrescribeHistory);
+			console.log($itemScope.editedPrescribeHistory.prescribes.tasks);
+			console.log($itemScope.$index);
+			console.log($itemScope.editedPrescribeHistory.prescribes.tasks[$itemScope.$index]);
+			$itemScope.editedPrescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
+			console.log($itemScope.editedPrescribeHistory);
+			changeSaveControl($scope, $http);
+		}]
+	];
 	$scope.menuDrugPrescribesGroup = [
 		['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) { 
 			console.log($itemScope);
@@ -82,10 +94,6 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 				}
 			}).error(function(data, status, headers, config) {
 			});
-		}],
-		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
-			$itemScope.editedPrescribeHistory.prescribes.tasks.splice($itemScope.$index, 1);
-			changeSaveControl($scope, $http);
 		}]
 	];
 

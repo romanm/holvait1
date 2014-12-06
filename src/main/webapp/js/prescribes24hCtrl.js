@@ -13,6 +13,25 @@ cuwyApp.controller('p24hDocCtrl', [ '$scope', '$http', '$filter', '$sce', functi
 	});
 
 	$scope.saveWorkDoc = function(){
+		console.log("saveWorkDoc");
+		var excangeServer = "sahCuwy";
+//		var excangeServer = "dU";
+		if(excangeServer == config.installConfig.aliasId){
+			if($scope.workDoc.exchange){
+				var ek = Object.keys($scope.workDoc.exchange);
+				var noToSave =false;
+				for (k in ek) 
+					if(ek[k] != excangeServer){
+						noToSave = true;
+						break;
+					}
+				if(noToSave){
+					alert("Цей документ не призначений для запису. Він керується з сервера лікарні! \n" +
+					"Якщо ви хочете редагувати цей документ зробіть з нього копію.")
+					return;
+				}
+			}
+		}
 		saveWorkDoc(config.urlPrefix + '/save' + urlServer + '/prescribes', $scope, $http);
 	}
 

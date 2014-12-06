@@ -40,14 +40,24 @@
 <hr/>
 <div data-ng-show="parameters.s">
 		<span class="navbar-right selectedServer"> <b>
-				Цей документ знаходиться на сайті:</b> <a
-			href="http://sah.curepathway.com/prescribes24h.html?id={{parameters.id}}">
+				Цей документ знаходиться на сайті:</b> 
+				<a href="http://sah.curepathway.com/prescribes24h.html?id={{parameters.id}}">
 				sah.curepathway.com </a>.
 				Ви маєте доступ з можливістью вносити зміни до нього.
 		</span>
 		<hr/>
 </div>
 <div class="container">
+	<div class="row" data-ng-show="workDoc.exchange.sahCuwy">
+		<div class="col-xs-12">
+			<div class="navbar-right">
+			Документ синхронізований з 
+			<a href="http://sah.curepathway.com/prescribes24h.html?id={{workDoc.exchange.sahCuwy.id}}" target="_blank">
+			sah.curepathway.com
+			</a>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-xs-12">
 			<div data-ng-repeat="prescribeHistory in p24hDoc.prescribesHistory"

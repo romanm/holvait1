@@ -4,9 +4,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 
 	console.log("protocolsCtrl");
 	$scope.protocolOrder1sList = protocolOrder1sList;
-	console.log($scope.protocolOrder1sList);
 	$scope.prescribeOrder1sList = prescribeOrder1sList;
-	console.log($scope.prescribeOrder1sList);
 	
 	if(typeof prescribeOrder1sListOpen === 'undefined'){
 		$scope.prescribeOrder1sListOpen = [];
@@ -14,7 +12,6 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		$scope.prescribeOrder1sListOpen = prescribeOrder1sListOpen;
 	}
 	
-	console.log($scope.prescribeOrder1sListOpen);
 	$scope.prescribeListOrArchive = false;
 
 	$scope.saveNewPrescribe = function(){
@@ -51,15 +48,12 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 	postPrescribe = function (postUrl, editPrescribeOrder){
 		console.log("postPrescribe");
 		console.log(postUrl);
-		console.log(editPrescribeOrder);
 		$http({
 			method : 'POST',
 			data : editPrescribeOrder,
 			url : config.urlPrefix + postUrl
 		}).success(function(data, status, headers, config){
-			console.log("postPrescribe after");
 			$scope.prescribeOrder1sList = data;
-			console.log(data);
 		}).error(function(data, status, headers, config) {
 			$scope.error = data;
 		});

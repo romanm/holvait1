@@ -34,7 +34,6 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 	$http({ method : 'GET', url : config.urlPrefix + '/read' + urlServer + '/prescribe_14'
 	}).success(function(prescribesGroup, status, headers, config) {
 		$scope.prescribesGroup = prescribesGroup;
-		console.log($scope.prescribesGroup);
 	}).error(function(data, status, headers, config) {
 	});
 

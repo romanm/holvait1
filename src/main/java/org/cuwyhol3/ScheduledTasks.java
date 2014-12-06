@@ -24,25 +24,26 @@ public class ScheduledTasks {
 	@Autowired
 	private Lp24ControllerImpl lp24Controller;
 
-	@Scheduled(fixedRate = 117000)
-	public void checkSavedPatient() {
+	@Scheduled(fixedRate = 17000)
+	public void checkSavedPatient(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(""+readSavedPatient+" "+dateFormat.format(new Date()));
 		if(null == readSavedPatient)
 			return;
 		int patientId = (int) readSavedPatient.get("patient_id");
 		Map<String, Object> readJsonDbFile2map = lp24Controller.readJsonDbFile2map(Lp24Config.getPatientDbJsonName(patientId));
+		boolean updateDrugToBlock1 = false;
 		for (Map map : (List<Map>) readJsonDbFile2map.get("prescribesHistory")) {
 			for (Map drugInPatientDocument : (List<Map>) (List) ((Map) map.get("prescribes")).get("tasks")) {
-				logger.debug(""+drugInPatientDocument);
+				logger.debug("\n"+drugInPatientDocument);
 				if(null == drugInPatientDocument)
 					continue;
 				final Integer drugId = (Integer) drugInPatientDocument.get("DRUG_ID");
 				if(null == drugId)
 					continue;
-				final Map<String, Object> readDrugDocument = lp24Controller.readDrug(drugId);
-				logger.debug(""+readDrugDocument);
-				if(lp24Controller.updateDrugToBlock1(readDrugDocument, drugInPatientDocument)){
+				Map<String, Object> readDrugDocument = lp24Controller.readDrug(drugId);
+				updateDrugToBlock1 = updateDrugToBlock1 || lp24Controller.updateDrugToBlock1(readDrugDocument, drugInPatientDocument);
+				if(updateDrugToBlock1){
 					lp24Controller.writeToJsonDbFile(readDrugDocument, Lp24Config.getDrugDbJsonName(drugId));
 				}
 			}
@@ -50,7 +51,7 @@ public class ScheduledTasks {
 		lp24jdbc.updateSavedPatientIsChecked(patientId);
 	}
 
-	@Scheduled(fixedRate = 287000)
+	@Scheduled(fixedRate = 887000)
 	public void reportCurrentTime() {
 		System.out.println("The time is now " + dateFormat.format(new Date()) + lp24jdbc);
 	}
