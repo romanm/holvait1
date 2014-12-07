@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-//@Component("scheduledTasks")
+@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasks {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
@@ -24,11 +24,10 @@ public class ScheduledTasks {
 	@Scheduled(fixedRate = 17000)
 	public void reReadDrugWeb(){
 		final Integer countDrugWeb = lp24jdbc.countDrugWeb();
-		logger.debug(dateFormat.format(new Date())+" - countDrugWeb == "+countDrugWeb);
 		if(countDrugWeb > 0)
 			return;
 		final List<Map<String, Object>> readDrugWeb = lp24Controller.readDrugWeb("sah");
-		System.out.println(readDrugWeb);
+		logger.debug(dateFormat.format(new Date())+" - reReadDrugWeb - "+readDrugWeb.size());
 		lp24jdbc.insertDrugWeb(readDrugWeb);
 		lp24Controller.pushNewDrugInWeb("sah");
 	}

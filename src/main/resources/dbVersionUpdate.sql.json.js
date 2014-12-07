@@ -33,6 +33,11 @@
 			"drop table if exists  DRUG_WEB1 "
 			,"CREATE TABLE if not exists DRUG_WEB1 (DRUG_WEB_ID INT(10) primary key, DRUG_WEB_NAME VARCHAR(50) unique NOT NULL, DRUG_WEB_ARCHIVE BOOLEAN NOT NULL, DRUG_WEB_SAVEDTS TIMESTAMP NOT NULL)"
 		]
+	},{
+		"dbVersionId" : 8,
+		"sqls" : [
+			"alter table drug1 add column if not exists checked_web_savedts timestamp default dateadd('year',-1,now()) not null"
+		]
 	}
 	]
 }

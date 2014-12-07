@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component("scheduledTasks")
+//@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasksWeb {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
