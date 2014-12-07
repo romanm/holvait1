@@ -22,6 +22,11 @@
 		"sqls" : [
 			"select ' alter table PATIENT1 drop CONSTRAINT '||constraint_name as sql_update from information_schema.constraints where table_name ='PATIENT1' and column_list = 'PATIENT_NAME'"
 		]
+	},{
+		"dbVersionId" : 5,
+		"sqls" : [
+			"alter table drug1 add column if not exists drug_savedts timestamp default now() not null"
+		]
 	}
 	]
 }

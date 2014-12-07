@@ -27,7 +27,7 @@ public class ScheduledTasks {
 	@Scheduled(fixedRate = 17000)
 	public void checkSavedPatient(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
-		logger.debug(""+readSavedPatient+" "+dateFormat.format(new Date()));
+		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
 		if(null == readSavedPatient)
 			return;
 		int patientId = (int) readSavedPatient.get("patient_id");
