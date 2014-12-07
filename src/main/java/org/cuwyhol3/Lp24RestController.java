@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class Lp24RestController {
 	private static final Logger logger = LoggerFactory.getLogger(Lp24RestController.class);
 	
-	@Autowired
-	private ScheduledTasks scheduledTasks;
+	@Autowired private ScheduledTasksWeb scheduledTasks;
+//	@Autowired private ScheduledTasks scheduledTasks;
 
 	@Autowired
 	private Lp24ControllerImpl lp24Controller;

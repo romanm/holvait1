@@ -3,6 +3,9 @@ package org.cuwyhol3;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ import java.util.Map;
 import org.h2.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.stereotype.Component;
@@ -138,21 +142,6 @@ public class Lp24jdbc {
 		return map;
 	}
 
-	public Map<String, Object> readDrugFromName(String name) {
-		String sql = "SELECT * FROM drug1 WHERE drug_name = ?";
-		logger.debug("\n"+sql.replaceFirst("\\?", ""+name));
-		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, name);
-		Map<String, Object> map = prescribe1sList.get(0);
-		return map;
-	}
-	public Map<String, Object> readDrug(Integer id) {
-		String sql = "SELECT * FROM drug1 WHERE drug_id = ?";
-		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
-		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, id);
-		Map<String, Object> map = prescribe1sList.get(0);
-		return map;
-	}
-
 	public Map<String, Object> newPrescribe(Map<String, Object> newPrescribeOrder) {
 		Object prescribeName = newPrescribeOrder.get("PRESCRIBE_NAME");
 		jdbcTemplate.update("INSERT INTO prescribe1 (prescribe_name) VALUES (?)",prescribeName);
@@ -179,15 +168,6 @@ public class Lp24jdbc {
 	public int removePrescribeOrder(Map<String, Object> removePatient) {
 		Integer prescribeId = (Integer) removePatient.get("PRESCRIBE_ID");
 		int update = jdbcTemplate.update("DELETE FROM prescribe1 WHERE prescribe_id = ?",prescribeId);
-		return update;
-	}
-	public int updateDrug(Map<String, Object> drugToUpdate) {
-		String drugName = (String) drugToUpdate.get("DRUG_NAME");
-		Boolean drugArchive = (Boolean) drugToUpdate.get("DRUG_ARCHIVE");
-		Integer drugId = (Integer) drugToUpdate.get("DRUG_ID");
-		String sql = "UPDATE drug1 SET drug_name = ?, drug_archive = ? WHERE drug_id = ?";
-		int update = this.jdbcTemplate.update(sql,
-			drugName, drugArchive, drugId);
 		return update;
 	}
 	public int updatePrescribeOrder(Map<String, Object> prescribeToUpdate) {
@@ -243,45 +223,19 @@ public class Lp24jdbc {
 		return update;
 	}
 
-	public Map<String, Object> newDrug(Map<String, Object> newDrug) {
-		Object drugName = newDrug.get("DRUG_NAME");
-		logger.debug(""+drugName+"/"+newDrug);
-		jdbcTemplate.update("INSERT INTO drug1 (drug_name) VALUES (?)",drugName);
-		String sqlSelectDrug1 = "SELECT drug_id FROM drug1 WHERE drug_name = ? limit 1";
-		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sqlSelectDrug1, drugName);
-		logger.debug(""+drug1sList);
-		Map<String, Object> nDr = drug1sList.get(0);
-		logger.debug(""+nDr);
-		Integer newDrugId = (Integer) nDr.get("DRUG_ID");
-		logger.debug(""+newDrugId);
-		newDrug.put("DRUG_ID", newDrugId);
-		logger.debug(""+newDrug);
-		return newDrug;
-	}
 
-	public int removeDrug(Map<String, Object> removeDrug) {
-		Integer drugId = (Integer) removeDrug.get("DRUG_ID");
-		int update = jdbcTemplate.update("delete from drug1 where drug_id = ?",drugId);
-		return update;
-	}
 
-	public List<Map<String, Object>> drug1sList() {
-		String sql = "SELECT * FROM drug1";
-		logger.debug("\n"+sql);
-		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
-		return drug1sList;
-	}
 	public Integer nextDbId() {
 		return jdbcTemplate.queryForObject("select nextval('dbid')", Integer.class);
 	}
 
 	private void initDbVersionControl() {
-		Map dbVersionControlFile = new HashMap<String, Object>();
-		List dbVersionUpdateList = new ArrayList<Map>();
-		Map versionUpdate = new HashMap<String, Object>();
+		Map<String, Object> dbVersionControlFile = new HashMap<String, Object>();
+		List<Map<String, Object>> dbVersionUpdateList = new ArrayList<Map<String, Object>>();
+		Map<String, Object> versionUpdate = new HashMap<String, Object>();
 		versionUpdate.put("dbVersionId", 0);
 		versionUpdate.put("dbVersionDate", new Date());
-		List sqlList = new ArrayList<List>();
+		List<String> sqlList = new ArrayList<String>();
 		sqlList.add("CREATE TABLE if not exists dbversion (dbversion_ID INT(10) NOT NULL, "
 				+ "dbversion_date timestamp default now(), primary key (dbversion_id)");
 		sqlList.add("CREATE SEQUENCE  if not exists  dbid");
@@ -290,8 +244,92 @@ public class Lp24jdbc {
 		dbVersionControlFile.put("dbVersionUpdateList", dbVersionUpdateList);
 		writeJsonDbVersionInitFile(dbVersionControlFile);
 	}
-
+//-------------------- drug ------------------
+	public List<Map<String, Object>> drug1sList() {
+		String sql = "SELECT * FROM drug1";
+		logger.debug("\n"+sql);
+		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
+		return drug1sList;
+	}
+	public Map<String, Object> readDrugFromName(String name) {
+		String sql = "SELECT * FROM drug1 WHERE drug_name = ?";
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+name));
+		Map<String, Object> map = null;
+		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, name);
+		if(prescribe1sList.size() > 0){
+			map = prescribe1sList.get(0);
+		}
+		return map;
+	}
+	public Map<String, Object> readDrugFromId(Integer id) {
+		String sql = "SELECT * FROM drug1 WHERE drug_id = ?";
+		logger.debug("\n"+sql.replaceFirst("\\?", ""+id));
+		List<Map<String, Object>> prescribe1sList = jdbcTemplate.queryForList(sql, id);
+		Map<String, Object> map = prescribe1sList.get(0);
+		return map;
+	}
+	public int removeDrug(Map<String, Object> removeDrug) {
+		Integer drugId = (Integer) removeDrug.get("DRUG_ID");
+		int update = jdbcTemplate.update("delete from drug1 where drug_id = ?",drugId);
+		return update;
+	}
+	public Map<String, Object> newDrug(Map<String, Object> newDrug,final Timestamp timestamp) {
+		String drugName = (String) newDrug.get("DRUG_NAME");
+		jdbcTemplate.update("INSERT INTO drug1 (drug_name,DRUG_SAVEDTS) VALUES (?,?)",drugName,timestamp);
+		String sqlSelectDrug1 = "SELECT drug_id FROM drug1 WHERE drug_name = ? limit 1";
+		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sqlSelectDrug1, drugName);
+		Map<String, Object> nDr = drug1sList.get(0);
+		Integer newDrugId = (Integer) nDr.get("DRUG_ID");
+		newDrug.put("DRUG_ID", newDrugId);
+		return newDrug;
+	}
+	public int updateDrug(Map<String, Object> drugToUpdate) {
+		String drugName = (String) drugToUpdate.get("DRUG_NAME");
+		Boolean drugArchive = (Boolean) drugToUpdate.get("DRUG_ARCHIVE");
+		Integer drugId = (Integer) drugToUpdate.get("DRUG_ID");
+		String sql = "UPDATE drug1 SET drug_name = ?, drug_archive = ? WHERE drug_id = ?";
+		int update = this.jdbcTemplate.update(sql,
+			drugName, drugArchive, drugId);
+		return update;
+	}
+	public int updateDrugSavedTs(Integer drugId, Timestamp savedTs) {
+		String sql = "UPDATE drug1 SET drug_savedts = ? WHERE drug_id = ?";
+		int update = this.jdbcTemplate.update(sql, savedTs, drugId);
+		return update;
+	}
+//-------------------- drug-web ------------------
+	public Integer countDrugWeb() {
+		return jdbcTemplate.queryForObject("select count(*) from drug_web1", Integer.class);
+	}
+	public void insertDrugWeb(final List<Map<String, Object>> readDrugWeb) {
+		String sql = "INSERT INTO DRUG_WEB1 " +
+				"(DRUG_WEB_ID, DRUG_WEB_NAME, DRUG_WEB_ARCHIVE, DRUG_WEB_SAVEDTS) VALUES (?, ?, ?, ?)";
+		jdbcTemplate.batchUpdate(sql , new BatchPreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				final Map<String, Object> map = readDrugWeb.get(i);
+				ps.setInt(1, (Integer) map.get("DRUG_ID"));
+				ps.setString(2, (String) map.get("DRUG_NAME"));
+				ps.setBoolean(3, (boolean) map.get("DRUG_ARCHIVE"));
+				ps.setTimestamp(4, new Timestamp((long) map.get("DRUG_SAVEDTS")));
+			}
+			@Override
+			public int getBatchSize() {
+				return readDrugWeb.size();
+			}
+		});
+		jdbcTemplate.update("delete from DRUG_WEB1 where DRUG_WEB_ARCHIVE ");
+		jdbcTemplate.update("DELETE FROM DRUG_WEB1 WHERE DRUG_WEB_ID IN "
+		+ "( select DRUG_WEB_ID from DRUG1, DRUG_WEB1 where DRUG_NAME = DRUG_WEB_NAME AND DRUG_SAVEDTS = DRUG_WEB_SAVEDTS)");
+	}
 	
+	public List<Map<String, Object>> getNewDrugForWeb() {
+		String sql = "select * from DRUG1 left join DRUG_WEB1 on DRUG_NAME = DRUG_WEB_NAME where DRUG_WEB_ID is null AND DRUG_ARCHIVE = false";
+		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+		return queryForList;
+	}
+//-------------------- drug-web ------------------END
+//-------------------- drug ------------------END
 
 
 }

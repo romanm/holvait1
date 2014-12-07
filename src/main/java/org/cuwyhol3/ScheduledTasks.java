@@ -12,19 +12,28 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component("scheduledTasks")
+//@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasks {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
-	@Autowired
-	private Lp24jdbc lp24jdbc;
-
-	@Autowired
-	private Lp24ControllerImpl lp24Controller;
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+	
+	@Autowired private Lp24jdbc lp24jdbc;
+	@Autowired private Lp24ControllerImpl lp24Controller;
 
 	@Scheduled(fixedRate = 17000)
+	public void reReadDrugWeb(){
+		final Integer countDrugWeb = lp24jdbc.countDrugWeb();
+		logger.debug(dateFormat.format(new Date())+" - countDrugWeb == "+countDrugWeb);
+		if(countDrugWeb > 0)
+			return;
+		final List<Map<String, Object>> readDrugWeb = lp24Controller.readDrugWeb("sah");
+		System.out.println(readDrugWeb);
+		lp24jdbc.insertDrugWeb(readDrugWeb);
+		lp24Controller.pushNewDrugInWeb("sah");
+	}
+
+	@Scheduled(fixedRate = 107000)
 	public void checkSavedPatient(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
