@@ -16,8 +16,8 @@ var config = //first line separate
 	},
 	"urlPrefix": "",
 	"installConfig":{
-		"aliasId": "dU",
-		"name": "developer Ubuntu"
+		"aliasId": "sahCuwy",
+		"name": "sah curepathway"
 	},
 	"startHour24lp": 8
 };

@@ -22,16 +22,16 @@ public class Lp24Config {
 //	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 
 	//develop tasclin/clinic
-	final static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
-	final static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
-	final static String innerDbFolderPfad = "src/main/webapp/db/";
-	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
-
-	//develop tasclin/hol-sec
 //	final static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
-//	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
+//	final static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/holvait1-dev/lp24protocol";
 //	final static String innerDbFolderPfad = "src/main/webapp/db/";
 //	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
+
+	//develop tasclin/hol-sec
+	final static String applicationFolderPfad = "/home/roman/01_hol_2/holvait1/";
+	static String urlDb = "jdbc:h2:file:~/01_hol_2/db-h2/hol-sec-dev/lp24protocol";
+	final static String innerDbFolderPfad = "src/main/webapp/db/";
+	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 
 	//test install freehost.ua/holweb
 //	final static String applicationFolderPfad = "/home/roman/01_hol_2/hol-sec-2";
@@ -40,7 +40,7 @@ public class Lp24Config {
 //	final static String innerOpenDbFolderPfad = "src/main/webapp/cuwy/db/";
 
 	final static String jsonDbPhad = applicationFolderPfad + innerDbFolderPfad;
-	final static String pushedWebNewDrug = "pushedWebNewDrug/";
+	final static String subDirForPushDrugsFromClinic = "pushedWebNewDrug/";
 	final static String archivePrefix = "archive/";
 	public final static String patientDbPrefix = "patient/patient_";
 	public final static String prescribeDbPrefix = "prescribe/prescribe_";
@@ -51,7 +51,7 @@ public class Lp24Config {
 		return formatDate;
 	}
 	static String getPushedDrugPathName(Integer drugId) {
-		return pushedWebNewDrug + "drug_" + drugId+ ""
+		return subDirForPushDrugsFromClinic + "drug_" + drugId+ ""
 				+ "__"
 				+ archiveDateStamp()
 				+ ".json";

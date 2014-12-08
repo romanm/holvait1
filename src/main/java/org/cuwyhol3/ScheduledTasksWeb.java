@@ -16,52 +16,61 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-//@Component("scheduledTasks")
+@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasksWeb {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 
 	@Autowired private Lp24jdbc lp24jdbc;
 	@Autowired private Lp24ControllerImpl lp24Controller;
 	
 	final static int maxSaveInOneTimes = 10;
 	
-	@Scheduled(fixedRate = 17000)
-	public void addNewPushedDrugs(){
-		final String workDir = Lp24Config.jsonDbPhad+Lp24Config.pushedWebNewDrug;
-		File folder = new File(workDir);
-		File[] listOfFiles = folder.listFiles();
-		final int saveOneTimes = Math.min(maxSaveInOneTimes, listOfFiles.length);
+	@Scheduled(fixedRate = 17001)
+	public void updateDrugsDbFromClinicFiles(){
+		final String workDirForPushDrugsFromClinic = Lp24Config.jsonDbPhad+Lp24Config.subDirForPushDrugsFromClinic;
+		File folderWithPushedDrugsFromClinic = new File(workDirForPushDrugsFromClinic);
+		File[] listOfFilesFromClinic = folderWithPushedDrugsFromClinic.listFiles();
+		final int saveOneTimes = Math.min(maxSaveInOneTimes, listOfFilesFromClinic.length);
 		if(saveOneTimes == 0)
 			return;
-		logger.debug(dateFormat.format(new Date())+" - addNewPushedDrugs == "+saveOneTimes+" from "+listOfFiles.length);
+		logger.debug(dateFormat.format(new Date())+" - updateDrugsDbFromClinicFiles == "+folderWithPushedDrugsFromClinic);
+		logger.debug(dateFormat.format(new Date())+" - updateDrugsDbFromClinicFiles == "+saveOneTimes+" from "+listOfFilesFromClinic.length);
+		boolean isChanged = false;
 		for (int i = 0; i < saveOneTimes; i++) {
-			final File file = listOfFiles[i];
-			Map<String, Object> newDrug = lp24Controller.readJsonDbFile2map(file);
-			final Long lNewDrugSavedTs = (Long) newDrug.get("savedTs");
+			final File fileFromClinic = listOfFilesFromClinic[i];
+			Map<String, Object> drugFromClinic = lp24Controller.readJsonDbFile2map(fileFromClinic);
+			final Long lNewDrugSavedTs = (Long) drugFromClinic.get("savedTs");
 			//not for update from other DB / locale DB only
 			//lp24Controller.updateDrugs(newDrug);
-			final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName((String) newDrug.get("DRUG_NAME"));
+			Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName((String) drugFromClinic.get("DRUG_NAME"));
 			if(null == readDrugFromName){
-				newDrug = lp24jdbc.newDrug(newDrug, new Timestamp(lNewDrugSavedTs));
-				lp24Controller.writeToJsonDbFile(newDrug, Lp24Config.getDrugDbJsonName((Integer) newDrug.get("DRUG_ID")));
+				final Map<String, Object> newDrug = lp24jdbc.newDrug(drugFromClinic, new Timestamp(lNewDrugSavedTs));
+				final Integer drugId = (Integer) newDrug.get("DRUG_ID");
+				drugFromClinic.put("DRUG_ID", drugId);
+				lp24Controller.writeToJsonDbFile(drugFromClinic, Lp24Config.getDrugDbJsonName(drugId));
+				isChanged = true;
 			}else{
-				final boolean addDose2DrugDocument = lp24Controller.addDose2DrugDocument(newDrug, readDrugFromName);
+				final Integer drugId = (Integer) readDrugFromName.get("DRUG_ID");
+				final Map<String, Object> readDrug = lp24Controller.readDrug(drugId);
+				final boolean addDose2DrugDocument = lp24Controller.addDose2DrugDocument(drugFromClinic, readDrug);
 				if(addDose2DrugDocument){
-					final Integer drugId = (Integer) readDrugFromName.get("DRUG_ID");
-					Timestamp savedTS = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
-					savedTS = new Timestamp((lNewDrugSavedTs > savedTS.getTime())?lNewDrugSavedTs:new Date().getTime());
-					lp24jdbc.updateDrugSavedTs(drugId, savedTS);
+					isChanged = true;
+					Timestamp savedTs = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
+					savedTs = new Timestamp((lNewDrugSavedTs > savedTs.getTime())?lNewDrugSavedTs:new Date().getTime());
+					readDrug.put("savedTs", savedTs);
+					lp24jdbc.updateDrugSavedTs(drugId, savedTs);
+					lp24Controller.writeToJsonDbFile(readDrug, Lp24Config.getDrugDbJsonName(drugId));
 				}
 			}
 			try {
-				Files.delete(file.toPath());
+				Files.delete(fileFromClinic.toPath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		if(saveOneTimes > 0){
+		if(isChanged){
 			List<Map<String, Object>> drug1sList = lp24Controller.drug1sList();
 		}
 	}

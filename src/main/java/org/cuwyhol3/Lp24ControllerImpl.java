@@ -274,7 +274,7 @@ public class Lp24ControllerImpl {
 		}else{
 			drugTarget.put("doses", list);
 		}
-		final boolean isChanged = ddDosesSize == hashSetSize;
+		final boolean isChanged = ddDosesSize != hashSetSize;
 		return isChanged;
 	}
 	void collectingStatistic(String nameOfList, List<Map> listToAdd, Map<String, Object> collectionParent) {
