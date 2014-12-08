@@ -181,9 +181,9 @@ public class Lp24ControllerImpl {
 					if(null != drug){
 						Map<String, Object> drugDocument;
 						Integer drugId = (Integer) drug.get("DRUG_ID");
-						String drugNameInDoc = (String) drug.get("DRUG_NAME");
+						String drugNameInPrescribeDoc = (String) drug.get("DRUG_NAME");
 						if(null == drugId){
-							if(null == drugNameInDoc || "" == drugNameInDoc)
+							if(null == drugNameInPrescribeDoc || "" == drugNameInPrescribeDoc)
 								continue;
 							//save new drug in DB
 							drugDocument = newDrugToDbAndDoc(drug);
@@ -191,12 +191,13 @@ public class Lp24ControllerImpl {
 						}else{
 							drugDocument = readDrug(drugId);
 							String drugName = (String) drugDocument.get("DRUG_NAME");
-							logger.debug(drugName+"=="+drugNameInDoc+"/"+drugName.equals(drugNameInDoc));
-							if(!drugName.equals(drugNameInDoc)){//drug from WEB with false ID
-								final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName(drugNameInDoc);
+							logger.debug(drugName+"=="+drugNameInPrescribeDoc+"/"+drugName.equals(drugNameInPrescribeDoc));
+							if(!drugName.equals(drugNameInPrescribeDoc)){//drug from WEB with false ID
+								final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName(drugNameInPrescribeDoc);
 								drugName = (String) readDrugFromName.get("DRUG_NAME");
-								logger.debug(drugName+"=="+drugNameInDoc+"/"+drugName.equals(drugNameInDoc));
-								if(!drugName.equals(drugNameInDoc)){
+								logger.debug(drugName+"=="+drugNameInPrescribeDoc+"/"+drugName.equals(drugNameInPrescribeDoc));
+								if(!drugName.equals(drugNameInPrescribeDoc)){
+									//було змінене ім’я, а ID залишився старий, треба створити ліку з новим ім’ям
 									drugDocument = newDrugToDbAndDoc(drug);
 								}else{
 									drugId = (Integer) readDrugFromName.get("DRUG_ID");
@@ -205,8 +206,7 @@ public class Lp24ControllerImpl {
 								updateDrug = true;
 							}
 						}
-						List<Map> doses = addDose2DrugDocument(drug, drugDocument);
-						drugDocument.put("doses", doses);
+						final boolean addDose2DrugDocument = addDose2DrugDocument(drug, drugDocument);
 						saveDrug(drugDocument);
 					}
 				}
@@ -215,8 +215,7 @@ public class Lp24ControllerImpl {
 	}
 
 	private Map<String, Object> newDrugToDbAndDoc(Map drug) {
-		Map<String, Object> drugDocument;
-		drugDocument = lp24jdbc.newDrug(drug, new Timestamp(new Date().getTime()));
+		Map<String, Object> drugDocument = lp24jdbc.newDrug(drug, new Timestamp(new Date().getTime()));
 		drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
 		return drugDocument;
 	}
@@ -236,6 +235,9 @@ public class Lp24ControllerImpl {
 	List<Map> getListOfMaps(Map map, String key) {
 		return (List<Map>)map.get(key);
 	}
+	private Map getMap(Map<String, Object> map, String key) {
+		return (Map)map.get(key);
+	}
 	private Map getInitMap(Map map,final String key) {
 		Map mapInMap = getMap(map, key);
 		if(null == mapInMap){
@@ -244,25 +246,51 @@ public class Lp24ControllerImpl {
 		}
 		return mapInMap;
 	}
-	private Map getMap(Map<String, Object> map, String key) {
-		return (Map)map.get(key);
-	}
+	
 	private Integer getInt(Map<String, Object> map, String key) {
 		final Object object = map.get(key);
 		return Integer.parseInt((String) object);
 	}
-	List<Map> addDose2DrugDocument(Map drug, Map<String, Object> drugDocument) {
+	boolean addDose2DrugDocument(Map<String, Object> drugSource, Map<String, Object> drugTarget) {
 		Set<Map> hashSet = new HashSet<Map>();
-		List<Map> ddDoses = getListOfMaps(drugDocument, "doses");
-		if(null != ddDoses)
+		List<Map> ddDoses = getListOfMaps(drugTarget, "doses");
+		int ddDosesSize = 0;
+		if(null != ddDoses){
+			ddDosesSize = ddDoses.size();
 			hashSet.addAll(ddDoses);
-		List<Map> dDoses = getListOfMaps(drug, "doses");
+		}
+		List<Map> dDoses = getListOfMaps(drugSource, "doses");
 		if(null != dDoses)
 			hashSet.addAll(dDoses);
-		Map dose = getMap(drug, "dose");
+		Map dose = getMap(drugSource, "dose");
 		if(null != dose)
 			hashSet.add(dose);
-		return new ArrayList<Map>(hashSet);
+		final int hashSetSize = hashSet.size();
+		//меньше 5 добре, більше 5 треба вибирати кращі
+		final List<Map> list = new ArrayList<Map>(hashSet);
+		if(hashSetSize > 5){
+			drugTarget.put("doses", list.subList(0, 5));
+			collectingStatistic("doses",list,drugTarget);
+		}else{
+			drugTarget.put("doses", list);
+		}
+		final boolean isChanged = ddDosesSize == hashSetSize;
+		return isChanged;
+	}
+	void collectingStatistic(String nameOfList, List<Map> listToAdd, Map<String, Object> collectionParent) {
+		final String nameOfListStatistic = nameOfList+"statistic";
+		if(collectionParent.containsKey(nameOfListStatistic))
+			collectionParent.put(nameOfListStatistic, new ArrayList<Map>());
+		final List<Map> list = getList(collectionParent, nameOfListStatistic);
+		collectionParent.put(nameOfListStatistic, addListUnique(listToAdd, list));
+	}
+	ArrayList<Map> addListUnique(List<Map> listToAdd,
+			final List<Map> list) {
+		Set<Map> hashSet = new HashSet<Map>();
+		hashSet.addAll(list);
+		hashSet.addAll(listToAdd);
+		final ArrayList<Map> arrayList = new ArrayList<Map>(hashSet);
+		return arrayList;
 	}
 	public List<Map<String, Object>> elexRea() {
 		return null;
@@ -450,18 +478,9 @@ public class Lp24ControllerImpl {
 		}
 		return null;
 	}
-
 	//------------------prescribe----------------------------END
+
 	//------------------drug----------------------------
-	public Map<String, Object> readDrug(Integer drugId) {
-		String fileNameWithPathAdd = lp24Config.getDrugDbJsonName(drugId);
-		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
-		if(null == readJsonDbFile2map){
-			readJsonDbFile2map = lp24jdbc.readDrugFromId(drugId);
-			writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
-		}
-		return readJsonDbFile2map;
-	}
 	public List<Map<String, Object>> saveNewDrug(Map<String, Object> newDrug) {
 		logger.debug(" o - "+newDrug);
 		newDrug = lp24jdbc.newDrug(newDrug, new Timestamp(new Date().getTime()));
@@ -493,8 +512,100 @@ public class Lp24ControllerImpl {
 		writeToJsDbFile("var drug1sList = ", drug1sList, lp24Config.drug1sListJsFileName);
 		return drug1sList;
 	}
+	public void writeDrug(Integer drugId,Object readJsonDbFile2map) {
+		String fileNameWithPathAdd = lp24Config.getDrugDbJsonName(drugId);
+		writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
+	}
+	public Map<String, Object> readDrug(Integer drugId) {
+		String fileNameWithPathAdd = lp24Config.getDrugDbJsonName(drugId);
+		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
+		if(null == readJsonDbFile2map){
+			readJsonDbFile2map = lp24jdbc.readDrugFromId(drugId);
+			writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
+		}
+		return readJsonDbFile2map;
+	}
 	//------------------drug----------------------------END
+	//------------------ drug-web ------------------------------------
+	public Map<String, Object> readDrugFromWeb(String shortServerName, Integer drugId) {
+		String url = "http://"+ shortServerName+ ".curepathway.com//read/drug_"+drugId;
+		Map<String, Object> readValue = null;
+		try {
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			InputStream requestBody = con.getInputStream();
+			readValue = mapper.readValue(requestBody, Map.class);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return readValue;
+	}
+	public List<Map<String, Object>> readDrugListeFromWeb(String shortServerName) {
+		String url = "http://"+ shortServerName+ ".curepathway.com/drug1sList";
+		List<Map<String, Object>> readValue = null;
+		try {
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			InputStream requestBody = con.getInputStream();
+			readValue = mapper.readValue(requestBody, List.class);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return readValue;
+	}
+	public void pushNewDrugsToWebServer(String sah) {
+		final List<Map<String, Object>> newDrugForWeb = lp24jdbc.getNewDrugForWeb();
+		for (Map<String, Object> map : newDrugForWeb) {
+			Integer drugId = (Integer) map.get("DRUG_ID");
+			final Map<String, Object> drug = readDrug(drugId);
+			drug.put("savedTs", map.get("DRUG_SAVEDTS"));
+			pushWebNewDrug(sah, drug);
+		}
+	}
+	Map<String, Object> pushedWebNewDrug(Map<String, Object> drug) {
+		Integer drugId = (Integer) drug.get("DRUG_ID");
+		final String pushedDrugPathName = lp24Config.getPushedDrugPathName(drugId);
+		logger.debug(pushedDrugPathName);
+		writeToJsonDbFile(drug, pushedDrugPathName);
+		final Map<String, Object> mapDrug = new HashMap<String, Object>();
+		mapDrug.put("id", drugId);
+		return mapDrug;
+	}
+	Map<String, Object> pushWebNewDrug(String shortServerName, Map<String, Object> drug) {
+		String url = "http://"+ shortServerName+ ".curepathway.com/pushedWebNewDrug";
+		logger.debug(url);
+		HttpURLConnection con = postToUrl(drug, mapper, url);
+		logger.debug(""+con);
+		Map<String, Object>  readValue = null;
+		if(null != con){
+			try {
+				InputStream requestBody = con.getInputStream();
+				readValue = mapper.readValue(requestBody, Map.class);
+				logger.debug(""+readValue);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return readValue;
+	}
+	ObjectMapper mapper = new ObjectMapper();
+	
+	//------------------ drug-web ------------------------------------END
 
+	public Map<String, Object> sessionCopy(Map<String, Object> copyObj,
+			HttpSession session) {
+		session.setAttribute("copyObj", copyObj);
+		return copyObj;
+	}
+
+	public Map<String, Object> sessionPaste(HttpSession session) {
+		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
+		return copyObj;
+	}
 	Map<String, Object> readJsonDbFile2map(String fileName) {
 		String pathToFile = Lp24Config.applicationFolderPfad + Lp24Config.innerDbFolderPfad + fileName;
 		File file = new File(pathToFile);
@@ -552,17 +663,6 @@ public class Lp24ControllerImpl {
 		}
 	}
 
-	public Map<String, Object> sessionCopy(Map<String, Object> copyObj,
-			HttpSession session) {
-		session.setAttribute("copyObj", copyObj);
-		return copyObj;
-	}
-
-	public Map<String, Object> sessionPaste(HttpSession session) {
-		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
-		return copyObj;
-	}
-
 	public List<Map<String, Object>> removePrescribeOrder(
 			Map<String, Object> prescribeToRemove) {
 		logger.debug(" o - "+prescribeToRemove);
@@ -575,60 +675,5 @@ public class Lp24ControllerImpl {
 	public Integer nextDbId() {
 		return lp24jdbc.nextDbId();
 	}
-	
-	//------------------ drug-web ------------------------------------
-	public void pushNewDrugInWeb(String sah) {
-		final List<Map<String, Object>> newDrugForWeb = lp24jdbc.getNewDrugForWeb();
-		for (Map<String, Object> map : newDrugForWeb) {
-			Integer drugId = (Integer) map.get("DRUG_ID");
-			final Map<String, Object> drug = readDrug(drugId);
-			drug.put("savedTs", map.get("DRUG_SAVEDTS"));
-			pushWebNewDrug(sah, drug);
-		}
-	}
-	Map<String, Object> pushedWebNewDrug(Map<String, Object> drug) {
-		Integer drugId = (Integer) drug.get("DRUG_ID");
-		final String pushedDrugPathName = lp24Config.getPushedDrugPathName(drugId);
-		logger.debug(pushedDrugPathName);
-		writeToJsonDbFile(drug, pushedDrugPathName);
-		final Map<String, Object> mapDrug = new HashMap<String, Object>();
-		mapDrug.put("id", drugId);
-		return mapDrug;
-	}
-	private Map<String, Object> pushWebNewDrug(String shortServerName, Map<String, Object> drug) {
-		String url = "http://"+ shortServerName+ ".curepathway.com/pushedWebNewDrug";
-		logger.debug(url);
-		HttpURLConnection con = postToUrl(drug, mapper, url);
-		logger.debug(""+con);
-		Map<String, Object>  readValue = null;
-		if(null != con){
-			try {
-				InputStream requestBody = con.getInputStream();
-				logger.debug(""+requestBody);
-				readValue = mapper.readValue(requestBody, Map.class);
-				logger.debug(""+readValue);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return readValue;
-	}
-	ObjectMapper mapper = new ObjectMapper();
-	public List<Map<String, Object>> readDrugWeb(String shortServerName) {
-		String url = "http://"+ shortServerName+ ".curepathway.com/drug1sList";
-		List<Map<String, Object>> readValue = null;
-		try {
-			URL obj = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			InputStream requestBody = con.getInputStream();
-			readValue = mapper.readValue(requestBody, List.class);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return readValue;
-	}
-	//------------------ drug-web ------------------------------------END
 
 }

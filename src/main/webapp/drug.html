@@ -49,6 +49,7 @@
 				<span data-ng-repeat="dose in drugDocument.doses"
 					data-ng-click="dose2newDose(dose)"
 					data-ng-context-menu="menuDoses"
+					class="mouseover"
 				>
 					<small data-ng-show="dose.DOSECONCENTRATON_NUMBER">
 						{{dose.DOSECONCENTRATON_NUMBER}}{{dose.DOSECONCENTRATON_UNIT}}
@@ -67,12 +68,14 @@
 					</th>
 					<th title="Одиниці виміру" class="doseDialog">
 						<span 
+						class="mouseover"
 						data-ng-repeat="doseUnit in ['мл', 'таб', 'мг']"
 						data-ng-click="newDrugDocumentDose.DOSE_UNIT = doseUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseUnit}}</span>
 					</th>
 					<th title="Шлях введення" class="doseDialog">
 						<span 
+						class="mouseover"
 						data-ng-repeat="doseRouteOfAdministration in ['в/в', 'в/м', 'п.о.']"
 						data-ng-click="newDrugDocumentDose.DOSE_ROUTE_OF_ADMINISTRATION = doseRouteOfAdministration"
 						><span data-ng-show="$index != 0">|</span>{{doseRouteOfAdministration}}</span>
@@ -81,6 +84,7 @@
 					<th title="Концентрація">--</th>
 					<th title="Одиниці виміру концентрації">
 						<span 
+						class="mouseover"
 						data-ng-repeat="doseConcentrationUnit in ['%', 'мг/мл']"
 						data-ng-click="newDrugDocumentDose.DOSECONCENTRATON_UNIT = doseConcentrationUnit"
 						><span data-ng-show="$index != 0">|</span>{{doseConcentrationUnit}}</span>
@@ -114,22 +118,33 @@
 					типових призначень {{ddPrescribeHistoryIndex + 1}}</div>
 				<div data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
 					data-ng-init="drugIndex = $index"
+					 class="mouseover"
 				data-ng-context-menu="menuDrugInPrescribesGroup">
-					<span data-ng-show="drug.groupPosition > 0">+</span> <span
-						ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>,
+					<span data-ng-show="drug.groupPosition > 0">+</span> 
+					<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>,
 					<span ng-bind-html="drugHourDescription(drug)"></span>
-				</div>
+					<span data-ng-repeat="drugInline in drug.inlineDrugs"
+							ng-init="drugInlineIndex = $index">{{drug.splitSymbol}}
+							<span data-ng-show="!drug.splitSymbol">+ </span> <span
+							ng-bind-html="drugDescription(drugInline)"></span>
+						</span>
+					</div>
 			</div>
 		</div>
 		<div class="col-xs-6">
 			<div data-ng-repeat="replacementDrug in workDoc.replacementDrugs"
-				data-ng-init="replacementDrugIndex = $index;">
-				<h3>{{replacementDrug.DRUG_NAME}}</h3>
+				data-ng-init="replacementDrugIndex = $index;"
+				data-ng-context-menu="menuReplacmentDrug"
+				>
+				<h3
+				 class="mouseover"
+				>{{replacementDrug.DRUG_NAME}}</h3>
 				<div
 					data-ng-repeat="rdPrescribeHistory in replacementDrug.prescribesHistory"
 					data-ng-init="rdPrescribeHistoryIndex = $index;">
 					Група типових призначень {{rdPrescribeHistoryIndex + 1}}
 					<div data-ng-repeat="rDrug in rdPrescribeHistory.prescribes.tasks"
+					 class="mouseover"
 							data-ng-init="rDrugIndex = $index">
 						<span data-ng-show="rDrug.groupPosition > 0">+</span>
 						<span ng-bind-html="taskAndHourDescription(rDrugIndex, rdPrescribeHistory)"></span>,

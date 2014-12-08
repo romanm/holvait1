@@ -292,16 +292,26 @@ public class Lp24jdbc {
 			drugName, drugArchive, drugId);
 		return update;
 	}
+	public int updateDrugCheckedWebSavedTs(Integer drugId, Timestamp savedTs) {
+		String sql = "UPDATE drug1 SET checked_web_savedts = ? WHERE drug_id = ?";
+		int update = this.jdbcTemplate.update(sql, savedTs, drugId);
+		return update;
+	}
 	public int updateDrugSavedTs(Integer drugId, Timestamp savedTs) {
 		String sql = "UPDATE drug1 SET drug_savedts = ? WHERE drug_id = ?";
 		int update = this.jdbcTemplate.update(sql, savedTs, drugId);
 		return update;
 	}
+	public int delete1DrugWeb(Integer drugWebId) {
+		String sql = "delete from drug_web1 WHERE drug_web_id = ?";
+		int update = this.jdbcTemplate.update(sql,  drugWebId);
+		return update;
+	}
 //-------------------- drug-web ------------------
-	public Integer countDrugWeb() {
+	public Integer countDrugFromWebTable() {
 		return jdbcTemplate.queryForObject("select count(*) from drug_web1", Integer.class);
 	}
-	public void insertDrugWeb(final List<Map<String, Object>> readDrugWeb) {
+	public void insertDrugFromWebToUpdateCheck(final List<Map<String, Object>> readDrugWeb) {
 		String sql = "INSERT INTO DRUG_WEB1 " +
 				"(DRUG_WEB_ID, DRUG_WEB_NAME, DRUG_WEB_ARCHIVE, DRUG_WEB_SAVEDTS) VALUES (?, ?, ?, ?)";
 		jdbcTemplate.batchUpdate(sql , new BatchPreparedStatementSetter() {
@@ -323,6 +333,13 @@ public class Lp24jdbc {
 		+ "( select DRUG_WEB_ID from DRUG1, DRUG_WEB1 where DRUG_NAME = DRUG_WEB_NAME AND DRUG_SAVEDTS = DRUG_WEB_SAVEDTS)");
 	}
 	
+	public Map<String, Object> getDrugForWebToCheck() {
+		String sqlDbVersion = "select * from DRUG_WEB1, DRUG1 "
+				+ " where DRUG_NAME = DRUG_WEB_NAME "
+				+ " and (DRUG_WEB_SAVEDTS != CHECKED_WEB_SAVEDTS or DRUG_SAVEDTS > DRUG_WEB_SAVEDTS) limit 1";
+		final Map<String, Object> map = jdbcTemplate.queryForList(sqlDbVersion).get(0);
+		return map;
+	}
 	public List<Map<String, Object>> getNewDrugForWeb() {
 		String sql = "select * from DRUG1 left join DRUG_WEB1 on DRUG_NAME = DRUG_WEB_NAME where DRUG_WEB_ID is null AND DRUG_ARCHIVE = false";
 		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);

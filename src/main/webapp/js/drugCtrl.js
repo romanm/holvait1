@@ -52,6 +52,12 @@ cuwyApp.controller('drugCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 		saveWorkDoc(config.urlPrefix + "/save/drug", $scope, $http);
 	}
 
+	$scope.menuReplacmentDrug = [
+		['<span class="glyphicon glyphicon-remove"></span> Видалити', function ($itemScope) {
+			$itemScope.workDoc.replacementDrugs.splice($itemScope.replacementDrugIndex, 1);
+			changeSaveControl($scope, $http);
+		}]
+	];
 	$scope.menuDrugName = [
 		['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) { 
 			copyDrugDocument($scope.drugDocument, $http)

@@ -1,5 +1,6 @@
 package org.cuwyhol3;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,15 +22,87 @@ public class ScheduledTasks {
 	@Autowired private Lp24jdbc lp24jdbc;
 	@Autowired private Lp24ControllerImpl lp24Controller;
 
-	@Scheduled(fixedRate = 17000)
-	public void reReadDrugWeb(){
-		final Integer countDrugWeb = lp24jdbc.countDrugWeb();
-		if(countDrugWeb > 0)
+//	@Scheduled(fixedRate = 1000)
+	public void reReadDrugFromWeb(){
+		final Integer countDrugFromWebTable = lp24jdbc.countDrugFromWebTable();
+		if(countDrugFromWebTable > 0){
+			final Map<String, Object> drugToCheck = lp24jdbc.getDrugForWebToCheck();
+			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+drugToCheck);
+			Integer drugId  = (Integer) drugToCheck.get("DRUG_ID");
+			Integer drugWebId  = (Integer) drugToCheck.get("DRUG_WEB_ID");
+			Map<String, Object> drugTasks = check1DrugWithDrugFromWeb(drugWebId,drugId);
+			Timestamp drugWebsavedTS = (Timestamp) drugToCheck.get("DRUG_WEB_SAVEDTS");
+			final long ldrugWebsavedTS = drugWebsavedTS.getTime();
+			lp24jdbc.updateDrugCheckedWebSavedTs(drugId, drugWebsavedTS);
+			if((boolean) drugTasks.get("isChanged")){
+				Timestamp savedTS = (Timestamp) drugToCheck.get("DRUG_SAVEDTS");
+				savedTS = new Timestamp((ldrugWebsavedTS > savedTS.getTime())?ldrugWebsavedTS:new Date().getTime());
+				lp24jdbc.updateDrugSavedTs(drugId, savedTS);
+				lp24Controller.writeToJsonDbFile(drugTasks, Lp24Config.getDrugDbJsonName(drugId));
+				drugTasks.put("savedTs", savedTS);
+				lp24Controller.pushWebNewDrug("sah", drugTasks);
+			}
+			lp24jdbc.delete1DrugWeb(drugWebId);
 			return;
-		final List<Map<String, Object>> readDrugWeb = lp24Controller.readDrugWeb("sah");
-		logger.debug(dateFormat.format(new Date())+" - reReadDrugWeb - "+readDrugWeb.size());
-		lp24jdbc.insertDrugWeb(readDrugWeb);
-		lp24Controller.pushNewDrugInWeb("sah");
+		}
+		final List<Map<String, Object>> readDrugListeFromWeb = lp24Controller.readDrugListeFromWeb("sah");
+		logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb.size());
+		lp24jdbc.insertDrugFromWebToUpdateCheck(readDrugListeFromWeb);
+		lp24Controller.pushNewDrugsToWebServer("sah");
+	}
+
+	private Map<String, Object> check1DrugWithDrugFromWeb(Integer drugWebId, Integer drugId) {
+		final Map<String, Object> readDrugFromWeb = lp24Controller.readDrugFromWeb("sah",drugWebId);
+		final Map<String, Object> readDrug = lp24Controller.readDrug(drugId);
+		logger.debug(" w "+readDrugFromWeb);
+		readDrug.put("isChanged", false);
+		final boolean addDose2DrugDocument = lp24Controller.addDose2DrugDocument(readDrugFromWeb, readDrug);
+		readDrug.put("isChanged", addDose2DrugDocument);
+		final List webTasks = getPrescribesTasks(readDrugFromWeb);
+		List drugTasks = getPrescribesTasks(readDrug);
+		if(webTasks != null){
+			if(drugTasks == null)
+			{
+				readDrug.put("prescribesHistory", readDrugFromWeb.get("prescribesHistory"));
+				readDrug.put("isChanged", true);
+			}else
+			{
+				final int hashCode = drugTasks.hashCode();
+
+				drugTasks = lp24Controller.addListUnique(webTasks, drugTasks);
+				if(drugTasks.size() > 5){
+					final Map prescribesHistoryPrescribes = getPrescribesHistoryPrescribes(readDrug);
+					lp24Controller.collectingStatistic("tasks",drugTasks,prescribesHistoryPrescribes);
+					prescribesHistoryPrescribes.put("tasks", drugTasks.subList(0, 5));
+				}
+				logger.debug(" w "+hashCode+" != " + drugTasks.hashCode()+"/"+(hashCode != drugTasks.hashCode()));
+				if(hashCode != drugTasks.hashCode())
+					readDrug.put("isChanged", true);
+			}
+		}
+		else if(drugTasks != null)
+		{
+			readDrug.put("isChanged", true);
+		}
+		return readDrug;
+	}
+
+	private Map getPrescribesHistoryPrescribes(final Map<String, Object> prescribesHistoryParent) {
+		Map map = null;
+		final List<Map> prescribesHistory = (List) prescribesHistoryParent.get("prescribesHistory");
+		if(prescribesHistory != null) {
+			map = (Map) prescribesHistory.get(0).get("prescribes");
+		}
+		return map;
+	}
+	private List getPrescribesTasks(final Map<String, Object> prescribesHistoryParent) {
+		List tasks = null;
+		final List<Map> prescribesHistory = (List) prescribesHistoryParent.get("prescribesHistory");
+		if(prescribesHistory != null) {
+			final Map map = (Map) prescribesHistory.get(0).get("prescribes");
+			tasks = (List) map.get("tasks");
+		}
+		return tasks;
 	}
 
 	@Scheduled(fixedRate = 107000)
@@ -61,6 +134,6 @@ public class ScheduledTasks {
 
 	@Scheduled(fixedRate = 887000)
 	public void reportCurrentTime() {
-		System.out.println("The time is now " + dateFormat.format(new Date()) + lp24jdbc);
+		System.out.println("The time is now " + dateFormat.format(new Date()));
 	}
 }

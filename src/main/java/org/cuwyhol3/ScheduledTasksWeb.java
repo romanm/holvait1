@@ -33,27 +33,27 @@ public class ScheduledTasksWeb {
 		File folder = new File(workDir);
 		File[] listOfFiles = folder.listFiles();
 		final int saveOneTimes = Math.min(maxSaveInOneTimes, listOfFiles.length);
-		if(saveOneTimes > 0)
-			logger.debug(dateFormat.format(new Date())+" - addNewPushedDrugs == "+saveOneTimes+" from "+listOfFiles.length);
+		if(saveOneTimes == 0)
+			return;
+		logger.debug(dateFormat.format(new Date())+" - addNewPushedDrugs == "+saveOneTimes+" from "+listOfFiles.length);
 		for (int i = 0; i < saveOneTimes; i++) {
 			final File file = listOfFiles[i];
 			Map<String, Object> newDrug = lp24Controller.readJsonDbFile2map(file);
 			final Long lNewDrugSavedTs = (Long) newDrug.get("savedTs");
-			final Timestamp newDrugSavedTS = new Timestamp(lNewDrugSavedTs);
 			//not for update from other DB / locale DB only
 			//lp24Controller.updateDrugs(newDrug);
 			final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName((String) newDrug.get("DRUG_NAME"));
 			if(null == readDrugFromName){
-				newDrug = lp24jdbc.newDrug(newDrug, newDrugSavedTS);
+				newDrug = lp24jdbc.newDrug(newDrug, new Timestamp(lNewDrugSavedTs));
 				lp24Controller.writeToJsonDbFile(newDrug, Lp24Config.getDrugDbJsonName((Integer) newDrug.get("DRUG_ID")));
 			}else{
-				final Timestamp oldSavedTS = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
-				if(lNewDrugSavedTs > oldSavedTS.getTime()){
+				final boolean addDose2DrugDocument = lp24Controller.addDose2DrugDocument(newDrug, readDrugFromName);
+				if(addDose2DrugDocument){
 					final Integer drugId = (Integer) readDrugFromName.get("DRUG_ID");
-					lp24jdbc.updateDrugSavedTs(drugId, new Timestamp(lNewDrugSavedTs));
+					Timestamp savedTS = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
+					savedTS = new Timestamp((lNewDrugSavedTs > savedTS.getTime())?lNewDrugSavedTs:new Date().getTime());
+					lp24jdbc.updateDrugSavedTs(drugId, savedTS);
 				}
-				List<Map> doses = lp24Controller.addDose2DrugDocument(newDrug, readDrugFromName);
-				readDrugFromName.put("doses", doses);
 			}
 			try {
 				Files.delete(file.toPath());
