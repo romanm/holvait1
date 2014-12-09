@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasksWeb {
-	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksClinic.class);
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 
 	@Autowired private Lp24jdbc lp24jdbc;
@@ -54,11 +54,12 @@ public class ScheduledTasksWeb {
 			}else{
 				final Integer drugId = (Integer) readDrugFromName.get("DRUG_ID");
 				final Map<String, Object> readDrug = lp24Controller.readDrug(drugId);
-				final boolean addDose2DrugDocument = lp24Controller.addDose2DrugDocument(drugFromClinic, readDrug);
-				if(addDose2DrugDocument){
-					isChanged = true;
+				//isChanged = lp24Controller.addDose2DrugDocument(drugFromClinic, readDrug);
+				//if(isChanged){
+				lp24Controller.margeDrugs(drugFromClinic, readDrug);
+				if((boolean) readDrug.get("isChanged")){
 					Timestamp savedTs = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
-					savedTs = new Timestamp((lNewDrugSavedTs > savedTs.getTime())?lNewDrugSavedTs:new Date().getTime());
+					savedTs = new Timestamp((null != lNewDrugSavedTs && lNewDrugSavedTs > savedTs.getTime())?lNewDrugSavedTs:new Date().getTime());
 					readDrug.put("savedTs", savedTs);
 					lp24jdbc.updateDrugSavedTs(drugId, savedTs);
 					lp24Controller.writeToJsonDbFile(readDrug, Lp24Config.getDrugDbJsonName(drugId));

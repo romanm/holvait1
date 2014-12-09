@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 @Component("lp24Controller")
 public class Lp24ControllerImpl {
 	private static final Logger logger = LoggerFactory.getLogger(Lp24ControllerImpl.class);
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 	private Lp24Config lp24Config;
 
 	@Autowired
@@ -144,6 +146,62 @@ public class Lp24ControllerImpl {
 	}
 	//------------------patient----------------------------END
 
+	//----------------works between documents and servers-------------------------------------
+	//----------------works between servers-------------------------------------
+	void margeDrugs(final Map<String, Object> sourceDrug, final Map<String, Object> targetDrug) {
+		targetDrug.put("isChanged", false);
+		boolean isChanged = addDose2DrugDocument(sourceDrug, targetDrug);
+		targetDrug.put("isChanged", isChanged);
+		List drugTasks = getPrescribesTasks(targetDrug);
+		logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks);
+		final List webDrugTasks = getPrescribesTasks(sourceDrug);
+		if(webDrugTasks != null){
+			if(drugTasks == null)
+			{
+				targetDrug.put("prescribesHistory", sourceDrug.get("prescribesHistory"));
+				targetDrug.put("isChanged", true);
+			}else{
+				final int hashCode = drugTasks.hashCode();
+				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+hashCode);
+				final Map prescribesHistoryPrescribes = getPrescribesHistoryPrescribes(targetDrug);
+				drugTasks = addListUnique(webDrugTasks, drugTasks);
+				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks);
+				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks.size());
+				if(drugTasks.size() > 5){
+					collectingStatistic("tasks",drugTasks,prescribesHistoryPrescribes);
+					prescribesHistoryPrescribes.put("tasks", drugTasks.subList(0, 5));
+				}else{
+					prescribesHistoryPrescribes.put("tasks", drugTasks);
+				}
+				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks.hashCode());
+				logger.debug(" w "+hashCode+" != " + drugTasks.hashCode()
+				+"/"+(hashCode != drugTasks.hashCode()));
+				if(hashCode != drugTasks.hashCode())
+					targetDrug.put("isChanged", true);
+			}
+		}
+	}
+
+	private Map getPrescribesHistoryPrescribes(final Map<String, Object> prescribesHistoryParent) {
+		Map map = null;
+		final List<Map> prescribesHistory = (List) prescribesHistoryParent.get("prescribesHistory");
+		if(prescribesHistory != null) {
+			map = (Map) prescribesHistory.get(0).get("prescribes");
+		}
+		return map;
+	}
+	private List getPrescribesTasks(final Map<String, Object> prescribesHistoryParent) {
+		List tasks = null;
+		final List<Map> prescribesHistory = (List) prescribesHistoryParent.get("prescribesHistory");
+		if(prescribesHistory != null) {
+			final Map map = (Map) prescribesHistory.get(0).get("prescribes");
+			tasks = (List) map.get("tasks");
+		}
+		return tasks;
+	}
+	//----------------works between servers-------------------------------------END
+	//----------------works between documents and servers-------------------------------------END
+	
 	public boolean updateDrugToBlock1(Map<String, Object> readDrug, Map drugFromDocument) {
 		for (Map prescribeHistory : getInitListOfMaps(readDrug, "prescribesHistory")) {
 			final Map prescribes = getInitMap(prescribeHistory, "prescribes");
