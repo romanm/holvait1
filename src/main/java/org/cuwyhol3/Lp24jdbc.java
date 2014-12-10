@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ public class Lp24jdbc {
 //	private Lp24ControllerImpl lp24Controller;
 
 	private static final Logger logger = LoggerFactory.getLogger(Lp24jdbc.class);
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 	private Lp24Config lp24Config;
 
 	private JdbcTemplate jdbcTemplate;
@@ -290,12 +292,7 @@ public class Lp24jdbc {
 		String sql = "UPDATE drug1 SET drug_name = ?, drug_archive = ? WHERE drug_id = ?";
 		int update = this.jdbcTemplate.update(sql,
 			drugName, drugArchive, drugId);
-		return update;
-	}
-	public int updateDrugCheckedWebSavedTS(Integer drugId, Timestamp savedTS) {
-		String sql = "UPDATE drug1 SET checked_web_savedts = ? WHERE drug_id = ?";
-		logger.debug(sql.replaceFirst("\\?", ""+savedTS).replaceFirst("\\?", ""+drugId));
-		int update = this.jdbcTemplate.update(sql, savedTS, drugId);
+		updateDrugSavedTS(drugId, new Timestamp(new Date().getTime()));
 		return update;
 	}
 	public int updateDrugSavedTS(Integer drugId, Timestamp savedTS) {
@@ -332,7 +329,7 @@ public class Lp24jdbc {
 		});
 	}
 
-	void deleteChekedDrugFromWeb() {
+	void deleteNoCheckableDrugFromWeb() {
 		jdbcTemplate.update("delete from DRUG_WEB1 where DRUG_WEB_ARCHIVE ");
 		jdbcTemplate.update("DELETE FROM DRUG_WEB1 WHERE DRUG_WEB_ID IN "
 		+ "( select DRUG_WEB_ID from DRUG1, DRUG_WEB1 where DRUG_NAME = DRUG_WEB_NAME AND DRUG_SAVEDTS = DRUG_WEB_SAVEDTS)");
@@ -346,12 +343,20 @@ public class Lp24jdbc {
 //		+ " and DRUG_WEB_SAVEDTS > DRUG_SAVEDTS  "
 //		+ " and (DRUG_WEB_SAVEDTS != CHECKED_WEB_SAVEDTS or DRUG_WEB_SAVEDTS > DRUG_SAVEDTS) "
 //				+ " and DRUG_WEB_SAVEDTS != DRUG_SAVEDTS "
-		final Map<String, Object> map = jdbcTemplate.queryForList(sqlDbVersion).get(0);
+		logger.debug(sqlDbVersion);
+		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlDbVersion);
+		if(null == queryForList)
+			return null;
+		final Map<String, Object> map = queryForList.get(0);
 		return map;
 	}
 	public List<Map<String, Object>> getNewDrugForWeb() {
+		final List<Map<String, Object>> queryForList1 = jdbcTemplate.queryForList("select * from DRUG1 left join DRUG_WEB1 on DRUG_NAME = DRUG_WEB_NAME --where DRUG_WEB_ID is null AND DRUG_ARCHIVE = false");
+		logger.debug(" - getNewDrugForWeb - "+queryForList1.size());
 		String sql = "select * from DRUG1 left join DRUG_WEB1 on DRUG_NAME = DRUG_WEB_NAME where DRUG_WEB_ID is null AND DRUG_ARCHIVE = false";
+		logger.debug(" - getNewDrugForWeb - "+sql);
 		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+		logger.debug(" - getNewDrugForWeb - "+queryForList);
 		return queryForList;
 	}
 //-------------------- drug-web ------------------END

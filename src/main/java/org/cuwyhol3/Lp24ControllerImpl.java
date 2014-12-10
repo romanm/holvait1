@@ -545,6 +545,7 @@ public class Lp24ControllerImpl {
 	}
 	public Map<String, Object> saveDrug(Map<String, Object> drug) {
 		Integer drugId = (Integer) drug.get("DRUG_ID");
+		lp24jdbc.updateDrugSavedTS(drugId, new Timestamp(new Date().getTime()));
 		writeToJsonDbFile(drug, lp24Config.getDrugDbJsonName(drugId));
 		return drug;
 	}
@@ -620,12 +621,10 @@ public class Lp24ControllerImpl {
 	}
 	public void pushNewDrugsToWebServer(String sah) {
 		final List<Map<String, Object>> newDrugForWeb = lp24jdbc.getNewDrugForWeb();
-		logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+newDrugForWeb.size());
-		logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+newDrugForWeb);
+		System.out.println(newDrugForWeb.size());
 		for (Map<String, Object> map : newDrugForWeb) {
 			Integer drugId = (Integer) map.get("DRUG_ID");
 			final Map<String, Object> drug = readDrug(drugId);
-			logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+drug);
 			drug.put("savedTS", map.get("DRUG_SAVEDTS"));
 			pushWebNewDrug(sah, drug);
 		}

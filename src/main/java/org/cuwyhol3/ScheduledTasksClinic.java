@@ -2,6 +2,7 @@ package org.cuwyhol3;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,18 +18,45 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class ScheduledTasksClinic {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksClinic.class);
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
+
 	@Autowired private Lp24jdbc lp24jdbc;
 	@Autowired private Lp24ControllerImpl lp24Controller;
+	private static Calendar waitToDate;
+	private static int multipleWaitSecondReReadDrugFromWeb;
 
-	@Scheduled(fixedRate = 1001)
+	ScheduledTasksClinic(){
+		initWaitToDate();
+	}
+
+	@Scheduled(fixedRate = 2001)
 	public void reReadDrugFromWeb(){
+		if(Calendar.getInstance().getTimeInMillis() < waitToDate.getTimeInMillis())
+			return;
 		final Integer countDrugFromWebTable = lp24jdbc.countDrugFromWebTable();
-		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+countDrugFromWebTable);
-		if(true && countDrugFromWebTable > 0){
+		if(0 == countDrugFromWebTable){
+			final List<Map<String, Object>> readDrugListeFromWeb = lp24Controller.readDrugListeFromWeb("sah");
+			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb);
+			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb.size());
+			lp24jdbc.insertDrugFromWebToUpdateCheck(readDrugListeFromWeb);
+			lp24Controller.pushNewDrugsToWebServer("sah");
+			lp24jdbc.deleteNoCheckableDrugFromWeb();
+			final Integer countDrugFromWebTable2 = lp24jdbc.countDrugFromWebTable();
+			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+countDrugFromWebTable2);
+			if(0 == countDrugFromWebTable2){
+				multipleWaitToDate();
+				logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+multipleWaitSecondReReadDrugFromWeb+" * 2001");
+				printDifference(Calendar.getInstance().getTime(), waitToDate.getTime());
+			}
+		}else{
+			initWaitToDate();
 			logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+countDrugFromWebTable);
 			final Map<String, Object> drugToCheck = lp24jdbc.getDrugForWebToCheck();
+			if(null == drugToCheck)
+			{
+				lp24jdbc.deleteNoCheckableDrugFromWeb();
+				return;
+			}
 			Integer drugId  = (Integer) drugToCheck.get("DRUG_ID");
 			Integer drugWebId  = (Integer) drugToCheck.get("DRUG_WEB_ID");
 			final Map<String, Object> readDrugFromWeb = lp24Controller.readDrugFromWeb("sah",drugWebId);
@@ -36,7 +64,7 @@ public class ScheduledTasksClinic {
 			lp24Controller.margeDrugs(readDrugFromWeb, readDrug);
 			Timestamp savedTsInWeb = (Timestamp) drugToCheck.get("DRUG_WEB_SAVEDTS");
 			Timestamp savedTS = (Timestamp) drugToCheck.get("DRUG_SAVEDTS");
-//			if(savedTsInWeb.getTime() > savedTS.getTime()){ так правильніше, але дає зациклювання
+			//			if(savedTsInWeb.getTime() > savedTS.getTime()){ так правильніше, але дає зациклювання
 			if(savedTsInWeb.getTime() != savedTS.getTime()){ // случай з реальної ситуації
 				savedTS = savedTsInWeb;
 			}else if((boolean) readDrug.get("isChanged")){
@@ -52,14 +80,18 @@ public class ScheduledTasksClinic {
 			logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - END"+readDrug);
 			return;
 		}
-		final List<Map<String, Object>> readDrugListeFromWeb = lp24Controller.readDrugListeFromWeb("sah");
-		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb);
-		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb.size());
-		lp24jdbc.insertDrugFromWebToUpdateCheck(readDrugListeFromWeb);
-		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb.size());
-		lp24Controller.pushNewDrugsToWebServer("sah");
-		lp24jdbc.deleteChekedDrugFromWeb();
-		
+	}
+
+	private void multipleWaitToDate() {
+		if(multipleWaitSecondReReadDrugFromWeb < 2048)
+			multipleWaitSecondReReadDrugFromWeb *= 2;
+		waitToDate = Calendar.getInstance();
+		final int addSec = 2001 * multipleWaitSecondReReadDrugFromWeb;
+		waitToDate.add(Calendar.MILLISECOND, addSec);
+	}
+	private void initWaitToDate() {
+		this.multipleWaitSecondReReadDrugFromWeb = 2;
+		waitToDate = Calendar.getInstance();
 	}
 
 	@Scheduled(fixedRate = 1007001)
@@ -92,5 +124,36 @@ public class ScheduledTasksClinic {
 	@Scheduled(fixedRate = 887000)
 	public void reportCurrentTime() {
 		System.out.println("The time is now " + dateFormat.format(new Date()));
+	}
+
+
+	public void printDifference(Date startDate, Date endDate){
+
+		//milliseconds
+		long different = endDate.getTime() - startDate.getTime();
+
+		long secondsInMilli = 1000;
+		long minutesInMilli = secondsInMilli * 60;
+		long hoursInMilli = minutesInMilli * 60;
+		long daysInMilli = hoursInMilli * 24;
+
+		long elapsedDays = different / daysInMilli;
+		different = different % daysInMilli;
+
+		long elapsedHours = different / hoursInMilli;
+		different = different % hoursInMilli;
+
+		long elapsedMinutes = different / minutesInMilli;
+		different = different % minutesInMilli;
+
+		long elapsedSeconds = different / secondsInMilli;
+
+		System.out.printf(
+				"%d days, %d hours, %d minutes, %d seconds%n ", 
+				elapsedDays,
+				elapsedHours, elapsedMinutes, elapsedSeconds);
+		System.out.print("different : " + different);
+		System.out.println(" beetween : "+ dateFormat.format(endDate)+" and : " + dateFormat.format(startDate));
+
 	}
 }
