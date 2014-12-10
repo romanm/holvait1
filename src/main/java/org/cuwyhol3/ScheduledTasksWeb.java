@@ -16,10 +16,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component("scheduledTasks")
+//@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasksWeb {
-	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksClinic.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksWeb.class);
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS");
 
 	@Autowired private Lp24jdbc lp24jdbc;
@@ -41,27 +41,25 @@ public class ScheduledTasksWeb {
 		for (int i = 0; i < saveOneTimes; i++) {
 			final File fileFromClinic = listOfFilesFromClinic[i];
 			Map<String, Object> drugFromClinic = lp24Controller.readJsonDbFile2map(fileFromClinic);
-			final Long lNewDrugSavedTs = (Long) drugFromClinic.get("savedTs");
-			//not for update from other DB / locale DB only
-			//lp24Controller.updateDrugs(newDrug);
+			logger.debug(dateFormat.format(new Date())+" - updateDrugsDbFromClinicFiles == "+drugFromClinic.get("DRUG_ID")+"/"+drugFromClinic.get("DRUG_NAME"));
 			Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName((String) drugFromClinic.get("DRUG_NAME"));
+			final Long savedTsInClinic = (Long) drugFromClinic.get("savedTS");
 			if(null == readDrugFromName){
-				final Map<String, Object> newDrug = lp24jdbc.newDrug(drugFromClinic, new Timestamp(lNewDrugSavedTs));
-				final Integer drugId = (Integer) newDrug.get("DRUG_ID");
+				final Map<String, Object> insertDrug = lp24jdbc.insertDrug(drugFromClinic, new Timestamp(savedTsInClinic));
+				final Integer drugId = (Integer) insertDrug.get("DRUG_ID");
 				drugFromClinic.put("DRUG_ID", drugId);
 				lp24Controller.writeToJsonDbFile(drugFromClinic, Lp24Config.getDrugDbJsonName(drugId));
 				isChanged = true;
 			}else{
 				final Integer drugId = (Integer) readDrugFromName.get("DRUG_ID");
 				final Map<String, Object> readDrug = lp24Controller.readDrug(drugId);
-				//isChanged = lp24Controller.addDose2DrugDocument(drugFromClinic, readDrug);
-				//if(isChanged){
 				lp24Controller.margeDrugs(drugFromClinic, readDrug);
+				logger.debug(dateFormat.format(new Date())+" - updateDrugsDbFromClinicFiles == "+readDrug.get("isChanged"));
 				if((boolean) readDrug.get("isChanged")){
-					Timestamp savedTs = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
-					savedTs = new Timestamp((null != lNewDrugSavedTs && lNewDrugSavedTs > savedTs.getTime())?lNewDrugSavedTs:new Date().getTime());
-					readDrug.put("savedTs", savedTs);
-					lp24jdbc.updateDrugSavedTs(drugId, savedTs);
+					Timestamp savedTS = (Timestamp) readDrugFromName.get("DRUG_SAVEDTS");
+					Timestamp savedTS2 =  new Timestamp(savedTsInClinic >= savedTS.getTime() ? savedTsInClinic : new Date().getTime());
+					lp24jdbc.updateDrugSavedTS(drugId, savedTS2);
+					readDrug.put("savedTS", savedTS2);
 					lp24Controller.writeToJsonDbFile(readDrug, Lp24Config.getDrugDbJsonName(drugId));
 				}
 			}

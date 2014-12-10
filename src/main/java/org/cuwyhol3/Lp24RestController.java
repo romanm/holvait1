@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class Lp24RestController {
 	private static final Logger logger = LoggerFactory.getLogger(Lp24RestController.class);
 	
-	@Autowired private ScheduledTasksWeb scheduledTasks;
-//	@Autowired private ScheduledTasksClinic scheduledTasks;
+//	@Autowired private ScheduledTasksWeb scheduledTasks;
+	@Autowired private ScheduledTasksClinic scheduledTasks;
 
-	@Autowired
-	private Lp24ControllerImpl lp24Controller;
+	@Autowired private Lp24ControllerImpl lp24Controller;
 
 	//------------------patient----------------------
 	@RequestMapping(value="/read/patient_{patientId}", method=RequestMethod.GET)
@@ -153,7 +152,7 @@ public class Lp24RestController {
 	}
 	@RequestMapping(value = "/updateDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> updateDrug(@RequestBody Map<String, Object> drugToUpdate) {
-		logger.debug("/removeDrug");
+		logger.debug("/updateDrug");
 		return lp24Controller.updateDrug(drugToUpdate);
 	}
 	@RequestMapping(value = "/removeDrug", method = RequestMethod.POST)

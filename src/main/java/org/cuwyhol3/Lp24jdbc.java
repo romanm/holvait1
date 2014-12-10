@@ -273,7 +273,7 @@ public class Lp24jdbc {
 		int update = jdbcTemplate.update("delete from drug1 where drug_id = ?",drugId);
 		return update;
 	}
-	public Map<String, Object> newDrug(Map<String, Object> newDrug,final Timestamp timestamp) {
+	public Map<String, Object> insertDrug(Map<String, Object> newDrug,final Timestamp timestamp) {
 		String drugName = (String) newDrug.get("DRUG_NAME");
 		jdbcTemplate.update("INSERT INTO drug1 (drug_name,DRUG_SAVEDTS) VALUES (?,?)",drugName,timestamp);
 		String sqlSelectDrug1 = "SELECT drug_id FROM drug1 WHERE drug_name = ? limit 1";
@@ -292,14 +292,16 @@ public class Lp24jdbc {
 			drugName, drugArchive, drugId);
 		return update;
 	}
-	public int updateDrugCheckedWebSavedTs(Integer drugId, Timestamp savedTs) {
+	public int updateDrugCheckedWebSavedTS(Integer drugId, Timestamp savedTS) {
 		String sql = "UPDATE drug1 SET checked_web_savedts = ? WHERE drug_id = ?";
-		int update = this.jdbcTemplate.update(sql, savedTs, drugId);
+		logger.debug(sql.replaceFirst("\\?", ""+savedTS).replaceFirst("\\?", ""+drugId));
+		int update = this.jdbcTemplate.update(sql, savedTS, drugId);
 		return update;
 	}
-	public int updateDrugSavedTs(Integer drugId, Timestamp savedTs) {
+	public int updateDrugSavedTS(Integer drugId, Timestamp savedTS) {
 		String sql = "UPDATE drug1 SET drug_savedts = ? WHERE drug_id = ?";
-		int update = this.jdbcTemplate.update(sql, savedTs, drugId);
+		logger.debug(sql.replaceFirst("\\?", ""+savedTS).replaceFirst("\\?", ""+drugId));
+		int update = this.jdbcTemplate.update(sql, savedTS, drugId);
 		return update;
 	}
 	public int delete1DrugWeb(Integer drugWebId) {
@@ -313,7 +315,7 @@ public class Lp24jdbc {
 	}
 	public void insertDrugFromWebToUpdateCheck(final List<Map<String, Object>> readDrugWeb) {
 		String sql = "INSERT INTO DRUG_WEB1 " +
-				"(DRUG_WEB_ID, DRUG_WEB_NAME, DRUG_WEB_ARCHIVE, DRUG_WEB_SAVEDTS) VALUES (?, ?, ?, ?)";
+		" (DRUG_WEB_ID, DRUG_WEB_NAME, DRUG_WEB_ARCHIVE, DRUG_WEB_SAVEDTS) VALUES (?, ?, ?, ?)";
 		jdbcTemplate.batchUpdate(sql , new BatchPreparedStatementSetter() {
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -328,6 +330,9 @@ public class Lp24jdbc {
 				return readDrugWeb.size();
 			}
 		});
+	}
+
+	void deleteChekedDrugFromWeb() {
 		jdbcTemplate.update("delete from DRUG_WEB1 where DRUG_WEB_ARCHIVE ");
 		jdbcTemplate.update("DELETE FROM DRUG_WEB1 WHERE DRUG_WEB_ID IN "
 		+ "( select DRUG_WEB_ID from DRUG1, DRUG_WEB1 where DRUG_NAME = DRUG_WEB_NAME AND DRUG_SAVEDTS = DRUG_WEB_SAVEDTS)");
@@ -336,7 +341,11 @@ public class Lp24jdbc {
 	public Map<String, Object> getDrugForWebToCheck() {
 		String sqlDbVersion = "select * from DRUG_WEB1, DRUG1 "
 				+ " where DRUG_NAME = DRUG_WEB_NAME "
-				+ " and (DRUG_WEB_SAVEDTS != CHECKED_WEB_SAVEDTS or DRUG_SAVEDTS > DRUG_WEB_SAVEDTS) limit 1";
+				+ " and DRUG_WEB_SAVEDTS != DRUG_SAVEDTS  "
+				+ " limit 1";
+//		+ " and DRUG_WEB_SAVEDTS > DRUG_SAVEDTS  "
+//		+ " and (DRUG_WEB_SAVEDTS != CHECKED_WEB_SAVEDTS or DRUG_WEB_SAVEDTS > DRUG_SAVEDTS) "
+//				+ " and DRUG_WEB_SAVEDTS != DRUG_SAVEDTS "
 		final Map<String, Object> map = jdbcTemplate.queryForList(sqlDbVersion).get(0);
 		return map;
 	}

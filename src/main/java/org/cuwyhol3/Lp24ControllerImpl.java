@@ -147,13 +147,14 @@ public class Lp24ControllerImpl {
 	//------------------patient----------------------------END
 
 	//----------------works between documents and servers-------------------------------------
+	//----------------works between documents -------------------------------------
+	//----------------works between documents -------------------------------------END
 	//----------------works between servers-------------------------------------
 	void margeDrugs(final Map<String, Object> sourceDrug, final Map<String, Object> targetDrug) {
 		targetDrug.put("isChanged", false);
 		boolean isChanged = addDose2DrugDocument(sourceDrug, targetDrug);
 		targetDrug.put("isChanged", isChanged);
 		List drugTasks = getPrescribesTasks(targetDrug);
-		logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks);
 		final List webDrugTasks = getPrescribesTasks(sourceDrug);
 		if(webDrugTasks != null){
 			if(drugTasks == null)
@@ -162,19 +163,15 @@ public class Lp24ControllerImpl {
 				targetDrug.put("isChanged", true);
 			}else{
 				final int hashCode = drugTasks.hashCode();
-				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+hashCode);
 				final Map prescribesHistoryPrescribes = getPrescribesHistoryPrescribes(targetDrug);
 				drugTasks = addListUnique(webDrugTasks, drugTasks);
-				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks);
-				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks.size());
 				if(drugTasks.size() > 5){
 					collectingStatistic("tasks",drugTasks,prescribesHistoryPrescribes);
 					prescribesHistoryPrescribes.put("tasks", drugTasks.subList(0, 5));
 				}else{
 					prescribesHistoryPrescribes.put("tasks", drugTasks);
 				}
-				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+drugTasks.hashCode());
-				logger.debug(" w "+hashCode+" != " + drugTasks.hashCode()
+				logger.debug(dateFormat.format(new Date())+" - margeDrugs - "+hashCode+" != " + drugTasks.hashCode()
 				+"/"+(hashCode != drugTasks.hashCode()));
 				if(hashCode != drugTasks.hashCode())
 					targetDrug.put("isChanged", true);
@@ -273,7 +270,7 @@ public class Lp24ControllerImpl {
 	}
 
 	private Map<String, Object> newDrugToDbAndDoc(Map drug) {
-		Map<String, Object> drugDocument = lp24jdbc.newDrug(drug, new Timestamp(new Date().getTime()));
+		Map<String, Object> drugDocument = lp24jdbc.insertDrug(drug, new Timestamp(new Date().getTime()));
 		drug.put("DRUG_ID", drugDocument.get("DRUG_ID"));
 		return drugDocument;
 	}
@@ -541,19 +538,25 @@ public class Lp24ControllerImpl {
 	//------------------drug----------------------------
 	public List<Map<String, Object>> saveNewDrug(Map<String, Object> newDrug) {
 		logger.debug(" o - "+newDrug);
-		newDrug = lp24jdbc.newDrug(newDrug, new Timestamp(new Date().getTime()));
+		newDrug = lp24jdbc.insertDrug(newDrug, new Timestamp(new Date().getTime()));
 		logger.debug(" o - "+newDrug);
 		List<Map<String, Object>> drug1sList = drug1sList();
 		return drug1sList;
 	}
 	public Map<String, Object> saveDrug(Map<String, Object> drug) {
-		Integer prescribeId = (Integer) drug.get("DRUG_ID");
-		writeToJsonDbFile(drug, lp24Config.getDrugDbJsonName(prescribeId));
+		Integer drugId = (Integer) drug.get("DRUG_ID");
+		writeToJsonDbFile(drug, lp24Config.getDrugDbJsonName(drugId));
 		return drug;
 	}
 	public List<Map<String, Object>> updateDrug(Map<String, Object> drugToUpdate) {
 		logger.debug(" o - "+drugToUpdate);
 		int updateDrug = lp24jdbc.updateDrug(drugToUpdate);
+		Integer drugId = (Integer) drugToUpdate.get("DRUG_ID");
+		final Map<String, Object> readDrugFromId = lp24jdbc.readDrugFromId(drugId);
+		final Map<String, Object> readDrug = readDrug(drugId);
+		String drugName = (String) drugToUpdate.get("DRUG_NAME");
+		readDrug.put("DRUG_NAME", drugName);
+		writeToJsonDbFile(readDrug, lp24Config.getDrugDbJsonName(drugId));
 		List<Map<String, Object>> drug1sList = drug1sList();
 		return drug1sList;
 	}
@@ -617,10 +620,13 @@ public class Lp24ControllerImpl {
 	}
 	public void pushNewDrugsToWebServer(String sah) {
 		final List<Map<String, Object>> newDrugForWeb = lp24jdbc.getNewDrugForWeb();
+		logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+newDrugForWeb.size());
+		logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+newDrugForWeb);
 		for (Map<String, Object> map : newDrugForWeb) {
 			Integer drugId = (Integer) map.get("DRUG_ID");
 			final Map<String, Object> drug = readDrug(drugId);
-			drug.put("savedTs", map.get("DRUG_SAVEDTS"));
+			logger.debug(dateFormat.format(new Date())+" - pushNewDrugsToWebServer - "+drug);
+			drug.put("savedTS", map.get("DRUG_SAVEDTS"));
 			pushWebNewDrug(sah, drug);
 		}
 	}
@@ -706,6 +712,11 @@ public class Lp24ControllerImpl {
 	void writeJsonDbVersionInitFile(Object java2jsonObject) {
 		final String fileName = lp24Config.applicationFolderPfad + "src/main/resources/dbVersionUpdate.json.sql";
 		writeToJsonDbFile(java2jsonObject, fileName);
+	}
+	void writeToJsonDbFile(Map java2jsonObject, String fileName) {
+		//delete old parameters and document tiles
+		java2jsonObject.remove("savedTs");
+		writeToJsonDbFile((Object) java2jsonObject, fileName);
 	}
 	void writeToJsonDbFile(Object java2jsonObject, String fileName) {
 		File file = new File(Lp24Config.applicationFolderPfad + lp24Config.innerDbFolderPfad + fileName);

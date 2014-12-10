@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-//@Component("scheduledTasks")
+@Component("scheduledTasks")
 @EnableScheduling
 public class ScheduledTasksClinic {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksClinic.class);
@@ -22,40 +22,47 @@ public class ScheduledTasksClinic {
 	@Autowired private Lp24jdbc lp24jdbc;
 	@Autowired private Lp24ControllerImpl lp24Controller;
 
-	@Scheduled(fixedRate = 1001000)
+	@Scheduled(fixedRate = 1001)
 	public void reReadDrugFromWeb(){
 		final Integer countDrugFromWebTable = lp24jdbc.countDrugFromWebTable();
-		if(countDrugFromWebTable > 0){
+		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+countDrugFromWebTable);
+		if(true && countDrugFromWebTable > 0){
+			logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+countDrugFromWebTable);
 			final Map<String, Object> drugToCheck = lp24jdbc.getDrugForWebToCheck();
-			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+drugToCheck);
 			Integer drugId  = (Integer) drugToCheck.get("DRUG_ID");
 			Integer drugWebId  = (Integer) drugToCheck.get("DRUG_WEB_ID");
 			final Map<String, Object> readDrugFromWeb = lp24Controller.readDrugFromWeb("sah",drugWebId);
 			final Map<String, Object> readDrug = lp24Controller.readDrug(drugId);
-			logger.debug(" w "+readDrugFromWeb);
 			lp24Controller.margeDrugs(readDrugFromWeb, readDrug);
-
-			Timestamp drugWebsavedTS = (Timestamp) drugToCheck.get("DRUG_WEB_SAVEDTS");
-			final long ldrugWebsavedTS = drugWebsavedTS.getTime();
-			lp24jdbc.updateDrugCheckedWebSavedTs(drugId, drugWebsavedTS);
+			Timestamp savedTsInWeb = (Timestamp) drugToCheck.get("DRUG_WEB_SAVEDTS");
+			Timestamp savedTS = (Timestamp) drugToCheck.get("DRUG_SAVEDTS");
+//			if(savedTsInWeb.getTime() > savedTS.getTime()){ так правильніше, але дає зациклювання
+			if(savedTsInWeb.getTime() != savedTS.getTime()){ // случай з реальної ситуації
+				savedTS = savedTsInWeb;
+			}else if((boolean) readDrug.get("isChanged")){
+				savedTS = new Timestamp(new Date().getTime());
+			}
+			lp24jdbc.updateDrugSavedTS(drugId, savedTS);
 			if((boolean) readDrug.get("isChanged")){
-				Timestamp savedTS = (Timestamp) drugToCheck.get("DRUG_SAVEDTS");
-				savedTS = new Timestamp((ldrugWebsavedTS > savedTS.getTime())?ldrugWebsavedTS:new Date().getTime());
-				lp24jdbc.updateDrugSavedTs(drugId, savedTS);
-				readDrug.put("savedTs", savedTS);
+				readDrug.put("savedTS", savedTS);
 				lp24Controller.writeToJsonDbFile(readDrug, Lp24Config.getDrugDbJsonName(drugId));
 				lp24Controller.pushWebNewDrug("sah", readDrug);
 			}
 			lp24jdbc.delete1DrugWeb(drugWebId);
+			logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - END"+readDrug);
 			return;
 		}
 		final List<Map<String, Object>> readDrugListeFromWeb = lp24Controller.readDrugListeFromWeb("sah");
-		logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb.size());
+		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb);
+		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb.size());
 		lp24jdbc.insertDrugFromWebToUpdateCheck(readDrugListeFromWeb);
+		logger.debug(dateFormat.format(new Date())+" - check1DrugFromWeb - "+readDrugListeFromWeb.size());
 		lp24Controller.pushNewDrugsToWebServer("sah");
+		lp24jdbc.deleteChekedDrugFromWeb();
+		
 	}
 
-	@Scheduled(fixedRate = 107000)
+	@Scheduled(fixedRate = 1007001)
 	public void checkSavedPatient(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
