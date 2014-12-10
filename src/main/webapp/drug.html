@@ -39,6 +39,15 @@
 <hr/>
 <div class="container">
 	<div class="row">
+		<div class="col-xs-12">
+			<span class="navbar-right" title="{{drugDocument.savedTS | date:'yyyy-MM-dd HH:mm:ss.sss'}}"><small>
+{{drugDocument.savedTS | date:'yyyy-MM-dd'}}
+</small></span>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
 		<div class="col-xs-2">
 			<span class="close navbar-right"><small>Назви</small></span>
 			<h3 data-ng-context-menu="menuDrugName"><u>{{drugDocument.DRUG_NAME}}</u></h3>

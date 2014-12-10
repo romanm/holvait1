@@ -579,11 +579,13 @@ public class Lp24ControllerImpl {
 		writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
 	}
 	public Map<String, Object> readDrug(Integer drugId) {
+		final Map<String, Object> readDrugFromId = lp24jdbc.readDrugFromId(drugId);
 		String fileNameWithPathAdd = lp24Config.getDrugDbJsonName(drugId);
 		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
+		readJsonDbFile2map.put("savedTS", readDrugFromId.get("DRUG_SAVEDTS"));
 		if(null == readJsonDbFile2map){
-			readJsonDbFile2map = lp24jdbc.readDrugFromId(drugId);
-			writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
+			writeToJsonDbFile(readDrugFromId, fileNameWithPathAdd);
+			readJsonDbFile2map = readDrugFromId;
 		}
 		return readJsonDbFile2map;
 	}
