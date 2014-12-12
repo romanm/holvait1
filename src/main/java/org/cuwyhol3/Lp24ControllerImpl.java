@@ -209,19 +209,19 @@ public class Lp24ControllerImpl {
 				prescribes.put("tasks", tasks);
 				return true;
 			}else{
-				boolean doseNumberExist = false;
-				final Integer doseNumberNew = getInt(getMap(drugFromDocument, "dose"), "DOSE_NUMBER");
+				boolean drugPrescrbeExist = false;
+				final int hashCode = drugFromDocument.hashCode();
 				for (Map drugFromDrug : tasks) {
-					doseNumberExist = doseNumberExist || doseNumberNew.equals(getInt(getMap(drugFromDrug, "dose"), "DOSE_NUMBER"));
-					if(null == drugFromDrug.get("DRUG_ID")){
-						logger.debug("leer");
+					if(hashCode == drugFromDrug.hashCode()){
+						drugPrescrbeExist = true;
+						break;
 					}
 				}
-				if(!doseNumberExist){
+				if(!drugPrescrbeExist){
 					tasks.add(drugFromDocument);
 					return true;
 				}
-				logger.debug(doseNumberExist+"/"+tasks);
+				logger.debug(drugPrescrbeExist+"/"+tasks);
 			}
 		}
 		return false;

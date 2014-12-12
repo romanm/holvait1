@@ -36,7 +36,6 @@ public class ScheduledTasksClinic {
 		final Integer countDrugFromWebTable = lp24jdbc.countDrugFromWebTable();
 		if(0 == countDrugFromWebTable){
 			final List<Map<String, Object>> readDrugListeFromWeb = lp24Controller.readDrugListeFromWeb("sah");
-			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb);
 			logger.debug(dateFormat.format(new Date())+" - reReadDrugFromWeb - "+readDrugListeFromWeb.size());
 			lp24jdbc.insertDrugFromWebToUpdateCheck(readDrugListeFromWeb);
 			lp24Controller.pushNewDrugsToWebServer("sah");
@@ -94,7 +93,7 @@ public class ScheduledTasksClinic {
 		waitToDate = Calendar.getInstance();
 	}
 
-	@Scheduled(fixedRate = 1007001)
+	@Scheduled(fixedRate = 17001)
 	public void checkSavedPatient(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html data-ng-app="llsdApp" data-ng-controller="llsdCtrl" moznomarginboxes mozdisallowselectionprint>
+<head>
+	<meta charset="utf-8" />
+	<title>llsd</title>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
+	<style type="text/css">
+@page {
+	margin: 10mm 1mm 15mm 11mm;
+}
+
+col.nameCol {
+	width: 50mm;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+col.hourCol {
+	width: 8mm;
+}
+
+.uppercase {
+	text-transform: uppercase;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+.groupDrug td { border-width: 0px 1px;}
+td, th {
+	border: solid;
+	border-width: 1px 1px;
+}
+
+.fontsmall80 {
+	font-size: 80%;
+}
+
+.fontsmall {
+	font-size: 75%;
+}
+
+	#outer { text-align: center; }
+	#inner { text-align: left; margin: 0 auto; }
+	.t { float: left; }
+	/*
+	table { border: 1px solid black; }
+	*/
+	#clearit { clear: left; }
+.topLeft{text-align: left; vertical-align: text-top;}
+.lineBottom{border-bottom: 1px solid;}
+</style>
+</head>
+<body>
+
+	<div id="outer" class="fontsmall80">
+		<div id="inner">
+			<div class="t">
+				<table>
+					<tr>
+						<th colspan="3">Міська клінічна лікарня швидкої медичної
+							допомоги <br /> реанімаційно - анестезіологічне відділення
+						</th>
+					</tr>
+					<tr>
+						<td rowspan="3">
+							<div class="lineBottom">П.І., по Б. </div>
+							<div class="lineBottom">Д.з.:</div>
+						</td>
+						<td rowspan="2" class="topLeft bold">Дата<br/>.</td>
+						<td rowspan="2" class="topLeft bold">Вік<br/>.</td>
+					</tr>
+					<tr>
+					</tr>
+					<tr>
+						<td rowspan="2" class="topLeft bold">Доба</td>
+						<td rowspan="2" class="topLeft bold">Вага</td>
+					</tr>
+					<tr>
+						<th>Карта інтенсивної терапії №</th>
+					</tr>
+				</table>
+			</div>
+
+			<div class="t">..</div>
+
+			<div class="t">
+				<table>
+					<colgroup>
+						<col style="width: 70mm;" />
+						<col style="width: 40mm;" />
+						<col style="width: 20mm;" />
+					</colgroup>
+					<tr>
+						<td>ШВЛ</td>
+						<td>Гр.кр.</td>
+						<td rowspan="2">Rh.</td>
+					</tr>
+					<tr>
+						<td>.</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Вена</td>
+						<td>перелито</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>добовий діурез</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Дренажі</td>
+						<td>баланс</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>.</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+
+		</div>
+		<div id="clearit">.</div>
+	</div>
+
+	<table class="fontsmall80">
+		<colgroup>
+			<col style="width: 90mm;" />
+			<col style="width: 30mm;" />
+		</colgroup>
+		<tr>
+			<th rowspan="6"
+			 class="topLeft"
+			>Особливі відмітки</th>
+			<td>АТ</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Ps</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ЦВТ</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Лі-Уайт</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ЧД</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>.</td>
+			<td data-ng-repeat="dayHour in dayHours"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<th colspan="2" style="text-align: left;">Довенні та дом’язеві
+				інфузії</th>
+			<th data-ng-repeat="dayHour in dayHours"
+				data-ng-init="lpHour = getLp24hourStr(dayHour)">{{lpHour}}</th>
+			<th>{{9 > startHour24lp?'':'0'}}{{startHour24lp}}</th>
+		</tr>
+		<tr data-ng-repeat-start="taskInDay in tasksInDay"
+				data-ng-class="{'groupDrug': prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition >= 0}"
+				data-ng-init="taskInDayIndex = $index">
+				<td colspan="2"><span
+					data-ng-show="prescribeHistory.prescribes.tasks[taskInDayIndex].groupPosition > 0">+</span>
+					<span ng-bind-html="taskDescription($index, prescribeHistory)"></span>
+					<span
+					data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs">
+						+<span ng-bind-html="drugDescription(drugInline)"></span>
+				</span></td>
+				<td data-ng-repeat="dayHour in dayHours">
+					<i data-ng-show="isMinus(taskInDayIndex, $index, prescribeHistory)" class="fa fa-minus"></i>
+				</td>
+				<td></td>
+			</tr>
+			<tr data-ng-repeat-end="" class="groupDrug"
+				data-ng-repeat="drugInline in prescribeHistory.prescribes.tasks[taskInDayIndex].inlineDrugs | filter : {inSelfLine : true}"
+				ng-init="drugInlineIndex = $index">
+				<td class="nohover" colspan="2"><span> +<span
+						ng-bind-html="drugDescription(drugInline)"></span>
+				</span></td>
+				<td data-ng-repeat="dayHour in dayHours"
+					ng-init="dayHourIndex = $index"><i
+					data-ng-show="isMinusDrugInDrug(dayHourIndex, drugInline )"
+					class="fa fa-minus"></i> <span
+					data-ng-show="isMinusDrugInDrug(dayHourIndex, drugInline )"
+					class="glyphicon glyphicon-minus"></span></td>
+				<td></td>
+			</tr>
+	</table>
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/db/cuwy1.config.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script type="text/javascript">
+	
+	angular.module('llsdApp', ['ngSanitize']).controller('llsdCtrl', ['$scope', '$http', '$sce', 
+			function($scope, $http, $sce) {
+		console.log("----------llsdCtrl----------");
+		setCookieDaysLong('printForm','llsd',365);
+		$scope.tasksInDayNumber = 20;
+		$scope.startHour24lp = 9;
+		initDeclarePrescribesPrint($scope, $http, $sce);
+		$scope.getMMMMUa = function (date){ return jsDate = new Date(date).getMMMMUa(); }
+	}]);
+
+	</script>
+
+
+</body>
+</html>
