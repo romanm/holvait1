@@ -40,11 +40,13 @@
 		</ul>
 	</span>
 <hr/>
-	<div align="center" ng-context-menu="menuPatientUpdate"
+	<div class="container">
+	<div class="row">
+		<div class="col-xs-6" ng-context-menu="menuPatientUpdate"
 	data-ng-class="{selected:patient.selectPrescribesHistoryIndex == -1 }"
 	>
 		<div data-ng-show="!patient.patientUpdateOpen"
-			data-ng-dblclick="updatePatient()"
+			data-ng-click="updatePatient()"
 		>
 			<u>{{patient.PATIENT_NAME}}</u><span
 				data-ng-show="patient.PATIENT_HISTORYID"> № іх <u>{{patient.PATIENT_HISTORYID}}
@@ -74,8 +76,16 @@
 				</div>
 			</form>
 		</div>
+		</div>
+		<div class="col-xs-6">
+			<div class="input-group">
+				<span class="input-group-addon">Пошук:</span> <input
+					ng-model="seekPatient" type="text" class="form-control"
+					data-ng-change="filterPatients()"
+					placeholder="ліка / тег / блок" auto-focus="" />
+			</div>
+		</div>
 	</div>
-	<div class="container">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="navbar-right">

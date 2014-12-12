@@ -98,6 +98,15 @@ $scope.menuTasksAll = [
 			}
 		}).error(function(data, status, headers, config) {
 		});
+	}],
+	null,
+	['<span class="glyphicon glyphicon-plus"></span> Видалити всі призначення ', function ($itemScope) {
+		var drugCount = $itemScope.prescribeHistory.prescribes.tasks.length;
+		var isConfirmed = confirm("Підтвердіть, що Ви дійсно бажаєте вилучити одразу " +drugCount +" ліків !");
+		if(isConfirmed){
+			$itemScope.prescribeHistory.prescribes.tasks.splice(0,drugCount - 1);
+			changeSaveControl($scope, $http);
+		}
 	}]
 ];
 
@@ -169,6 +178,7 @@ $scope.checkPatientUpdated = function(){
 		if(checkUpdated){
 			changeSaveControl($scope, $http);
 		}
+		console.log($scope.patient.patientUpdateOpen);
 	}
 }
 $scope.isPatientUpdateOpen = function(){
