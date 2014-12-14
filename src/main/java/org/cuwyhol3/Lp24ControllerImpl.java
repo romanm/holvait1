@@ -228,6 +228,9 @@ public class Lp24ControllerImpl {
 	}
 
 	boolean updateDrugs(Map<String, Object> prescribes) {
+		//TODO метод хибний, слід перенести в scheduled task, також повинен працювати тільки для chackedDrug = true 
+		if(true)
+			return false;
 		boolean updateDrug = false;
 		final List<Map> list = getList(prescribes,"prescribesHistory");
 		if(null != list)
@@ -246,11 +249,9 @@ public class Lp24ControllerImpl {
 						}else{
 							drugDocument = readDrug(drugId);
 							String drugName = (String) drugDocument.get("DRUG_NAME");
-							logger.debug(drugName+"=="+drugNameInPrescribeDoc+"/"+drugName.equals(drugNameInPrescribeDoc));
 							if(!drugName.equals(drugNameInPrescribeDoc)){//drug from WEB with false ID
 								final Map<String, Object> readDrugFromName = lp24jdbc.readDrugFromName(drugNameInPrescribeDoc);
 								drugName = (String) readDrugFromName.get("DRUG_NAME");
-								logger.debug(drugName+"=="+drugNameInPrescribeDoc+"/"+drugName.equals(drugNameInPrescribeDoc));
 								if(!drugName.equals(drugNameInPrescribeDoc)){
 									//було змінене ім’я, а ID залишився старий, треба створити ліку з новим ім’ям
 									drugDocument = newDrugToDbAndDoc(drug);
@@ -336,7 +337,12 @@ public class Lp24ControllerImpl {
 		final String nameOfListStatistic = nameOfList+"statistic";
 		if(collectionParent.containsKey(nameOfListStatistic))
 			collectionParent.put(nameOfListStatistic, new ArrayList<Map>());
-		final List<Map> list = getList(collectionParent, nameOfListStatistic);
+		List<Map> list = getList(collectionParent, nameOfListStatistic);
+		if(null == list)
+		{
+			list = new ArrayList<Map>();
+			collectionParent.put(nameOfListStatistic, list);
+		}
 		collectionParent.put(nameOfListStatistic, addListUnique(listToAdd, list));
 	}
 	ArrayList<Map> addListUnique(List<Map> listToAdd,
@@ -536,6 +542,13 @@ public class Lp24ControllerImpl {
 	//------------------prescribe----------------------------END
 
 	//------------------drug----------------------------
+	public List<Map<String, Object>> saveNewTag(Map<String, Object> newTag) {
+		logger.debug(" o - "+newTag);
+		newTag = lp24jdbc.insertTag(newTag, new Timestamp(new Date().getTime()));
+		logger.debug(" o - "+newTag);
+		List<Map<String, Object>> drug1sList = tag1sList();
+		return drug1sList;
+	}
 	public List<Map<String, Object>> saveNewDrug(Map<String, Object> newDrug) {
 		logger.debug(" o - "+newDrug);
 		newDrug = lp24jdbc.insertDrug(newDrug, new Timestamp(new Date().getTime()));
@@ -579,6 +592,7 @@ public class Lp24ControllerImpl {
 		writeToJsonDbFile(readJsonDbFile2map, fileNameWithPathAdd);
 	}
 	public Map<String, Object> readDrug(Integer drugId) {
+		logger.debug(""+drugId);
 		final Map<String, Object> readDrugFromId = lp24jdbc.readDrugFromId(drugId);
 		String fileNameWithPathAdd = lp24Config.getDrugDbJsonName(drugId);
 		Map<String, Object> readJsonDbFile2map = readJsonDbFile2map(fileNameWithPathAdd);
@@ -661,8 +675,7 @@ public class Lp24ControllerImpl {
 	
 	//------------------ drug-web ------------------------------------END
 
-	public Map<String, Object> sessionCopy(Map<String, Object> copyObj,
-			HttpSession session) {
+	public Map<String, Object> sessionCopy(Map<String, Object> copyObj, HttpSession session) {
 		session.setAttribute("copyObj", copyObj);
 		return copyObj;
 	}
@@ -670,6 +683,59 @@ public class Lp24ControllerImpl {
 	public Map<String, Object> sessionPaste(HttpSession session) {
 		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
 		return copyObj;
+	}
+	public Map<String, Object> tagPaste(Map<String, Object> pasteObj, HttpSession session) {
+		final Integer pastePlaceTagId = (Integer) pasteObj.get("TAG_ID");
+		logger.debug(""+pastePlaceTagId+" "+pasteObj);
+		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
+		
+		final Integer copyTagId = (Integer) copyObj.get("TAG_ID");
+		if(null != copyTagId){
+			lp24jdbc.addParentTag(pastePlaceTagId, copyTagId);
+			
+		}else{
+			final Integer copyDrugId = (Integer) copyObj.get("DRUG_ID");
+			logger.debug(copyDrugId+" "+copyObj);
+			lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+		}
+		final Map<String, Object> tagModel = tagModel();
+		return tagModel;
+//		final List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
+//		return tag1sList;
+	}
+	public List<Map<String, Object>> tag1sList() {
+		List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
+		return tag1sList;
+	}
+	Map<String, Object> tagModel() {
+		final Map<String, Object> tagMap = new HashMap<String, Object>();
+		Map<Integer, Object> tagTreeMap = new HashMap<Integer, Object>();
+		List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
+		for (Map<String, Object> map : tag1sList) {
+			final Integer tag0Id = (Integer) map.get("TAG_ID");
+			final Integer tag1Id = (Integer) map.get("T1_ID");
+			if(null == tag1Id){
+				tagTreeMap.put(tag0Id, map);
+			}else{ 
+				final Integer tag2Id = (Integer) map.get("T2_ID");
+				if(null == tag2Id){
+					final Map tag0Map = (Map) tagTreeMap.get(tag1Id);
+					Map<Integer, Object> childs = getChilds(tag0Map);
+					childs.put(tag0Id, map);
+				}
+			}
+		}
+		tagMap.put("tag1sList", tag1sList);
+		tagMap.put("tagTree", tagTreeMap);
+		return tagMap;
+	}
+	private Map<Integer, Object> getChilds(final Map tag0Map) {
+		Map<Integer, Object> childs = (Map<Integer, Object>) tag0Map.get("childs");
+		if(null == childs){
+			childs = new HashMap<Integer, Object>();
+			tag0Map.put("childs", childs);
+		}
+		return childs;
 	}
 	Map<String, Object> readJsonDbFile2map(String fileName) {
 		String pathToFile = Lp24Config.applicationFolderPfad + Lp24Config.innerDbFolderPfad + fileName;
@@ -689,7 +755,6 @@ public class Lp24ControllerImpl {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		logger.debug(" o - "+readJsonDbFile2map);
 		return readJsonDbFile2map;
 	}
 	private void writeToJsDbFile(String variable, Object objectForJson, String fileName) {
@@ -741,7 +806,7 @@ public class Lp24ControllerImpl {
 		List<Map<String, Object>> prescribe1sList = prescribe1sList();
 		return prescribe1sList;
 	}
-	
+
 	public Integer nextDbId() {
 		return lp24jdbc.nextDbId();
 	}

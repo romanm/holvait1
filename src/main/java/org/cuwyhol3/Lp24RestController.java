@@ -126,20 +126,32 @@ public class Lp24RestController {
 	}
 	//------------------prescribe----------------------END
 
+	@RequestMapping(value = "/session/copy", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> sessionCopy(
+			@RequestBody Map<String, Object> copyObj, HttpSession session){
+		logger.debug("/session/copy");
+		return lp24Controller.sessionCopy(copyObj, session);
+	}
 	@RequestMapping(value = "/session/paste", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> sessionPaste(HttpSession session){
 		return lp24Controller.sessionPaste(session);
 	}
-	@RequestMapping(value = "/session/copy", method = RequestMethod.POST)
-	public @ResponseBody Map<String, Object> sessionCopy(
+	@RequestMapping(value = "/tag/paste", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> tagPaste(
 			@RequestBody Map<String, Object> copyObj, HttpSession session){
-		return lp24Controller.sessionCopy(copyObj, session);
+		logger.debug("/tag/paste");
+		return lp24Controller.tagPaste(copyObj, session);
 	}
 
 	//------------------drug----------------------
 	@RequestMapping(value="/read/drug_{drugId}", method=RequestMethod.GET)
 	public @ResponseBody Map<String, Object> readDrug(@PathVariable Integer drugId) {
 		return lp24Controller.readDrug(drugId);
+	}
+	@RequestMapping(value = "/saveNewTag", method = RequestMethod.POST)
+	public @ResponseBody List<Map<String, Object>> saveNewTag(@RequestBody Map<String, Object> newDrug) {
+		logger.debug("/saveNewTag");
+		return lp24Controller.saveNewTag(newDrug);
 	}
 	@RequestMapping(value = "/saveNewDrug", method = RequestMethod.POST)
 	public @ResponseBody List<Map<String, Object>> saveNewDrug(@RequestBody Map<String, Object> newDrug) {
@@ -164,6 +176,17 @@ public class Lp24RestController {
 	public @ResponseBody List<Map<String, Object>> drug1sList() {
 		return lp24Controller.drug1sList();
 	}
+	@RequestMapping(value = "/tagModel", method = RequestMethod.GET)
+	public @ResponseBody Map<String, Object> tagModel() {
+		logger.debug("/tagModel");
+		return lp24Controller.tagModel();
+	}
+	/*
+	@RequestMapping(value = "/tag1sList", method = RequestMethod.GET)
+	public @ResponseBody List<Map<String, Object>> tag1sList() {
+		return lp24Controller.tag1sList();
+	}
+	 * */
 	//------------------drug----------------END------
 	@RequestMapping(value = "/nextDbId", method = RequestMethod.GET)
 	public @ResponseBody Integer nextDbId() {

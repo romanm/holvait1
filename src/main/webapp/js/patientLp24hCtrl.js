@@ -76,40 +76,6 @@ $scope.menuDayBlock = [
 	}]
 ];
 
-$scope.menuTasksAll = [
-	['<i class="fa fa-copy"></i> Копіювати <sub><kbd>Ctrl+C</kbd></sub>', function ($itemScope) {
-		copy(-1, $itemScope.prescribeHistory);
-	}],
-	['<i class="fa fa-paste"></i> Вставити <sub><kbd>Ctrl+V</kbd></sub>', function ($itemScope) {
-		pasteCopyObject($itemScope.prescribeHistory, $scope, $http);
-		console.log("----------------");
-		return
-		$http({ method : 'GET', url : config.urlPrefix + '/session/paste'
-		}).success(function(data, status, headers, config) {
-			
-			if($itemScope.prescribeHistory.prescribes.tasks.length == 0){
-				$itemScope.prescribeHistory.prescribes.tasks = data.tasks;
-				$scope.numberOfChange += $itemScope.prescribeHistory.prescribes.tasks.length;
-			}else{
-				if(data.tasks.length + $itemScope.prescribeHistory.prescribes.tasks.length < 19){
-					$itemScope.prescribeHistory.prescribes.tasks.push
-					.apply($itemScope.prescribeHistory.prescribes.tasks, data.tasks);
-				}
-			}
-		}).error(function(data, status, headers, config) {
-		});
-	}],
-	null,
-	['<span class="glyphicon glyphicon-plus"></span> Видалити всі призначення ', function ($itemScope) {
-		var drugCount = $itemScope.prescribeHistory.prescribes.tasks.length;
-		var isConfirmed = confirm("Підтвердіть, що Ви дійсно бажаєте вилучити одразу " +drugCount +" ліків !");
-		if(isConfirmed){
-			$itemScope.prescribeHistory.prescribes.tasks.splice(0,drugCount - 1);
-			changeSaveControl($scope, $http);
-		}
-	}]
-];
-
 deleteDay = function(prescribeHistory){
 	if(prescribeHistory.deleteDay){
 		$scope.workDoc.prescribesHistory.splice($scope.workDoc.selectPrescribesHistoryIndex, 1);

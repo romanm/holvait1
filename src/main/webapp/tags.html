@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html ng-app="cuwyApp" ng-controller="tagsCtrl">
+<head>
+	<meta charset="utf-8" />
+	<title>{{siteMap.title}}</title>
+	<link href="/css-vendor/bootstrap.css" rel="stylesheet"/>
+	<link href='/css-vendor/font-awesome.min.css' rel='stylesheet prefetch'/>
+	<link href="/css/cuwy1-cpoe-hol1.css" rel="stylesheet"/>
+</head>
+<body key-cuwytrap="">
+	<a id="focus_minus_1"
+		data-ng-class="{'selected': pageDeepPositionIndex == -1}"
+		href="home.html"><span class="glyphicon glyphicon-home"></span></a>
+/	<a id="focus_0"
+		data-ng-class="{'selected': pageDeepPositionIndex == 0}"
+		href="tags.html"> <span class="h1">{{siteMap.name}}</span>
+	</a>
+	<span class="navbar-right">
+		<ul class="nav nav-pills">
+			<li><a href="patients.html">пацієнти</a></li>
+			<li><sub>.</sub></li>
+			<li><a href="protocols.html">шаблони</a></li>
+			<li><a href="protocols.html">протоколи</a></li>
+			<li><a href="drugs.html">ліки</a></li>
+			<li><sub>.</sub></li>
+			<li><a href="#" data-ng-click="openF1()"> Підказка <small>(F1)</small>
+			</a></li>
+		</ul>
+	</span>
+		<hr/>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<span class="navbar-right"> <a href="#"
+					data-ng-click="filterArchive(false)"> Список ліків </a> | <a
+					href="#" data-ng-click="filterArchive(true)"> Архів </a> | <a
+					href="#" data-ng-click="reloadFromDb()" title="Поновити список">
+						<span class="glyphicon glyphicon-upload"></span>
+				</a>
+				</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-6">
+				<div class="input-group">
+					<span class="input-group-addon">Пошук:</span> <input
+						data-ng-model="seekTag" type="text" class="form-control"
+						data-ng-change="filterTags()"
+						placeholder="Теги пошук / запис" auto-focus="" />
+				</div>
+			</div>
+			<div class="col-xs-3">
+				<button type="button" ng-click="saveNewTag()"
+					class="btn btn-default">
+					<span class="glyphicon glyphicon-floppy-disk"></span> Записати
+					новий тег
+				</button>
+			</div>
+		</div>
+		tag1sList
+		<div class="row">
+			<div class="col-xs-6">
+				<table width="100%" class="tablehover">
+					<tr>
+						<th>ID</th>
+						<th>Тег</th>
+						<th>Прив’язка</th>
+					</tr>
+					<tr data-ng-repeat="tag in tagModel.tag1sList">
+						<td>{{tag.TAG_ID}}</td>
+						<td ng-context-menu="menuTagListItem">{{tag.TAG_NAME}}</td>
+						<td>{{tag.DRUG_NAME}} {{tag.T1_NAME}}</td>
+					</tr>
+				</table>
+			</div>
+			<div class="col-xs-6">
+			Логічне дерево тегів
+				<ul>
+					<li data-ng-repeat="tag1Index in getMapKeys(tagModel.tagTree)"
+						data-ng-init="tag1 = tagModel.tagTree[tag1Index];">
+						{{tag1.TAG_NAME}}
+						<ul data-ng-show="tag1.childs">
+							<li data-ng-repeat="tag2Index in getMapKeys(tag1.childs)"
+								data-ng-init="tag2 = tag1.childs[tag2Index];">
+						{{tag2.TAG_NAME}}
+								</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<script src="/js-vendor/jquery-2.1.1.min.js"></script>
+	<script src="/js-vendor/bootstrap.min.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
+	<script src="/js-vendor/angular-sanitize.min.js"></script>
+	<script src="/js-vendor/ui-bootstrap-tpls-0.11.0.js"></script>
+	<script src='/js-vendor/textAngular-sanitize.min.js'></script>
+	<script src='/js-vendor/textAngular.min.js'></script>
+	<script src="/db/cuwy1.config.js"></script>
+	<script src="/db/drug1sList.json.js"></script>
+	<script src="/js/cuwy1.directives.js"></script>
+	<script src="/js/tagsCtrl.js"></script>
+
+</body>
+</html>

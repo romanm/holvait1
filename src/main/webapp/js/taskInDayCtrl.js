@@ -10,35 +10,10 @@ cuwyApp.controller('taskInDayCtrl', ['$scope', '$http', '$filter', function ($sc
 		$scope.numberOfChange++;
 	}
 
-	adaptSelectDrugToFilterList = function(){
-		if(($scope.drug1sListFilter.length-1) < $scope.selectDrugIndex)
-			$scope.selectDrugIndex = null;
-	}
-
-	$scope.filterDrugs = function(){
-		var f1 = $filter('filter')($scope.drug1sList, {DRUG_ARCHIVE:false});
-		var f2 = $filter('filter')(f1, $scope.editedPrescribeDrug.DRUG_NAME);
-		$scope.drug1sListFilter = $filter('limitTo')(f2, 12);
-		adaptSelectDrugToFilterList();
-		if($scope.selectDrugIndex == null)
-			$scope.selectDrugIndex = 0;
-	}
 	$scope.filterDrugs();
 
 	$scope.changeDialogTab = function(fieldName){
 		$scope.taskInDay.dialogTab = fieldName;
-	}
-
-	$scope.drugToTask3 = function(drug){
-		var dT = $scope.editedPrescribeDrug;
-		var dS = drug;
-		dT.DRUG_ARCHIVE = dS.DRUG_ARCHIVE;
-		dT.DRUG_ID = dS.DRUG_ID;
-		dT.DRUG_NAME = dS.DRUG_NAME;
-		readDrugDocument(dT, $scope, $http);
-		$scope.numberOfChange++;
-		$scope.taskInDay.dialogTab = "dose";
-		$('#dose1').focus();
 	}
 
 	//-----------------------keydown------------------------

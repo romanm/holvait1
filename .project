@@ -21,26 +21,4 @@
 		<nature>org.springsource.ide.eclipse.gradle.core.nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/main/webapp/elex-rean-stat.html</name>
-			<type>1</type>
-			<location>/home/roman/1doc-folder/specialization/elex-rean-stat.html</location>
-		</link>
-		<link>
-			<name>src/main/webapp/tmp/p-m-m-1.html</name>
-			<type>1</type>
-			<location>/home/roman/research/popup-modal-moved/p-m-m-1.html</location>
-		</link>
-		<link>
-			<name>src/main/webapp/tmp/popup-mouseover2.html</name>
-			<type>1</type>
-			<location>/home/roman/research/popup-mouseover/popup-mouseover2.html</location>
-		</link>
-		<link>
-			<name>src/main/webapp/tmp/research-datepicker</name>
-			<type>2</type>
-			<location>/home/roman/01_hol_2/research-datepicker</location>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -31,6 +31,9 @@ public class ScheduledTasksClinic {
 
 	@Scheduled(fixedRate = 2001)
 	public void reReadDrugFromWeb(){
+		
+	}
+	public void reReadDrugFromWeb2(){
 		if(Calendar.getInstance().getTimeInMillis() < waitToDate.getTimeInMillis())
 			return;
 		final Integer countDrugFromWebTable = lp24jdbc.countDrugFromWebTable();
@@ -93,8 +96,17 @@ public class ScheduledTasksClinic {
 		waitToDate = Calendar.getInstance();
 	}
 
-	@Scheduled(fixedRate = 17001)
+	@Scheduled(fixedRate = 107001)
 	public void checkSavedPatient(){
+		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
+		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
+		if(null == readSavedPatient)
+			return;
+		int patientId = (int) readSavedPatient.get("patient_id");
+		lp24jdbc.updateSavedPatientIsChecked(patientId);
+	}
+
+	public void checkSaved_Patient3(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
 		if(null == readSavedPatient)
@@ -104,8 +116,11 @@ public class ScheduledTasksClinic {
 		boolean updateDrugToBlock1 = false;
 		for (Map map : (List<Map>) readJsonDbFile2map.get("prescribesHistory")) {
 			for (Map drugInPatientDocument : (List<Map>) (List) ((Map) map.get("prescribes")).get("tasks")) {
-				logger.debug("\n"+drugInPatientDocument);
+				logger.debug(""+drugInPatientDocument);
 				if(null == drugInPatientDocument)
+					continue;
+				logger.debug(""+drugInPatientDocument.get("changedDrug"));
+				if(true)
 					continue;
 				final Integer drugId = (Integer) drugInPatientDocument.get("DRUG_ID");
 				if(null == drugId)

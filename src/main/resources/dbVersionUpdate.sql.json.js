@@ -38,6 +38,11 @@
 		"sqls" : [
 			"alter table drug1 add column if not exists checked_web_savedts timestamp default dateadd('year',-1,now()) not null"
 		]
+	},{
+		"dbVersionId" : 9,
+		"sqls" : [
+			"create table if not exists tag1 (tag_name varchar(40)  not null, tag_drug_id int , tag_prescribe_id int , tag_pid int , tag_id int default (NEXT VALUE FOR dbid), unique (tag_name), primary key (tag_id), foreign key (tag_pid) references tag1(tag_id), foreign key (tag_drug_id) references drug1(drug_id), foreign key (tag_prescribe_id) references prescribe1(prescribe_id))"
+		]
 	}
 	]
 }

@@ -11,7 +11,8 @@ var config = //first line separate
 			{"title":":КП:Призначеня 24 г/добу" ,"name":"- КП:Призначеня 24 г/добу", "url":"prescribes24h.html"},
 			{"title":"КП::Призначеня","name":"Призначеня::Клінічні протоколи","url":"protocols.html"},
 			{"title":":IX:Призначеня","name":"- IX::Призначеня","url":"patient.html"},
-			{"title":"Ліка додаток","name":"Ліка додаток","url":"drug.html"}
+			{"title":"Ліка додаток","name":"Ліка додаток","url":"drug.html"},
+			{"title":"КП::Теги","name":"Теги","url":"tags.html"}
 		]
 	},
 	"urlPrefix": "",

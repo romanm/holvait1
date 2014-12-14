@@ -2,7 +2,7 @@ cuwyApp.controller('homeCtrl', [ '$scope', '$http', function ($scope, $http) {
 	console.log('homeCtrl');
 	$scope.siteMap = config.siteMap;
 	$scope.selectIndex = 0;
-	$scope.maxSelectIndex = 3;
+	$scope.maxSelectIndex = 4;
 
 	var KeyCodes = {
 		F1 : 112,

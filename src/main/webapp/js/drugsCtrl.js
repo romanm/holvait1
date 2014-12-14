@@ -1,4 +1,5 @@
-cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope, $http, $filter) {
+cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', '$sce', function ($scope, $http, $filter, $sce) {
+
 	$scope.siteMap = config.siteMap.siteMaps[1];
 
 	console.log("drugsCtrl");
@@ -8,6 +9,7 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	$scope.drugListOrArchive = false;
 	$scope.selectDrugIndex = null;
 	$scope.pageDeepPositionIndex = 1;
+	initDeclareListeSite($scope, $http, $sce, $filter);
 
 	$scope.reloadFromDb = function(){
 		$http({
@@ -72,7 +74,14 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', function ($scope
 	}
 
 	$scope.menuDrugList = [
-	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
+	['<i class="fa fa-paste"></i> Копіювати', function ($itemScope) {
+		console.debug('copy');
+		console.debug($itemScope);
+		console.debug($itemScope.drug);
+		copyListImem($itemScope.drug);
+	}],
+	null,
+	['<i class="fa fa-paste"></i> Корекція', function ($itemScope) {
 		console.debug('Edit');
 		$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
 	}],

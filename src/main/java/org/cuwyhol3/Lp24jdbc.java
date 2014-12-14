@@ -225,8 +225,6 @@ public class Lp24jdbc {
 		return update;
 	}
 
-
-
 	public Integer nextDbId() {
 		return jdbcTemplate.queryForObject("select nextval('dbid')", Integer.class);
 	}
@@ -246,6 +244,7 @@ public class Lp24jdbc {
 		dbVersionControlFile.put("dbVersionUpdateList", dbVersionUpdateList);
 		writeJsonDbVersionInitFile(dbVersionControlFile);
 	}
+	
 //-------------------- drug ------------------
 	public List<Map<String, Object>> drug1sList() {
 		String sql = "SELECT * FROM drug1";
@@ -275,6 +274,7 @@ public class Lp24jdbc {
 		int update = jdbcTemplate.update("delete from drug1 where drug_id = ?",drugId);
 		return update;
 	}
+	
 	public Map<String, Object> insertDrug(Map<String, Object> newDrug,final Timestamp timestamp) {
 		String drugName = (String) newDrug.get("DRUG_NAME");
 		jdbcTemplate.update("INSERT INTO drug1 (drug_name,DRUG_SAVEDTS) VALUES (?,?)",drugName,timestamp);
@@ -345,7 +345,7 @@ public class Lp24jdbc {
 //				+ " and DRUG_WEB_SAVEDTS != DRUG_SAVEDTS "
 		logger.debug(sqlDbVersion);
 		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlDbVersion);
-		if(null == queryForList)
+		if(null == queryForList || queryForList.isEmpty())
 			return null;
 		final Map<String, Object> map = queryForList.get(0);
 		return map;
@@ -361,6 +361,37 @@ public class Lp24jdbc {
 	}
 //-------------------- drug-web ------------------END
 //-------------------- drug ------------------END
+//-------------------- tag ------------------
+	public int updateTag(Integer drugId, Integer tagId) {
+		String sql = "UPDATE tag1 SET tag_drug_id = ? WHERE tag_id = ?";
+		int update = this.jdbcTemplate.update(sql, drugId, tagId);
+		return update;
+	}
+	public int addParentTag(Integer tagPId, Integer tagId) {
+		String sql = "UPDATE tag1 SET tag_pid = ? WHERE tag_id = ?";
+		int update = this.jdbcTemplate.update(sql, tagPId, tagId);
+		return update;
+	}
+	public List<Map<String, Object>> tag1sList() {
+		String sql = "select t.*, d.drug_name, t1.tag_id as t1_id, t1.tag_name as t1_name from TAG1 t "
+				+ " left join DRUG1 d on t.TAG_DRUG_ID = d.DRUG_ID"
+				+ " left join TAG1 t1 on t.TAG_PID = t1.TAG_ID";
+		logger.debug("\n"+sql);
+		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
+		return drug1sList;
+	}
+	public Map<String, Object> insertTag(Map<String, Object> newTag,final Timestamp timestamp) {
+		String tagName = (String) newTag.get("TAG_NAME");
+		jdbcTemplate.update("INSERT INTO tag1 (tag_name) VALUES (?)",tagName);
+		String sqlSelectDrug1 = "SELECT tag_id FROM tag1 WHERE tag_name = ? limit 1";
+		List<Map<String, Object>> tag1sList = jdbcTemplate.queryForList(sqlSelectDrug1, tagName);
+		Map<String, Object> nDr = tag1sList.get(0);
+		Integer newTagId = (Integer) nDr.get("DRUG_ID");
+		newTag.put("DRUG_ID", newTagId);
+		return newTag;
+	}
+//-------------------- tag ------------------END
 
+	
 
 }

@@ -41,51 +41,93 @@
 	</span>
 <hr/>
 	<div class="container">
-	<div class="row">
-		<div class="col-xs-6" ng-context-menu="menuPatientUpdate"
-	data-ng-class="{selected:patient.selectPrescribesHistoryIndex == -1 }"
-	>
-		<div data-ng-show="!patient.patientUpdateOpen"
-			data-ng-click="updatePatient()"
-		>
-			<u>{{patient.PATIENT_NAME}}</u><span
-				data-ng-show="patient.PATIENT_HISTORYID"> № іх <u>{{patient.PATIENT_HISTORYID}}
-			</u></span>
-		</div>
-		<div data-ng-show="patient.patientUpdateOpen">
-			<form class="form-inline" role="form">
-				<div class="form-group">
-					<div class="input-group">
-						<div class="input-group-addon">ПІП</div>
-						<input ng-model="patient.PATIENT_NAME" 
-						 auto-focus=""
-						class="form-control" type="text" placeholder="Призвище Ім'я та Побатькові">
-					</div>
+		<div class="row">
+			<div class="col-xs-6" ng-context-menu="menuPatientUpdate"
+				data-ng-class="{selected:patient.selectPrescribesHistoryIndex == -1 }">
+				<div data-ng-show="!patient.patientUpdateOpen"
+					data-ng-click="updatePatient()">
+					<u>{{patient.PATIENT_NAME}}</u><span
+						data-ng-show="patient.PATIENT_HISTORYID"> № іх <u>{{patient.PATIENT_HISTORYID}}
+					</u></span>
 				</div>
-				<div class="form-group">
-					<div class="input-group">
-						<div class="input-group-addon">Nr ІХ</div>
-						<input ng-model="patient.PATIENT_HISTORYID" class="form-control" type="text" placeholder="Номер історії хвороби">
-					</div>
+				<div data-ng-show="patient.patientUpdateOpen">
+					<form class="form-inline" role="form">
+						<div class="form-group">
+							<div class="input-group">
+								<div class="input-group-addon">ПІП</div>
+								<input ng-model="patient.PATIENT_NAME" auto-focus=""
+									class="form-control" type="text"
+									placeholder="Призвище Ім'я та Побатькові">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="input-group">
+								<div class="input-group-addon">Nr ІХ</div>
+								<input ng-model="patient.PATIENT_HISTORYID" class="form-control"
+									type="text" placeholder="Номер історії хвороби">
+							</div>
+						</div>
+						<div class="form-group">
+							<a href="#" title="Далі" class="close navbar-right"
+								data-ng-click="checkPatientUpdated()"> <span
+								class="glyphicon glyphicon-share-alt"></span>
+							</a>
+						</div>
+					</form>
 				</div>
-				<div class="form-group">
-					<a href="#" title="Далі" class="close navbar-right"
-						data-ng-click="checkPatientUpdated()">
-					<span class="glyphicon glyphicon-share-alt"></span>
-					</a>
+			</div>
+			<div class="col-xs-6">
+				<div class="input-group">
+					<span class="input-group-addon">Пошук:</span> <input
+						ng-model="seekPrescribeEdit" type="text" class="form-control"
+						data-ng-change="getSeekPrescribeEdit()"
+						placeholder="ліка / тег / блок" auto-focus="" />
 				</div>
-			</form>
-		</div>
-		</div>
-		<div class="col-xs-6">
-			<div class="input-group">
-				<span class="input-group-addon">Пошук:</span> <input
-					ng-model="seekPatient" type="text" class="form-control"
-					data-ng-change="filterPatients()"
-					placeholder="ліка / тег / блок" auto-focus="" />
 			</div>
 		</div>
 	</div>
+	<div class="container" data-ng-show="seekPrescribeEdit">
+		<div class="row"  data-ng-show="drugDocument">
+			<div class="col-xs-12">
+				<b> {{drugDocument.DRUG_NAME}} </b>
+				<span
+					data-ng-repeat="ddPrescribeHistory in drugDocument.prescribesHistory"
+					data-ng-init="ddPrescribeHistoryIndex = $index;"
+					>
+					Група типових призначень {{ddPrescribeHistoryIndex + 1}} :
+					<span
+						data-ng-repeat="drug in ddPrescribeHistory.prescribes.tasks"
+						data-ng-init="drugIndex = $index">
+					|
+					<span class="mouseover"
+							data-ng-click="addTaskToPrescribeHistory(ddPrescribeHistory, drugIndex)">
+							di11
+						<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>
+						<span data-ng-repeat="drugInline in drug.inlineDrugs"
+							ng-init="drugInlineIndex = $index" >
+							{{drug.splitSymbol}}
+							<span
+							data-ng-show="!prescribeHistory.prescribes.tasks[taskInDayIndex].splitSymbol">+
+							</span> <span ng-bind-html="drugDescription(drugInline)"></span>
+						</span>
+					</span>
+					</span>
+				</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				Медикаменти: <span data-ng-repeat="drug in drug1sListFilter ">
+					<span class="mouseover"
+					data-ng-class="{
+			selectpath:drug1sListFilter[selectDrugIndex] == drug,
+			selected:drug1sListFilter[selectDrugIndex] == drug }"
+					data-ng-click="drugToTask4(drug)"> {{drug.DRUG_NAME}} </span> |
+				</span>
+			</div>
+		</div>
+	</div>
+	<div class="container">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="navbar-right">
@@ -355,7 +397,7 @@
 				<tr>
 					<td><input type="text" class="form-control"
 						data-ng-model="editedPrescribeDrug.DRUG_NAME"
-						data-ng-change="filterDrugs()" auto-focus=""
+						data-ng-change="filterDrugs(editedPrescribeDrug.DRUG_NAME)" auto-focus=""
 						data-ng-focus="changeDialogTab('drug')"
 						placeholder=" пошук / запис"></td>
 					<td> <input id="dose1" 
@@ -509,6 +551,7 @@
 	<script src="/js-vendor/jquery-ui.min.js"></script>
 	<script src="/js-vendor/bootstrap.min.js"></script>
 	<script src="/js-vendor/bootstrap-datepicker.js"></script>
+	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js-vendor/angular-sanitize.min.js"></script>
 	<script src="/js-vendor/ui-bootstrap-tpls-0.11.2.js"></script>

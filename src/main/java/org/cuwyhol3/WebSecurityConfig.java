@@ -39,6 +39,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/help.html"
 						,"/conf.html"
 						,"/showimg.html"
+//						,"/tag1sList"
+						,"/tags.html"
+						,"/tagModel"
+						,"/saveNewTag"
 						//drug
 						,"/drugs.html"
 						,"/drug.html"
@@ -68,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						//edit
 						,"/session/copy"
 						,"/session/paste"
+						,"/tag/paste"
 						//elex
 						,"/elexRea"
 						,"/nextDbId"
