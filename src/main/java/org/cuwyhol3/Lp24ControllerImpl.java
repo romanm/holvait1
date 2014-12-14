@@ -694,18 +694,26 @@ public class Lp24ControllerImpl {
 			
 		}else{
 			final Integer copyDrugId = (Integer) copyObj.get("DRUG_ID");
-			logger.debug(copyDrugId+" / "+copyObj);
-			if(pasteObj.get("TAG_DRUG_ID") != null)
-			{
-				final Integer drugId = (Integer) copyObj.get("DRUG_ID");
-				Integer newTagPid;
-				if(pasteObj.get("TAG_NAME") == null)
-					newTagPid = (Integer) pasteObj.get("TAG_PID");
-				else
-					newTagPid = (Integer) pasteObj.get("TAG_ID");
-				lp24jdbc.insertTagDrugChild(drugId, newTagPid);
+			if(copyDrugId != null){
+				logger.debug(copyDrugId+" / "+copyObj);
+				if(pasteObj.get("TAG_DRUG_ID") != null)
+				{
+					final Integer drugId = (Integer) copyObj.get("DRUG_ID");
+					Integer newTagPid;
+					if(pasteObj.get("TAG_NAME") == null)
+						newTagPid = (Integer) pasteObj.get("TAG_PID");
+					else
+						newTagPid = (Integer) pasteObj.get("TAG_ID");
+					lp24jdbc.insertTagDrugChild(drugId, newTagPid);
+				}else{
+					lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+				}
 			}else{
-				lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+				final Integer copyPrescribeId = (Integer) copyObj.get("PRESCRIBE_ID");
+				if(copyPrescribeId != null){
+					
+				}
+				
 			}
 		}
 		final Map<String, Object> tagModel = tagModel();

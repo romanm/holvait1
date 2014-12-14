@@ -5,6 +5,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 	console.log("protocolsCtrl");
 	$scope.protocolOrder1sList = protocolOrder1sList;
 	$scope.prescribeOrder1sList = prescribeOrder1sList;
+	console.log(prescribeOrder1sList);
 	
 	if(typeof prescribeOrder1sListOpen === 'undefined'){
 		$scope.prescribeOrder1sListOpen = [];

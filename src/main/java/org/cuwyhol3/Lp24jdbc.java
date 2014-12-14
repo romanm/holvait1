@@ -247,7 +247,11 @@ public class Lp24jdbc {
 	
 //-------------------- drug ------------------
 	public List<Map<String, Object>> drug1sList() {
-		String sql = "select d.*, t1.TAG_NAME t1_name from drug1 d left join tag1 t1 on t1.TAG_DRUG_ID = d.DRUG_ID";
+		String sql = "select d.*, t1.TAG_NAME t1_name from drug1 d "
+				+ " left join ("
+				+ "select t1.tag_drug_id, CONCAT(t2.tag_name,t1.tag_name) tag_name from TAG1 t1 "
+				+ " left join tag1 t2 on t1.tag_pid=t2.tag_id and t1.tag_name is null) "
+				+ " t1 on t1.TAG_DRUG_ID = d.DRUG_ID";
 		logger.debug("\n"+sql);
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
