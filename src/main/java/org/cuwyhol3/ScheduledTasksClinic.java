@@ -98,6 +98,9 @@ public class ScheduledTasksClinic {
 
 	@Scheduled(fixedRate = 107001)
 	public void checkSavedPatient(){
+		
+	}
+	public void checkSavedPatient2(){
 		final Map<String, Object> readSavedPatient = lp24jdbc.readSavedPatient();
 		logger.debug(dateFormat.format(new Date())+" - read the newly saved not processed patient == "+readSavedPatient);
 		if(null == readSavedPatient)
@@ -137,7 +140,7 @@ public class ScheduledTasksClinic {
 
 	@Scheduled(fixedRate = 887000)
 	public void reportCurrentTime() {
-		System.out.println("The time is now " + dateFormat.format(new Date()));
+		//System.out.println("The time is now " + dateFormat.format(new Date()));
 	}
 
 

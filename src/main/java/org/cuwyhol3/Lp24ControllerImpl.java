@@ -686,22 +686,30 @@ public class Lp24ControllerImpl {
 	}
 	public Map<String, Object> tagPaste(Map<String, Object> pasteObj, HttpSession session) {
 		final Integer pastePlaceTagId = (Integer) pasteObj.get("TAG_ID");
-		logger.debug(""+pastePlaceTagId+" "+pasteObj);
+		logger.debug(pastePlaceTagId+" / "+pasteObj);
 		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
-		
 		final Integer copyTagId = (Integer) copyObj.get("TAG_ID");
 		if(null != copyTagId){
 			lp24jdbc.addParentTag(pastePlaceTagId, copyTagId);
 			
 		}else{
 			final Integer copyDrugId = (Integer) copyObj.get("DRUG_ID");
-			logger.debug(copyDrugId+" "+copyObj);
-			lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+			logger.debug(copyDrugId+" / "+copyObj);
+			if(pasteObj.get("TAG_DRUG_ID") != null)
+			{
+				final Integer drugId = (Integer) copyObj.get("DRUG_ID");
+				Integer newTagPid;
+				if(pasteObj.get("TAG_NAME") == null)
+					newTagPid = (Integer) pasteObj.get("TAG_PID");
+				else
+					newTagPid = (Integer) pasteObj.get("TAG_ID");
+				lp24jdbc.insertTagDrugChild(drugId, newTagPid);
+			}else{
+				lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+			}
 		}
 		final Map<String, Object> tagModel = tagModel();
 		return tagModel;
-//		final List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
-//		return tag1sList;
 	}
 	public List<Map<String, Object>> tag1sList() {
 		List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
@@ -709,31 +717,59 @@ public class Lp24ControllerImpl {
 	}
 	Map<String, Object> tagModel() {
 		final Map<String, Object> tagMap = new HashMap<String, Object>();
-		Map<Integer, Object> tagTreeMap = new HashMap<Integer, Object>();
+		Map<Integer, Map> tagTreeMap = new HashMap<Integer, Map>();
+		Map<Integer, Map> losChildMaps = new HashMap<Integer, Map>();
+		Map<Integer, Integer> tagsIdIndex = new HashMap<Integer, Integer>();
 		List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
+		int index = 0;
 		for (Map<String, Object> map : tag1sList) {
-			final Integer tag0Id = (Integer) map.get("TAG_ID");
-			final Integer tag1Id = (Integer) map.get("T1_ID");
-			if(null == tag1Id){
-				tagTreeMap.put(tag0Id, map);
-			}else{ 
-				final Integer tag2Id = (Integer) map.get("T2_ID");
-				if(null == tag2Id){
-					final Map tag0Map = (Map) tagTreeMap.get(tag1Id);
-					Map<Integer, Object> childs = getChilds(tag0Map);
-					childs.put(tag0Id, map);
+			final Integer tagId = (Integer) map.get("TAG_ID");
+			tagsIdIndex.put(tagId, index++);
+			final Integer tagPid = (Integer) map.get("TAG_PID");
+			if(losChildMaps.containsKey(tagId)){
+				final Map<Integer, Map> childs = getInitChilds(map);
+				childs.putAll(losChildMaps.get(tagId));
+			}
+			if(null == tagPid){
+				addItem(tagId, tagsIdIndex, tagTreeMap);
+			}else{
+				final Integer tIndex = tagsIdIndex.get(tagPid);
+				if(null == tIndex){
+					Map losChildMap = losChildMaps.get(tagPid);
+					if(losChildMap == null){
+						losChildMap = new HashMap<Integer, Object>();
+						losChildMaps.put(tagPid, losChildMap);
+					}
+					losChildMap.put(tagId, makeTreeIemMap(index));
+				}else{
+					final Map parentMap = tag1sList.get(tIndex);
+					Map<Integer, Map> childs = getInitChilds(parentMap);
+					addItem(tagId, tagsIdIndex, childs);
 				}
 			}
 		}
 		tagMap.put("tag1sList", tag1sList);
 		tagMap.put("tagTree", tagTreeMap);
+		tagMap.put("tagsIdIndex", tagsIdIndex);
 		return tagMap;
 	}
-	private Map<Integer, Object> getChilds(final Map tag0Map) {
-		Map<Integer, Object> childs = (Map<Integer, Object>) tag0Map.get("childs");
+	private void addItem(Integer tagId, Map<Integer, Integer> tagsIdIndex, Map<Integer, Map> parent) {
+		final HashMap<String, Object> treeItemMap = makeTreeIemMap(tagsIdIndex.get(tagId));
+		parent.put(tagId, treeItemMap);
+	}
+	private HashMap<String, Object> makeTreeIemMap(Integer index) {
+		final HashMap<String, Object> treeItemMap = new HashMap<String, Object>();
+		treeItemMap.put("index", index);
+		return treeItemMap;
+	}
+	private void addChild(Map<String, Object> map, final Integer tagId, Map<Integer, Object> parent) {
+		parent.put(tagId, 0);
+	}
+	private Map<Integer, Map> getInitChilds(final Map parentMap) {
+		Map<Integer, Map> childs = (Map<Integer, Map>) parentMap.get("childs");
 		if(null == childs){
-			childs = new HashMap<Integer, Object>();
-			tag0Map.put("childs", childs);
+			childs = new HashMap<Integer, Map>();
+			parentMap.put("childs", childs);
 		}
 		return childs;
 	}

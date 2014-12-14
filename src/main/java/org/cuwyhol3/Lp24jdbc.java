@@ -247,7 +247,7 @@ public class Lp24jdbc {
 	
 //-------------------- drug ------------------
 	public List<Map<String, Object>> drug1sList() {
-		String sql = "SELECT * FROM drug1";
+		String sql = "select d.*, t1.TAG_NAME t1_name from drug1 d left join tag1 t1 on t1.TAG_DRUG_ID = d.DRUG_ID";
 		logger.debug("\n"+sql);
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
@@ -390,7 +390,15 @@ public class Lp24jdbc {
 		newTag.put("DRUG_ID", newTagId);
 		return newTag;
 	}
+	
+	void insertTagDrugChild(final Integer drugId,
+			final Integer newTagPid) {
+		final Integer newTagId = nextDbId();
+		jdbcTemplate.update("INSERT INTO tag1 (TAG_ID, TAG_PID, TAG_DRUG_ID) VALUES (?,?,?)",newTagId,newTagPid,drugId);
+	}
 //-------------------- tag ------------------END
+
+
 
 	
 

@@ -17,6 +17,7 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', '$sce', function
 			url : config.urlPrefix + '/drug1sList'
 		}).success(function(data, status, headers, config) {
 			$scope.drug1sList = data;
+			console.log($scope.drug1sList);
 		}).error(function(data, status, headers, config) {
 			console.log(data);
 		});
