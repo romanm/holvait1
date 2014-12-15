@@ -81,7 +81,10 @@
 					<span class="input-group-addon">Пошук:</span> <input
 						ng-model="seekPrescribeEdit" type="text" class="form-control"
 						data-ng-change="getSeekPrescribeEdit()"
-						placeholder="ліка / тег / блок" auto-focus="" />
+						placeholder="ліка / тег / блок" auto-focus="" /> <span
+						class="input-group-addon" data-ng-show="k2l"> <a href="#"
+						data-ng-click="seekPrescribeEdit = k2l"> {{k2l}} </a>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -101,7 +104,6 @@
 					|
 					<span class="mouseover"
 							data-ng-click="addTaskToPrescribeHistory(ddPrescribeHistory, drugIndex)">
-							di11
 						<span ng-bind-html="taskAndHourDescription(drugIndex, ddPrescribeHistory)"></span>
 						<span data-ng-repeat="drugInline in drug.inlineDrugs"
 							ng-init="drugInlineIndex = $index" >
@@ -131,18 +133,50 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="navbar-right">
-				<a data-ng-click="openPrescribesGroupIndex = -1"> <span
-					class="glyphicon glyphicon-remove"></span>
-				</a> |
-				<span data-ng-repeat="pgPrescribesHistory in prescribesGroup.prescribesHistory" 
-					data-ng-init="pgPrescribesHistoryIndex = $index;" >
-					<a data-ng-click="openGroup(pgPrescribesHistoryIndex)" >
-						{{pgPrescribesHistory.prescribeHistoryDaysNote}}
-					</a>
-					|
-				</span>
+				<ul class="list-inline heightMin">
+					<li class="bold">Теги:</li>
+					<li data-ng-repeat="tag1Index in getMapKeys(tagModel.tagTree)"
+						class="mouseover"
+						data-ng-init="tag1 = tagModel.tag1sList[tagModel.tagsIdIndex[tag1Index]]">
+						<a data-ng-click="clickTag1Index(0, tag1Index)">{{tag1.TAG_NAME}}</a><span
+						data-ng-show="!$last">,</span>
+					</li>
+				</ul>
 			</div>
 		</div>
+	</div>
+	<div class="row" data-ng-show="tagModel.tag1sList[tagModel.tagsIdIndex[tagsPosition[0]]]">
+		<div class="col-xs-12">
+			<div class="navbar-right">
+				<ul class="list-inline heightMin">
+					<li class="bold">{{tagModel.tag1sList[tagModel.tagsIdIndex[tagsPosition[0]]].TAG_NAME}}</li>
+					<li class="mouseover"
+						data-ng-repeat="tag2Index in getMapKeys(tagModel.tag1sList[tagModel.tagsIdIndex[tagsPosition[0]]].childs)"
+						data-ng-init="tag2 = tagModel.tag1sList[tagModel.tagsIdIndex[tag2Index]]">
+						<a data-ng-click="clickTag1Index(1, tag2Index)">{{tag2.TAG_NAME}}</a>
+						<span data-ng-show="!$last">,</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+				<div class="navbar-right">
+					<a data-ng-click="openPrescribesGroupIndex = -1"> <span
+						class="glyphicon glyphicon-remove"></span>
+					</a> | <span
+						data-ng-repeat="pgPrescribesHistory in prescribesGroup.prescribesHistory"
+						data-ng-init="pgPrescribesHistoryIndex = $index;"> <a
+						data-ng-click="openGroup(pgPrescribesHistoryIndex)">
+							{{pgPrescribesHistory.prescribeHistoryDaysNote}} </a> |
+					</span>
+					<a
+						data-ng-click="openPrescribesGroupIndex = -1"> <span
+							class="glyphicon glyphicon-remove"></span>
+					</a>
+				</div>
+			</div>
 	</div>
 	<div class="row">
 		<div class="col-xs-12">
@@ -185,8 +219,8 @@
 					</a>
 					</span>
 					<span data-ng-context-menu="menuNoDelDayBlock"
-						data-ng-show="prescribeHistory.deleteDay"> Позначено для
-						вилучення. Призначення містить
+						data-ng-show="prescribeHistory.deleteDay"> 
+						Позначено для вилучення. Призначення містить
 						{{prescribeHistory.prescribes.tasks.length}} ліків. </span>
 					<!--
 				<a href="#" data-ng-click="collapseDayPrescribe(prescribeHistoryIndex)" ></a>

@@ -19,6 +19,14 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 
 	initDeclarePrescribesEdit($scope, $http, $sce, $filter);
 
+	$scope.readDbTagModel();
+	
+	$scope.tagsPosition = [];
+	$scope.clickTag1Index = function(position, tag1Index){
+		console.log(tag1Index);
+		$scope.tagsPosition[position] = tag1Index;
+	}
+
 	console.log("------patientLp24hCtrl-------------");
 	$http({ method : 'GET', url : config.urlPrefix + '/read/patient_'+$scope.parameters.id
 	}).success(function(data, status, headers, config) {

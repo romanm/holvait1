@@ -336,6 +336,9 @@ initWorkDocument = function(data, $scope, $http){
 		$scope.newPrescribes();
 		changeSaveControl($scope, $http);
 	}
+	angular.forEach($scope.patient.prescribesHistory, function(value, key){
+		value.deleteDay = false;
+	} );
 	initPrescribesTasksInDay($scope);
 	if(typeof $scope.patient.selectPrescribesHistoryIndex === 'undefined'){
 		$scope.patient.selectPrescribesHistoryIndex = 0;
@@ -367,10 +370,8 @@ initDeclareListeSite = function($scope, $http, $sce, $filter){
 	copyListImem = function(drug){
 		contextMenuCopy(drug, $http);
 	};
-
-
-
 }
+
 initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	initDeclarePrescribesCommon($scope, $http, $sce, $filter);
 	$scope.hourMoveWay = 0;
@@ -439,11 +440,28 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		return $scope.dayHourInSelectPath(dayHourIndex, taskInDayIndex, prescribeHistory) && ($scope.patient.pageDeepPositionIndex == 3);
 	}
 	//---------data-ng-class-----------------------------------END
+	var k2lMap = {
+		"й":"q","ц":"w","у":"e","к":"r","е":"t","н":"y","г":"u","ш":"i","щ":"o","з":"p","х":"[","ъ":"]",
+		"ф":"a","ы":"s","в":"d","а":"f","п":"g","р":"h","о":"j","л":"k","д":"l","ж":";","э":"'",
+		"я":"z","ч":"x","с":"c","м":"v","и":"b","т":"n","ь":"m","б":",","ю":"."
+	}
+	$scope.k2l = null;
 	$scope.getSeekPrescribeEdit = function(){
 		console.log($scope.selectDrugIndex);
 		console.log($scope.seekPrescribeEdit);
 		$scope.filterDrugs($scope.seekPrescribeEdit);
 		console.log($scope.drug1sListFilter);
+		$scope.k2l = null;
+		if($scope.drug1sListFilter.length == 0){
+			var k2l = "";
+			angular.forEach($scope.seekPrescribeEdit, function(value, key){
+				k2l += k2lMap[value];
+			});
+			$scope.filterDrugs(k2l);
+			if($scope.drug1sListFilter.length > 0){
+				$scope.k2l = k2l;
+			}
+		}
 	}
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
 		if($scope.patient.selectPrescribesHistoryIndex == -1){
@@ -1554,6 +1572,16 @@ $scope.$on('keydown', function(msg, obj){
 }
 
 initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
+
+	$scope.readDbTagModel = function(){
+		$http({ method : 'GET', url : config.urlPrefix + '/tagModel'
+		}).success(function(data, status, headers, config) {
+			console.log(data);
+			$scope.tagModel = data;
+		}).error(function(data, status, headers, config) {
+			console.log(data);
+		});
+	};
 
 	$scope.getMapKeys = function(map) {
 		if(typeof map === 'undefined'){

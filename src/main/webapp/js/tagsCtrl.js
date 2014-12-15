@@ -2,20 +2,8 @@ cuwyApp.controller('tagsCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 	console.log("tagsCtrl");
 	$scope.siteMap = config.siteMap.siteMaps[6];
 	initDeclareListeSite($scope, $http, $sce, $filter);
-	
-	$scope.reloadFromDb = function(){
-		$http({
-			method : 'GET',
-			url : config.urlPrefix + '/tagModel'
-		}).success(function(data, status, headers, config) {
-			console.log(data);
-			$scope.tagModel = data;
-		}).error(function(data, status, headers, config) {
-			console.log(data);
-		});
-	}
 
-	$scope.reloadFromDb();
+	$scope.readDbTagModel();
 
 	$scope.saveNewTag = function(){
 		console.log("saveNewTag");

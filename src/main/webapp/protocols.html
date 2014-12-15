@@ -73,6 +73,7 @@
 					<td>{{prescribe.PRESCRIBE_ID}}</td>
 					<td ng-context-menu="menuPrescribeList" ng-show="!prescribe.updateDialogOpen"
 						data-ng-class="{bold:prescribe.PRESCRIBE_RECOMMEND}"
+						class="mouseover"
 					>
 					<a href="prescribes24h.html?id={{prescribe.PRESCRIBE_ID}}">
 						{{prescribe.PRESCRIBE_NAME}}
@@ -175,10 +176,10 @@
 	<script src="/db/protocolOrder1sList.json.js"></script>
 	<script src="/db/prescribeOrder1sList.json.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
-	<!--  
-	-->
 	<script src="http://sah.curepathway.com/db/prescribeOrder1sListOpen.json.js"></script>
 	<script src="http://sah.curepathway.com/db/protocolOrder1sListOpen.json.js"></script>
+	<!--  
+	-->
 	<script src="/js/protocolsCtrl.js"></script>
 
 </body>

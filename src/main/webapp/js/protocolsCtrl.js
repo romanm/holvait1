@@ -1,11 +1,13 @@
 //var cuwyApp = angular.module('cuwyApp', ['ui.bootstrap']);
-cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http) {
+cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', '$filter', '$sce', function ($scope, $http, $filter, $sce) {
+
 	$scope.siteMap = config.siteMap.siteMaps[3];
 
 	console.log("protocolsCtrl");
 	$scope.protocolOrder1sList = protocolOrder1sList;
 	$scope.prescribeOrder1sList = prescribeOrder1sList;
 	console.log(prescribeOrder1sList);
+	initDeclareListeSite($scope, $http, $sce, $filter);
 	
 	if(typeof prescribeOrder1sListOpen === 'undefined'){
 		$scope.prescribeOrder1sListOpen = [];
@@ -73,11 +75,20 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		});
 	}
 
+//---------------------menu-------------------------------
 	$scope.menuPrescribeList = [
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		console.debug('Edit');
 		console.log($itemScope);
 		$itemScope.prescribe.updateDialogOpen = !$itemScope.prescribe.updateDialogOpen;
+	}],
+	null,
+	['<span class="glyphicon glyphicon-edit"></span> Копіювати', function ($itemScope) {
+		console.debug('Копіювати');
+		console.log($itemScope);
+		console.debug($itemScope);
+		console.debug($itemScope.prescribe);
+		copyListImem($itemScope.prescribe);
 	}],
 	null,
 	['<span class="glyphicon glyphicon-floppy-remove"></span> Перевести в архів', function ($itemScope) {
@@ -126,6 +137,7 @@ cuwyApp.controller('protocolsCtrl', [ '$scope', '$http', function ($scope, $http
 		$itemScope.drug.updateDialogOpen = !$itemScope.drug.updateDialogOpen;
 	}]
 	];
+//---------------------menu-------------------------------END
 //---------------------keydown-------------------------------
 
 	$scope.keys = [];

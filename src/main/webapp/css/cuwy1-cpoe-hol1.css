@@ -26,6 +26,9 @@
 	background-color: AliceBlue ;
 	*/
 }
+ul.heightMin {
+	margin-bottom:0;
+}
 table.dose{
 	width: 600px;
 	/*
