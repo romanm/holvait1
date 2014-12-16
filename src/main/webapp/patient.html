@@ -119,12 +119,16 @@
 		</div>
 		<div class="row">
 			<div class="col-xs-12">
-				Медикаменти: <span data-ng-repeat="drug in drug1sListFilter ">
+				<div>
+					Медикаменти: <span> {{drug1sListFilter[0].DRUG_NAME}} </span>
+				</div>
+				<span data-ng-repeat="drug in drug1sListFilter ">
 					<span class="mouseover"
+					data-ng-show="$index > 0"
 					data-ng-class="{
 			selectpath:drug1sListFilter[selectDrugIndex] == drug,
 			selected:drug1sListFilter[selectDrugIndex] == drug }"
-					data-ng-click="drugToTask4(drug)"> {{drug.DRUG_NAME}} </span> |
+					data-ng-click="drugToTask4(drug)"> {{drug.DRUG_NAME}} | </span>
 				</span>
 			</div>
 		</div>
@@ -585,7 +589,6 @@
 	<script src="/js-vendor/jquery-ui.min.js"></script>
 	<script src="/js-vendor/bootstrap.min.js"></script>
 	<script src="/js-vendor/bootstrap-datepicker.js"></script>
-	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js-vendor/angular.min.js"></script>
 	<script src="/js-vendor/angular-sanitize.min.js"></script>
 	<script src="/js-vendor/ui-bootstrap-tpls-0.11.2.js"></script>

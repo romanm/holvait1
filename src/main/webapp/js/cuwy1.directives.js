@@ -228,10 +228,20 @@ cuwyApp.directive('ngBlur', function() {
 
 //--------------patientLp24/prescribes24------------------------------
 
+extendToDrugDocument = function(drugsList, position, $scope, $http){
+	$http({ method : 'GET', url : config.urlPrefix + '/read/drug_' + drugsList[position].DRUG_ID
+	}).success(function(data, status, headers, config) {
+		$scope.drugDocument = data
+		drugsList[position] = $scope.drugDocument;
+		console.log($scope.drugsList);
+	}).error(function(data, status, headers, config) {
+		$scope.drugDocument = null;
+	});
+}
 readDrugDocument = function(drug, $scope, $http){
 	$http({ method : 'GET', url : config.urlPrefix + '/read/drug_'+drug.DRUG_ID
 	}).success(function(data, status, headers, config) {
-	console.log(data);
+		console.log(data);
 		$scope.drugDocument = data;
 	}).error(function(data, status, headers, config) {
 		$scope.drugDocument = null;
@@ -446,6 +456,7 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 		"я":"z","ч":"x","с":"c","м":"v","и":"b","т":"n","ь":"m","б":",","ю":"."
 	}
 	$scope.k2l = null;
+	
 	$scope.getSeekPrescribeEdit = function(){
 		console.log($scope.selectDrugIndex);
 		console.log($scope.seekPrescribeEdit);
@@ -461,6 +472,9 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 			if($scope.drug1sListFilter.length > 0){
 				$scope.k2l = k2l;
 			}
+		}
+		if($scope.drug1sListFilter.length > 0){
+			extendToDrugDocument($scope.drug1sListFilter, 0, $scope, $http);
 		}
 	}
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
@@ -1073,7 +1087,7 @@ $scope.keys.push({ code : KeyCodes.PageDown,
 		console.log("PageDown - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex >= 2){
 			if($scope.editedPrescribeHistory.selectDrugIndex < $scope.editedPrescribeHistory.prescribes.tasks.length - 1){
-				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length - 1;
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length;
 			}else{
 				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.tasksInDay.length - 1;
 			}
@@ -1085,10 +1099,10 @@ $scope.keys.push({ code : KeyCodes.PageUp,
 	action : function() {
 		console.log("PageUp - deep - "+$scope.workDoc.pageDeepPositionIndex);
 		if($scope.workDoc.pageDeepPositionIndex >= 2){
-			if($scope.editedPrescribeHistory.selectDrugIndex == 0){
-				$scope.editedPrescribeHistory.selectDrugIndex = -1;
-			}else{
+			if($scope.editedPrescribeHistory.selectDrugIndex <= $scope.editedPrescribeHistory.prescribes.tasks.length ){
 				$scope.editedPrescribeHistory.selectDrugIndex = 0;
+			}else{
+				$scope.editedPrescribeHistory.selectDrugIndex = $scope.editedPrescribeHistory.prescribes.tasks.length;
 			}
 		}
 	}
@@ -1530,6 +1544,11 @@ $scope.$on('keydown', function(msg, obj){
 		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, insertPosition);
 	}
 	$scope.addTaskToPrescribeHistory = function(drugPrescribeHistory, selectDrugIndex){
+		//correction position for drug inserts
+		if($scope.editedPrescribeDrug.DRUG_NAME != null){
+			$scope.editedPrescribeHistory.prescribes.tasks.splice($scope.editedPrescribeHistory.selectDrugIndex, 0, null);
+			initEditedPrescribeDrugForEdit($scope.editedPrescribeHistory, $scope.editedPrescribeHistory.selectDrugIndex, $scope);
+		}
 		addTaskToPrescribeHistoryInPosition(drugPrescribeHistory, selectDrugIndex, $scope.editedPrescribeHistory.selectDrugIndex);
 	}
 
