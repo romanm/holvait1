@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Lp24RestController {
 	private static final Logger logger = LoggerFactory.getLogger(Lp24RestController.class);
-	
+
 //	@Autowired private ScheduledTasksWeb scheduledTasks;
 	@Autowired private ScheduledTasksClinic scheduledTasks;
 
@@ -136,11 +136,23 @@ public class Lp24RestController {
 	public @ResponseBody Map<String, Object> sessionPaste(HttpSession session){
 		return lp24Controller.sessionPaste(session);
 	}
+	@RequestMapping(value = "/tag/delete", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> tagDelete(
+			@RequestBody Map<String, Object> pasteObj, HttpSession session){
+		logger.debug("/tag/delete");
+		return lp24Controller.tagDelete(pasteObj, session);
+	}
+	@RequestMapping(value = "/tag/drugDelete", method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> tagDrugDelete(
+			@RequestBody Map<String, Object> pasteObj, HttpSession session){
+		logger.debug("/tag/drugDelete");
+		return lp24Controller.tagDrugDelete(pasteObj, session);
+	}
 	@RequestMapping(value = "/tag/paste", method = RequestMethod.POST)
 	public @ResponseBody Map<String, Object> tagPaste(
-			@RequestBody Map<String, Object> copyObj, HttpSession session){
+			@RequestBody Map<String, Object> pasteObj, HttpSession session){
 		logger.debug("/tag/paste");
-		return lp24Controller.tagPaste(copyObj, session);
+		return lp24Controller.tagPaste(pasteObj, session);
 	}
 
 	//------------------drug----------------------

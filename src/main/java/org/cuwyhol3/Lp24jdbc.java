@@ -65,6 +65,7 @@ public class Lp24jdbc {
 		for (Map map : sqlVersionUpdateList) {
 			final Integer dbVersionId = (Integer) map.get("dbVersionId");
 			if(dbVersionId > thisDbVersionId){
+				logger.debug("update DB structure to version"+dbVersionId);
 				final List<String> sqls = (List<String>) map.get("sqls");
 				for (String sql : sqls) {
 					if(sql.indexOf("sql_update")>0){
@@ -77,6 +78,7 @@ public class Lp24jdbc {
 							
 						}
 					}else{
+						logger.debug(sql);
 						jdbcTemplate.update(sql);
 					}
 				}
@@ -229,6 +231,10 @@ public class Lp24jdbc {
 		return jdbcTemplate.queryForObject("select nextval('dbid')", Integer.class);
 	}
 
+	Integer selectForInteger(final String sql, int intParameter) {
+		return jdbcTemplate.queryForObject(sql, Integer.class, intParameter);
+	}
+
 	private void initDbVersionControl() {
 		Map<String, Object> dbVersionControlFile = new HashMap<String, Object>();
 		List<Map<String, Object>> dbVersionUpdateList = new ArrayList<Map<String, Object>>();
@@ -366,20 +372,32 @@ public class Lp24jdbc {
 //-------------------- drug-web ------------------END
 //-------------------- drug ------------------END
 //-------------------- tag ------------------
-	public int updateTag(Integer drugId, Integer tagId) {
+	public int deleteTag(Integer tagId) {
+		String sql = "delete tag1 WHERE tag_id = ?";
+		int update = this.jdbcTemplate.update(sql, tagId);
+		return update;
+	}
+	public int updateTagPrescribe(Integer prescribeId, Integer tagId) {
+		String sql = "UPDATE tag1 SET tag_Prescribe_id = ? WHERE tag_id = ?";
+		int update = this.jdbcTemplate.update(sql, prescribeId, tagId);
+		return update;
+	}
+	public int updateTagDrug(Integer drugId, Integer tagId) {
 		String sql = "UPDATE tag1 SET tag_drug_id = ? WHERE tag_id = ?";
 		int update = this.jdbcTemplate.update(sql, drugId, tagId);
 		return update;
 	}
-	public int addParentTag(Integer tagPId, Integer tagId) {
+	public int updateParentTag(Integer tagPId, Integer tagId) {
 		String sql = "UPDATE tag1 SET tag_pid = ? WHERE tag_id = ?";
 		int update = this.jdbcTemplate.update(sql, tagPId, tagId);
 		return update;
 	}
 	public List<Map<String, Object>> tag1sList() {
-		String sql = "select t.*, d.drug_name, t1.tag_id as t1_id, t1.tag_name as t1_name from TAG1 t "
-				+ " left join DRUG1 d on t.TAG_DRUG_ID = d.DRUG_ID"
-				+ " left join TAG1 t1 on t.TAG_PID = t1.TAG_ID";
+		String sql = "select t.*, d.drug_name, p.prescribe_name, tt.tag_name as tag_tag_name, t1.tag_id as t1_id, t1.tag_name as t1_name from TAG1 t "
+				+ " left join TAG1 t1 on t.TAG_PID = t1.TAG_ID "
+				+ " left join DRUG1 d on t.TAG_DRUG_ID = d.DRUG_ID "
+				+ " left join prescribe1 p on t.TAG_prescribe_ID = p.prescribe_ID "
+				+ " left join TAG1 tt on t.TAG_TAG_ID = tt.TAG_ID";
 		logger.debug("\n"+sql);
 		List<Map<String, Object>> drug1sList = jdbcTemplate.queryForList(sql);
 		return drug1sList;
@@ -395,10 +413,19 @@ public class Lp24jdbc {
 		return newTag;
 	}
 	
-	void insertTagDrugChild(final Integer drugId,
-			final Integer newTagPid) {
+	void insertTagTagChild(final Integer tagTagId, final Integer tagPid) {
 		final Integer newTagId = nextDbId();
-		jdbcTemplate.update("INSERT INTO tag1 (TAG_ID, TAG_PID, TAG_DRUG_ID) VALUES (?,?,?)",newTagId,newTagPid,drugId);
+		final String sql = "INSERT INTO tag1 (TAG_ID, TAG_PID, TAG_TAG_ID) VALUES (?,?,?)";
+		logger.debug(sql.replaceFirst("\\?", ""+newTagId).replaceFirst("\\?", ""+tagPid).replaceFirst("\\?", ""+tagTagId));
+		jdbcTemplate.update(sql, newTagId, tagPid, tagTagId);
+	}
+	void insertTagDrugChild(final Integer drugId, final Integer tagPid) {
+		final Integer newTagId = nextDbId();
+		jdbcTemplate.update("INSERT INTO tag1 (TAG_ID, TAG_PID, TAG_DRUG_ID) VALUES (?,?,?)", newTagId, tagPid, drugId);
+	}
+	void insertTagPrescribeChild(final Integer prescribeId, final Integer tagPid) {
+		final Integer newTagId = nextDbId();
+		jdbcTemplate.update("INSERT INTO tag1 (TAG_ID, TAG_PID, TAG_PRESCRIBE_ID) VALUES (?,?,?)", newTagId, tagPid, prescribeId);
 	}
 //-------------------- tag ------------------END
 

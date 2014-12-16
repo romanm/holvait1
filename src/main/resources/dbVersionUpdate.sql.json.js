@@ -48,6 +48,12 @@
 		"sqls" : [
 			"alter table tag1 alter column tag_name set null"
 		]
+	},{
+		"dbVersionId" : 11,
+		"sqls" : [
+			"alter table TAG1 add column if not exists tag_tag_id int"
+			,"alter table TAG1 add foreign key (tag_tag_id) references (tag_id)"
+		]
 	}
 	]
 }

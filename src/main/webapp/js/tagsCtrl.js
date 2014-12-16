@@ -23,32 +23,41 @@ cuwyApp.controller('tagsCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 		});
 	}
 
-	tagPaste = function($itemScope){
+	postTagToRest = function($itemScope, urlRest){
 		console.debug($itemScope);
-		$http({ method : 'POST', data : $itemScope.tag, url : config.urlPrefix + '/tag/paste'
+		$http({ method : 'POST', data : $itemScope.tag, url : config.urlPrefix + urlRest
 		}).success(function(data, status, headers, config) {
 			console.log(data);
-			$scope.tag1sList = data;
+			$scope.tagModel = data;
 		}).error(function(data, status, headers, config) {
 		});
 	};
 
+	$scope.menuTagDrugItem = [
+	['<i class="fa fa-copy"></i> Видалити', function ($itemScope) {
+		console.debug('delete');
+		postTagToRest($itemScope,'/tag/drugDelete');
+	}]
+	];
+
 	$scope.menuTagListItem = [
 	['<i class="fa fa-copy"></i> Копіювати', function ($itemScope) {
 		console.debug('copy');
-		console.debug($itemScope);
-		console.debug($itemScope.tag);
 		copyListImem($itemScope.tag);
 	}],
 	['<i class="fa fa-paste"></i> Вставити', function ($itemScope) {
 		console.debug('paste');
-		console.debug($itemScope.tag);
-		tagPaste($itemScope);
+		postTagToRest($itemScope,'/tag/paste');
 	}],
 	null,
 	['<span class="glyphicon glyphicon-edit"></span> Корекція', function ($itemScope) {
 		console.debug('Edit');
 		$itemScope.drug.drugUpdateOpen = !$itemScope.drug.drugUpdateOpen;
+	}],
+	null,
+	['<i class="fa fa-copy"></i> Видалити', function ($itemScope) {
+		console.debug('delete');
+		postTagToRest($itemScope,'/tag/delete');
 	}]
 	];
 	

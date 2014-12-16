@@ -73,6 +73,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						,"/session/copy"
 						,"/session/paste"
 						,"/tag/paste"
+						,"/tag/drugDelete"
+						,"/tag/delete"
 						//elex
 						,"/elexRea"
 						,"/nextDbId"

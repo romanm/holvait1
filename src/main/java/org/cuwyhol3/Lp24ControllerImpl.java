@@ -684,41 +684,90 @@ public class Lp24ControllerImpl {
 		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
 		return copyObj;
 	}
+
+	public Map<String, Object> tagDelete(Map<String, Object> tagDelete, HttpSession session) {
+		Integer tagId = (Integer) tagDelete.get("TAG_ID");
+		final Integer usedCount = lp24jdbc.selectForInteger("select count(*) from tag1 where ? in (tag_pid,tag_tag_id)",tagId);
+		final Map<String, Object> tagModel;
+		if(usedCount>0){
+			tagModel = tagModel();
+			final String string = "Неможливо видалити - використовується "
+					+ usedCount
+					+" "+ (usedCount==1?"раз":(usedCount>4?"разів": " рази"));
+			writeError(tagId, tagModel, string);
+		}else if(tagDelete.get("DRUG_NAME") != null){
+			tagModel = tagModel();
+			final String string = "Неможливо видалити - використовує медикамент ";
+			writeError(tagId, tagModel, string);
+		}else{
+			lp24jdbc.deleteTag(tagId);
+			tagModel = tagModel();
+		}
+		return tagModel;
+	}
+	private void writeError(Integer intParameter,
+			final Map<String, Object> tagModel, final String string) {
+		Integer index = (Integer) ((Map) tagModel.get("tagsIdIndex")).get(intParameter);
+		List tag1sList = (List) tagModel.get("tag1sList");
+		final Map newPasteObj = (Map) tag1sList.get(index);
+		newPasteObj.put("error", string);
+	}
+
+	public Map<String, Object> tagDrugDelete(Map<String, Object> pasteObj, HttpSession session) {
+		final Integer pastePlaceTagId = (Integer) pasteObj.get("TAG_ID");
+		logger.debug(pastePlaceTagId+" / "+pasteObj);
+		lp24jdbc.updateTagDrug(null, pastePlaceTagId);
+		final Map<String, Object> tagModel = tagModel();
+		return tagModel;
+	}
 	public Map<String, Object> tagPaste(Map<String, Object> pasteObj, HttpSession session) {
 		final Integer pastePlaceTagId = (Integer) pasteObj.get("TAG_ID");
 		logger.debug(pastePlaceTagId+" / "+pasteObj);
 		Map<String, Object> copyObj = (Map<String, Object>) session.getAttribute("copyObj");
 		final Integer copyTagId = (Integer) copyObj.get("TAG_ID");
+		logger.debug(copyTagId+" / "+copyObj);
 		if(null != copyTagId){
-			lp24jdbc.addParentTag(pastePlaceTagId, copyTagId);
-			
+			logger.debug(""+pastePlaceTagId);
+			logger.debug(""+pasteObj.get("TAG_PID"));
+			if(pasteObj.get("TAG_PID") != null){
+				lp24jdbc.updateParentTag(pastePlaceTagId, copyTagId);
+			}else{
+				lp24jdbc.insertTagTagChild(copyTagId, pastePlaceTagId);
+			}
 		}else{
 			final Integer copyDrugId = (Integer) copyObj.get("DRUG_ID");
 			if(copyDrugId != null){
-				logger.debug(copyDrugId+" / "+copyObj);
 				if(pasteObj.get("TAG_DRUG_ID") != null)
 				{
-					final Integer drugId = (Integer) copyObj.get("DRUG_ID");
-					Integer newTagPid;
-					if(pasteObj.get("TAG_NAME") == null)
-						newTagPid = (Integer) pasteObj.get("TAG_PID");
-					else
-						newTagPid = (Integer) pasteObj.get("TAG_ID");
-					lp24jdbc.insertTagDrugChild(drugId, newTagPid);
+					lp24jdbc.insertTagDrugChild(copyDrugId, getTagPid(pasteObj));
 				}else{
-					lp24jdbc.updateTag(copyDrugId, pastePlaceTagId);
+					lp24jdbc.updateTagDrug(copyDrugId, pastePlaceTagId);
 				}
 			}else{
 				final Integer copyPrescribeId = (Integer) copyObj.get("PRESCRIBE_ID");
+				logger.debug(copyPrescribeId+" / "+copyObj);
 				if(copyPrescribeId != null){
-					
+					if(pasteObj.get("TAG_PRESCRIBE_ID") != null)
+					{
+						lp24jdbc.insertTagPrescribeChild(copyDrugId, getTagPid(pasteObj));
+					}else{
+						lp24jdbc.updateTagPrescribe(copyPrescribeId, pastePlaceTagId);
+					}
 				}
-				
 			}
 		}
 		final Map<String, Object> tagModel = tagModel();
 		return tagModel;
 	}
+	private Integer getTagPid(Map<String, Object> pasteObj) {
+		Integer newTagPid;
+		if(pasteObj.get("TAG_NAME") == null)
+			newTagPid = (Integer) pasteObj.get("TAG_PID");
+		else
+			newTagPid = (Integer) pasteObj.get("TAG_ID");
+		return newTagPid;
+	}
+
 	public List<Map<String, Object>> tag1sList() {
 		List<Map<String, Object>> tag1sList = lp24jdbc.tag1sList();
 		return tag1sList;
