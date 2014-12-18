@@ -2,8 +2,9 @@ cuwyApp.controller('tagsCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 	console.log("tagsCtrl");
 	$scope.siteMap = config.siteMap.siteMaps[6];
 	initDeclareListeSite($scope, $http, $sce, $filter);
-
-	$scope.readDbTagModel();
+	$scope.tagModel = tagModel;
+	console.log(tagModel);
+	//$scope.readDbTagModel();
 
 	$scope.saveNewTag = function(){
 		console.log("saveNewTag");
@@ -22,7 +23,12 @@ cuwyApp.controller('tagsCtrl', [ '$scope', '$http', '$filter', '$sce', function 
 			$scope.error = data;
 		});
 	}
-
+	$scope.filterTags = function(){
+//		var f1 = $filter('filter')($scope.drug1sList, {DRUG_ARCHIVE:$scope.drugListOrArchive});
+//		var f2 = $filter('filter')(f1, $scope.seekDrug);
+		filterTag($scope.seekTag);
+	}
+	$scope.filterTags();
 	postTagToRest = function($itemScope, urlRest){
 		console.debug($itemScope);
 		$http({ method : 'POST', data : $itemScope.tag, url : config.urlPrefix + urlRest

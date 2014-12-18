@@ -773,7 +773,7 @@ public class Lp24ControllerImpl {
 		return tag1sList;
 	}
 	Map<String, Object> tagModel() {
-		final Map<String, Object> tagMap = new HashMap<String, Object>();
+		final Map<String, Object> tagModel = new HashMap<String, Object>();
 		Map<Integer, Map> tagTreeMap = new HashMap<Integer, Map>();
 		Map<Integer, Map> losChildMaps = new HashMap<Integer, Map>();
 		Map<Integer, Integer> tagsIdIndex = new HashMap<Integer, Integer>();
@@ -805,10 +805,11 @@ public class Lp24ControllerImpl {
 				}
 			}
 		}
-		tagMap.put("tag1sList", tag1sList);
-		tagMap.put("tagTree", tagTreeMap);
-		tagMap.put("tagsIdIndex", tagsIdIndex);
-		return tagMap;
+		tagModel.put("tag1sList", tag1sList);
+		tagModel.put("tagTree", tagTreeMap);
+		tagModel.put("tagsIdIndex", tagsIdIndex);
+		writeToJsDbFile("var tagModel = ", tagModel, lp24Config.tagModelJsFileName);
+		return tagModel;
 	}
 	private void addItem(Integer tagId, Map<Integer, Integer> tagsIdIndex, Map<Integer, Map> parent) {
 		final HashMap<String, Object> treeItemMap = makeTreeIemMap(tagsIdIndex.get(tagId));

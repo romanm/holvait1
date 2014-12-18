@@ -86,12 +86,14 @@
 						data-ng-dblclick="openItem($index)"
 					>
 						<td>{{$index+1}}</td>
-						<td ng-context-menu="menuDrugList" ng-show="!drug.drugUpdateOpen">
+						<td ng-context-menu="menuDrugList" data-ng-show="!drug.drugUpdateOpen">
 							<a id="drug_{{drug.DRUG_ID}}" href="drug.html?id={{drug.DRUG_ID}}">
 							{{drug.DRUG_NAME}}
 							</a>
 						</td>
 						<td>{{drug.DRUG_ID}}</td>
+						<td><span class="label label-default" data-ng-show="drug.T1_NAME">{{drug.T1_NAME}}
+						</span></td>
 						<td ng-context-menu="menuDrugList" ng-show="drug.drugUpdateOpen">
 							<div class="row">
 								<div class="col-xs-5">

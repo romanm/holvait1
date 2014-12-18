@@ -61,14 +61,20 @@
 			<div class="col-xs-6">
 				<table width="100%" class="table11hover">
 					<tr> <th>ID</th> <th>Тег</th> <th>Прив’язка</th> </tr>
+					<!-- 
 					<tr data-ng-repeat-start="tag in tagModel.tag1sList">
+					 -->
+					<tr data-ng-repeat-start="tag in tag1sListFilter">
 						<td>{{tag.TAG_ID}}</td>
-						<td ng-context-menu="menuTagListItem" class="mouseover">{{tag.TAG_NAME}}</td>
+						<td ng-context-menu="menuTagListItem" class="mouseover"><span
+							class="label label-default" data-ng-show="tag.TAG_NAME">{{tag.TAG_NAME}}
+						</span></td>
 						<td><span class="mouseover" ng-context-menu="menuTagDrugItem">{{tag.DRUG_NAME}}</span>
-						{{tag.TAG_TAG_NAME}}
-						{{tag.PRESCRIBE_NAME}}
-						<span
-							data-ng-show="tag.DRUG_NAME||tag.TAG_TAG_NAME||tag.PRESCRIBE_NAME">:</span> {{tag.T1_NAME}}</td>
+							<span class="label label-default" data-ng-show="tag.TAG_TAG_NAME">{{tag.TAG_TAG_NAME}}
+						</span> {{tag.PRESCRIBE_NAME}} <span
+							data-ng-show="tag.DRUG_NAME||tag.TAG_TAG_NAME||tag.PRESCRIBE_NAME">:</span><span
+							class="label label-primary" data-ng-show="tag.T1_NAME">{{tag.T1_NAME}} </span>
+							</td>
 					</tr>
 					<tr data-ng-repeat-end="" data-ng-show="tag.error">
 						<td colspan="3">
@@ -83,16 +89,15 @@
 				<ul>
 					<li data-ng-repeat="tag1Index in getMapKeys(tagModel.tagTree)"
 						data-ng-init="tag1 = tagModel.tag1sList[tagModel.tagsIdIndex[tag1Index]]">
-						{{tag1.TAG_NAME}}
+						<span class="label label-default" data-ng-show="tag1.TAG_NAME">{{tag1.TAG_NAME}}</span>
 						<ul data-ng-show="tag1.childs">
 							<li data-ng-repeat="tag2Index in getMapKeys(tag1.childs)"
 								data-ng-init="tag2 = tagModel.tag1sList[tagModel.tagsIdIndex[tag2Index]]">
-								{{tag2.TAG_NAME}} {{tag2.TAG_TAG_NAME}} <span
-								data-ng-show="tag2.DRUG_NAME || tag2.PRESCRIBE_NAME">-</span> 
-								{{tag2.PRESCRIBE_NAME}}
-								<span
-								data-ng-show="tag2.DRUG_NAME"> {{tag2.DRUG_NAME}}<span
-									data-ng-show="tag2.childs">,</span>
+								<span class="label label-default"
+								data-ng-show="tag2.TAG_NAME||tag2.TAG_TAG_NAME">{{tag2.TAG_NAME}}{{tag2.TAG_TAG_NAME}}</span>
+								<span data-ng-show="tag2.DRUG_NAME || tag2.PRESCRIBE_NAME">-</span>
+								{{tag2.PRESCRIBE_NAME}} <span data-ng-show="tag2.DRUG_NAME">
+									{{tag2.DRUG_NAME}}<span data-ng-show="tag2.childs">,</span>
 							</span> <span data-ng-repeat="tag3Index in getMapKeys(tag2.childs)"
 								data-ng-init="tag3 = tagModel.tag1sList[tagModel.tagsIdIndex[tag3Index]]"
 								data-ng-show="tag3.DRUG_NAME"> {{tag3.DRUG_NAME}}<span
@@ -101,7 +106,10 @@
 								<ul data-ng-show="tag2.childs">
 									<li data-ng-repeat="tag3Index in getMapKeys(tag2.childs)"
 										data-ng-init="tag3 = tagModel.tag1sList[tagModel.tagsIdIndex[tag3Index]]"
-										data-ng-show="tag3.TAG_NAME">{{tag3.TAG_NAME}}</li>
+										data-ng-show="tag3.TAG_NAME"><span
+										class="label label-default"
+										data-ng-show="tag3.TAG_NAME||tag3.TAG_TAG_NAME">{{tag3.TAG_NAME}}{{tag3.TAG_TAG_NAME}}</span>
+									</li>
 								</ul>
 							</li>
 						</ul>
@@ -120,6 +128,7 @@
 	<script src='/js-vendor/textAngular.min.js'></script>
 	<script src="/db/cuwy1.config.js"></script>
 	<script src="/db/drug1sList.json.js"></script>
+	<script src="/db/tagModel.json.js"></script>
 	<script src="/js/cuwy1.directives.js"></script>
 	<script src="/js/tagsCtrl.js"></script>
 

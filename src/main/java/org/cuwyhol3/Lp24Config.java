@@ -71,5 +71,6 @@ public class Lp24Config {
 	static String prescribeOrder1sListOpenJsFileName = "prescribeOrder1sListOpen.json.js";
 	static String patient1sListJsFileName = "patient1sList.json.js";
 	static String drug1sListJsFileName = "drug1sList.json.js";
+	static String tagModelJsFileName = "tagModel.json.js";
 
 }

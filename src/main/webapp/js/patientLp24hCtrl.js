@@ -25,6 +25,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 	$scope.clickTag1Index = function(position, tag1Index){
 		console.log(tag1Index);
 		$scope.tagsPosition[position] = tag1Index;
+		console.log($scope.tagsPosition);
 	}
 
 	console.log("------patientLp24hCtrl-------------");
@@ -39,6 +40,7 @@ cuwyApp.controller('patientLp24hCtrl', [ '$scope', '$http', '$filter', '$sce', f
 		}
 	}).error(function(data, status, headers, config) {
 	});
+
 	$http({ method : 'GET', url : config.urlPrefix + '/read' + urlServer + '/prescribe_14'
 	}).success(function(prescribesGroup, status, headers, config) {
 		$scope.prescribesGroup = prescribesGroup;

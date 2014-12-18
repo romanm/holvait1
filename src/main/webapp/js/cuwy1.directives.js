@@ -452,30 +452,57 @@ initDeclarePrescribesEdit = function($scope, $http, $sce, $filter){
 	//---------data-ng-class-----------------------------------END
 	var k2lMap = {
 		"й":"q","ц":"w","у":"e","к":"r","е":"t","н":"y","г":"u","ш":"i","щ":"o","з":"p","х":"[","ъ":"]",
-		"ф":"a","ы":"s","в":"d","а":"f","п":"g","р":"h","о":"j","л":"k","д":"l","ж":";","э":"'",
+		"ф":"a","і":"s","в":"d","а":"f","п":"g","р":"h","о":"j","л":"k","д":"l","ж":";","э":"'",
 		"я":"z","ч":"x","с":"c","м":"v","и":"b","т":"n","ь":"m","б":",","ю":"."
+	}
+	var l2kMap = {
+		"q":"й","w":"ц","e":"у","r":"к","t":"е","y":"н","u":"г","i":"ш","o":"щ","p":"з","[":"х","]":"ъ",
+		"a":"ф","s":"і","d":"в","f":"а","g":"п","h":"р","j":"о","k":"л","l":"д",";":"ж","'":"э",
+		"z":"я","x":"ч","c":"с","v":"м","b":"и","n":"т","m":"ь",",":"б",".":"ю"
 	}
 	$scope.k2l = null;
 	
 	$scope.getSeekPrescribeEdit = function(){
 		console.log($scope.selectDrugIndex);
 		console.log($scope.seekPrescribeEdit);
-		$scope.filterDrugs($scope.seekPrescribeEdit);
-		console.log($scope.drug1sListFilter);
+		filterTag($scope.seekPrescribeEdit);
 		$scope.k2l = null;
+		if($scope.tag1sListFilter.length == 0){
+			var k2l = changeLanquage($scope.seekPrescribeEdit);
+			filterTag(k2l);
+		}
+		if($scope.tag1sListFilter.length > 0){
+			console.log($scope.tag1sListFilter[0]);
+		}
+		console.log($scope.tag1sListFilter);
+		$scope.filterDrugs($scope.seekPrescribeEdit);
 		if($scope.drug1sListFilter.length == 0){
-			var k2l = "";
-			angular.forEach($scope.seekPrescribeEdit, function(value, key){
-				k2l += k2lMap[value];
-			});
+			var k2l = changeLanquage($scope.seekPrescribeEdit);
+			console.log(k2l);
 			$scope.filterDrugs(k2l);
 			if($scope.drug1sListFilter.length > 0){
 				$scope.k2l = k2l;
 			}
 		}
+		console.log($scope.drug1sListFilter);
 		if($scope.drug1sListFilter.length > 0){
 			extendToDrugDocument($scope.drug1sListFilter, 0, $scope, $http);
 		}
+		console.log($scope.drugDocument);
+	}
+
+	changeLanquage = function(str){
+		var k2l = "";
+		if($scope.seekPrescribeEdit.substring(0,1) in l2kMap){
+			angular.forEach($scope.seekPrescribeEdit, function(value, key){
+				k2l += l2kMap[value];
+			});
+		}else{
+			angular.forEach($scope.seekPrescribeEdit, function(value, key){
+				k2l += k2lMap[value];
+			});
+		}
+		return k2l;
 	}
 	$scope.collapseDayPrescribe = function(prescribeHistoryIndex){
 		if($scope.patient.selectPrescribesHistoryIndex == -1){
@@ -1591,6 +1618,14 @@ $scope.$on('keydown', function(msg, obj){
 }
 
 initDeclarePrescribesCommon = function($scope, $http, $sce, $filter){
+
+	filterTag = function(seekTag){
+		console.log("seekTag "+seekTag);
+		var f2 = $filter('filter')($scope.tagModel.tag1sList, seekTag);
+		$scope.tag1sListFilterLength =f2.length;
+		$scope.tag1sListFilter = $filter('limitTo')(f2, 24);
+		console.log($scope.tag1sListFilter);
+	}
 
 	$scope.readDbTagModel = function(){
 		$http({ method : 'GET', url : config.urlPrefix + '/tagModel'

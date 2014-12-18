@@ -33,6 +33,7 @@ cuwyApp.controller('drugsCtrl', [ '$scope', '$http', '$filter', '$sce', function
 		$scope.drug1sListFilterLength =f2.length;
 		$scope.drug1sListFilter = $filter('limitTo')(f2, 24);
 		$scope.drug1sListFilter = $filter('orderBy')($scope.drug1sListFilter, $scope.predicate, $scope.reverse);
+		console.log($scope.drug1sListFilter);
 	}
 	$scope.filterDrugs();
 
